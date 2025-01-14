@@ -64,6 +64,7 @@ export default {
   		},
 		fontFamily: {
 			title : ["var(--font-title)", "var(--font-geist-sans)", "arial"],
+			poppins: ["var(--poppins)"],
 		},
   		borderRadius: {
   			lg: 'var(--radius)',

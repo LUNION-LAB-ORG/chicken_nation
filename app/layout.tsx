@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import "./globals.css";
 import localFont from "next/font/local";
 
@@ -15,6 +15,14 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+const poppins = Poppins (
+  {
+    variable: "--poppins",
+    subsets: ["latin"],
+    weight: ["500"]
+  }
+);
 
 const title = localFont({
    src: "../public/assets/fonts/Blocklyn_Font/Blocklyn-Grunge.otf",
@@ -34,9 +42,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${title.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${title.variable} antialiased`}
       >
-        <Providers>{children}</Providers>  
+      <div className="font-poppins">
+          <Providers>{children}</Providers> 
+      </div> 
       </body>
     </html>
   );
