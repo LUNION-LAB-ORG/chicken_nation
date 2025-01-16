@@ -5,6 +5,8 @@ import localFont from "next/font/local";
 
 
   import { Providers } from "@/providers/providers";
+import Head from "@/components/home/navbar/navbar";
+import Footer from "@/components/home/footer/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,7 +47,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${title.variable} antialiased`}
       >
       <div className="font-poppins">
-          <Providers>{children}</Providers> 
+        <Head/>
+          <Providers>{children}</Providers>
+        <Footer/>
       </div> 
       </body>
     </html>

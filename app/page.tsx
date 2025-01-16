@@ -14,7 +14,7 @@ import Testimonial from "@/components/home/testimonial/testimonial";
 export default function Home() {
   return (
     <div>
-      <Head/>
+
       <Hero/>
       <About/>
       <Service/>
