@@ -12,17 +12,11 @@ import {
   Link,
   Button,
 } from "@nextui-org/react";
+import { Search, ShoppingCart } from "lucide-react";
 
-export const AcmeLogo = () => {
+export const ChickenLogo = () => {
   return (
-    <svg fill="none" height="36" viewBox="0 0 32 32" width="36">
-      <path
-        clipRule="evenodd"
-        d="M17.6482 10.1305L15.8785 7.02583L7.02979 22.5499H10.5278L17.6482 10.1305ZM19.8798 14.0457L18.11 17.1983L19.394 19.4511H16.8453L15.1056 22.5499H24.7272L19.8798 14.0457Z"
-        fill="currentColor"
-        fillRule="evenodd"
-      />
-    </svg>
+    <img src="assets/images/logo_1.png" alt="Chicken Nation" />
   );
 };
 
@@ -30,66 +24,66 @@ export default function Head() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const menuItems = [
-    "Profile",
-    "Dashboard",
-    "Activity",
-    "Analytics",
-    "System",
-    "Deployments",
-    "My Settings",
-    "Team Settings",
-    "Help & Feedback",
-    "Log Out",
+    "Accueil",
+    "Histoire",
+    "Nos restaurants",
+    "Franchise",
   ];
 
   return (
-    <Navbar onMenuOpenChange={setIsMenuOpen}>
+    <Navbar 
+      onMenuOpenChange={setIsMenuOpen} 
+      className="bg-[#F26522]"
+      maxWidth="full"
+    >
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          className="sm:hidden"
+          className="sm:hidden text-white"
         />
         <NavbarBrand>
-          <AcmeLogo />
-          <p className="font-bold text-inherit">ACME</p>
+          <ChickenLogo />
+          <p className="font-bold text-white text-xl ml-2">CHICKEN NATION</p>
         </NavbarBrand>
       </NavbarContent>
 
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem>
-          <Link color="foreground" href="#">
-            Features
-          </Link>
-        </NavbarItem>
-        <NavbarItem isActive>
-          <Link aria-current="page" href="#">
-            Customers
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" href="#">
-            Integrations
-          </Link>
-        </NavbarItem>
+      <NavbarContent className="hidden sm:flex gap-6" justify="center">
+        {menuItems.map((item, index) => (
+          <NavbarItem key={item} isActive={index === 0}>
+            <Link 
+              href="#" 
+              className={`text-white ${index === 0 ? 'bg-white/20 px-4 py-2 rounded' : ''}`}
+            >
+              {item}
+            </Link>
+          </NavbarItem>
+        ))}
       </NavbarContent>
+
       <NavbarContent justify="end">
-        <NavbarItem className="hidden lg:flex">
-            <Button href="#">Login</Button>
+        <NavbarItem>
+          <Search className="text-white" size={24}/>
         </NavbarItem>
         <NavbarItem>
-          <Button as={Link} color="primary" href="#" variant="flat">
-            Sign Up
+          <ShoppingCart className="text-white" size={24}/>
+        </NavbarItem>
+        <NavbarItem>
+          <Button
+            as={Link}
+            className="bg-[#8B4513] text-white font-semibold"
+            href="#"
+            variant="flat"
+          >
+            Connexion
           </Button>
         </NavbarItem>
       </NavbarContent>
-      <NavbarMenu>
+
+      <NavbarMenu className="bg-[#F26522]">
         {menuItems.map((item, index) => (
           <NavbarMenuItem key={`${item}-${index}`}>
             <Link
-              className="w-full"
-              color={
-                index === 2 ? "primary" : index === menuItems.length - 1 ? "danger" : "foreground"
-              }
+              className="w-full text-white"
               href="#"
               size="lg"
             >
@@ -101,4 +95,3 @@ export default function Head() {
     </Navbar>
   );
 }
-
