@@ -6,7 +6,7 @@ export default function Hero() {
     <div className="relative w-full h-screen overflow-hidden">
       {/* Background Pattern */}
       <img
-        className="absolute inset-0"
+        className="absolute inset-0 w-full h-full object-cove"
         src="assets/images/backgrounds/background1.png"
         alt="title"
         />

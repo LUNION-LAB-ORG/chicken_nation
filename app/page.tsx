@@ -23,7 +23,6 @@ export default function Home() {
       <OderFood/>
       <Testimonial/>
       <Faq/>
-      <Footer/>
     </div>
   );
 }
