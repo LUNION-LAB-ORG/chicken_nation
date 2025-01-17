@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Navbar,
   NavbarBrand,
@@ -13,6 +13,7 @@ import {
   Button,
 } from "@nextui-org/react";
 import { Search, ShoppingCart } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export const ChickenLogo = () => {
   return (
@@ -21,10 +22,11 @@ export const ChickenLogo = () => {
 };
 
 export default function Head() {
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   const menuItems = [
-    { name: "Accueil", link: "#" },
+    { name: "Accueil", link: "/" },
     { name: "Histoire", link: "/histoire" },
     { name: "Nos restaurants", link: "/restaurants" },
     { name: "Franchise", link: "/franchise" },
@@ -44,39 +46,42 @@ export default function Head() {
         />
         <NavbarBrand>
           <ChickenLogo />
-          <p className="font-bold text-white text-xl ml-2">CHICKEN NATION</p>
+          <p className="hidden md:block font-bold text-white text-xl ml-2">CHICKEN NATION</p>
         </NavbarBrand>
       </NavbarContent>
 
-      {/* Menu Principal */}
-      <NavbarContent className="hidden sm:flex gap-6" justify="center">
-        {menuItems.map((item, index) => (
-          <NavbarItem key={item.name}>
-            <Link
-              href={item.link}
-              className={`text-white ${
-                index === 0 ? "bg-white/20 px-4 py-2 rounded" : ""
-              }`}
-            >
-              {item.name}
-            </Link>
-          </NavbarItem>
-        ))}
-      </NavbarContent>
 
-      {/* Actions à droite */}
+       <NavbarContent className="hidden sm:flex gap-6" justify="center">
+      {menuItems.map((item) => (
+        <NavbarItem
+          key={item.name}
+          className={`${
+            pathname === item.link ? "bg-white clip-polygon-custom text-primary py-1 px-2" : ""
+          }`}
+        >
+          <Link
+            href={item.link}
+            className="text-white px-4 py-2 rounded hover:bg-white/10 transition"
+          >
+            {item.name}
+          </Link>
+        </NavbarItem>
+      ))}
+    </NavbarContent>
+
+
       <NavbarContent justify="end">
         <NavbarItem>
           <Search className="text-white cursor-pointer" size={24} />
         </NavbarItem>
         <NavbarItem>
-          <ShoppingCart className="text-white cursor-pointer" size={24} />
+          <ShoppingCart className="text-white cursor-pointer hidden md:block" size={24} />
         </NavbarItem>
         <NavbarItem>
           <Button
             as={Link}
-            className="bg-primary-800 text-white font-semibold"
-            href="/connexion"
+            className="hidden md:flex bg-primary-800 text-white font-semibold"
+            href="#"
             variant="flat"
           >
             Connexion
@@ -84,15 +89,25 @@ export default function Head() {
         </NavbarItem>
       </NavbarContent>
 
-      {/* Menu Mobile */}
+
       <NavbarMenu className="bg-primary">
         {menuItems.map((item) => (
           <NavbarMenuItem key={item.name}>
-            <Link className="w-full text-white" href={item.link}>
+            <Link className="w-full h-full text-white" href={item.link}>
               {item.name}
             </Link>
           </NavbarMenuItem>
         ))}
+        <NavbarItem>
+          <Button
+            as={Link}
+            className=" bg-primary-800 text-white font-semibold w-full"
+            href="#"
+            variant="flat"
+          >
+            Connexion
+          </Button>
+        </NavbarItem>
       </NavbarMenu>
     </Navbar>
   );

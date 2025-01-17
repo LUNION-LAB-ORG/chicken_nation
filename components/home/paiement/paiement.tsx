@@ -47,8 +47,7 @@ export default function Paiement() {
                                 </div>
                             </div>
                             ))}
-                        </div>
-            
+                        </div>    
     </div>
   );
 }
