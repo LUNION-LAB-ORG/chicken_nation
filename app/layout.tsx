@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Poppins } from "next/font/google";
+import "./globals.css";
 import localFont from "next/font/local";
 
-import "./globals.css";
-import { Providers } from "@/providers/providers";
+
+  import { Providers } from "@/providers/providers";
+import Head from "@/components/home/navbar/navbar";
+import Footer from "@/components/home/footer/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,10 +18,18 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const poppins = Poppins (
+  {
+    variable: "--poppins",
+    subsets: ["latin"],
+    weight: ["500"]
+  }
+);
+
 const title = localFont({
-  src: "../public/assets/fonts/Blocklyn_Font/Blocklyn-Grunge.otf",
-  variable: "--font-title",
-});
+   src: "../public/assets/fonts/Blocklyn_Font/Blocklyn-Grunge.otf",
+   variable: "--font-title", 
+  });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -33,10 +44,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${title.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${title.variable} antialiased`}
       >
-        <Providers>{children}</Providers>
+      <div className="font-poppins">
+        <Head/>
+          <Providers>{children}</Providers>
+        <Footer/>
+      </div> 
       </body>
     </html>
   );
 }
+
+
