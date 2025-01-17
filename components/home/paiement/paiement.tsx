@@ -29,25 +29,25 @@ export default function Paiement() {
         />
       </div>
       <div className="bg-primary w-full h-40 absolute bottom-0"></div>      
-                        <div className="absolute bottom-10 flex flex-col md:flex-row justify-center items-center gap-8">
-                            {paymentData.map((item, index) => (
-                            <div key={index} className="flex-1 min-w-[250px]">
-                                <div className="p-6 flex flex-col items-center text-center">
-                                <div className="w-32 h-32 bg-white rounded-2xl shadow-lg flex items-center justify-center mb-4">
-                                    <Image
-                                    src={item.icon}
-                                    alt="Payment method"
-                                    width={48}
-                                    height={48}
-                                    />
-                                </div>
-                                <p className="text-sm text-white">
-                                    {item.description}
-                                </p>
-                                </div>
+              <div className="absolute bottom-10 flex flex-col md:flex-row justify-center items-center gap-8">
+                      {paymentData.map((item, index) => (
+                      <div key={index} className="flex-1 min-w-[250px]">
+                            <div className="p-6 flex flex-col items-center text-center">
+                            <div className="w-32 h-32 bg-white rounded-2xl shadow-lg flex items-center justify-center mb-4">
+                                  <Image
+                                  src={item.icon}
+                                  alt="Payment method"
+                                  width={48}
+                                  height={48}
+                                  />
                             </div>
-                            ))}
-                        </div>    
+                            <p className="text-sm text-white">
+                                {item.description}
+                            </p>
+                            </div>
+                          </div>
+                          ))}
+                      </div>    
     </div>
   );
 }
