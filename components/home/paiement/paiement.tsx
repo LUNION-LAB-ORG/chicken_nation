@@ -18,23 +18,23 @@ export default function Paiement() {
   ];
 
   return (
-    <div className="relative">
+    <div className="relative bg-primary-100 pt-16 md:pt-0">
       {/* Background Image */}
-      <div className="h-96 w-full">
+      <div className="bg-primary-100 md:bg-transparent h-auto md:h-96 w-full">
         <Image
           src="/assets/images/backgrounds/special-menu.png"
           alt="Food background"
           width={1920}
           height={1080}
-          className="w-full h-full object-cover"
+          className="hidden md:block w-full h-full object-cover"
         />
       </div>
       
       {/* Background overlay */}
-      <div className="bg-primary w-full h-40 absolute bottom-0"></div>      
+      <div className="bg-primary-100 md:bg-primary w-full h-40 absolute bottom-0"></div>      
       
       {/* Cards container */}
-      <div className="relative md:absolute bottom-10 w-full px-4">
+      <div className="relative md:absolute my-auto md:my-auto bottom-10 w-full px-4">
         <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 max-w-6xl mx-auto">
           {paymentData.map((item, index) => (
             <div 

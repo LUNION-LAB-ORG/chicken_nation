@@ -18,9 +18,9 @@ export default function OderFood() {
 
       {/* Content Container */}
       <div className="relative z-10 max-w-7xl mx-auto px-4">
-        <div className="bg-white relative rounded-3xl p-12 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="bg-transparent md:bg-white relative rounded-3xl p-12 flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Left Image */}
-          <div className="absolute left-0 top-0 w-24 h-24">
+          <div className="hidden md:block absolute left-0 top-0 w-24 h-24">
             <Image
               src="/assets/images/illustrations/page-accueil/chicken.png"
               alt="Chicken bucket"
@@ -30,17 +30,17 @@ export default function OderFood() {
           </div>
 
           {/* Center Content */}
-          <div className="flex-1 flex flex-col items-center gap-4">
-            <h2 className="text-primary text-xl md:text-2xl font-semibold text-center md:text-left">
+          <div className="flex-1 flex flex-col items-center gap-10 md:gap-4">
+            <h2 className="text-white md:text-primary text-xl md:text-2xl font-normal md:font-semibold text-center md:text-left">
               Commandez votre déjeuner aujourd`&apos;`hui avec Chicken Nation
             </h2>
 
             {/* Form */}
-            <div className="w-full relative max-w-md flex bg-primary-100 rounded-full">
+            <div className="w-full relative max-w-md flex flex-col gap-4 md:gap-0 md:flex-row bg-transparent md:bg-primary-100 rounded-none md:rounded-full">
               <input
                 type="email"
                 placeholder="Adresse e-mail"
-                className="relative z-10 flex-1 px-6 py-3 w-full rounded-l-full text-primary-900 placeholder-primary-900 bg-orange-200 border-none"
+                className="relative z-10 flex-1 px-6 py-3 w-full rounded-full md:rounded-l-full text-primary-900 placeholder-primary-900 bg-orange-200 border-none"
               />
               <Button className="px-12 py-8 text-white bg-primary-800 rounded-full ">
                 Réserver
@@ -49,7 +49,7 @@ export default function OderFood() {
           </div>
 
           {/* Right Image */}
-          <div className="absolute bottom-0 right-0 w-24 h-24">
+          <div className="hidden md:block absolute bottom-0 right-0 w-24 h-24">
             <Image
               src="/assets/images/illustrations/page-accueil/repas-items-1.png"
               alt="Meal"

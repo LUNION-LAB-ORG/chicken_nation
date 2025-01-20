@@ -40,9 +40,9 @@ export default function Special() {
   ];
 
   return (
-    <section className="w-full max-w-7xl mx-auto p-20">
+    <section className="w-full max-w-7xl mx-auto p-10">
       <div className="relative">
-        <div className="flex justify-between">
+        <div className="flex justify-between gap-4">
           {/* Header */}
           <h1 className="text-4xl font-title font-bold text-primary mb-8">SPECIAL DEAL</h1>
 

@@ -1,4 +1,4 @@
-import {Accordion, AccordionItem} from "@nextui-org/react";
+import { Accordion, AccordionItem } from "@nextui-org/react";
 
 export default function AccordionComponent() {
   const defaultContent =
@@ -6,16 +6,36 @@ export default function AccordionComponent() {
 
   return (
     <Accordion variant="splitted" className="text-primary-800">
-      <AccordionItem key="1" aria-label="Accordion 1" title="Comment peut t-on faire une réservation ?" className="bg-primary-50 text-primary-800">
+      <AccordionItem
+        key="1"
+        aria-label="Accordion 1"
+        title="Comment peut t-on faire une réservation ?"
+        className="bg-primary-50 text-primary-800 text-sm p-2" // Réduit la taille du texte et le padding
+      >
         {defaultContent}
       </AccordionItem>
-      <AccordionItem key="2" aria-label="Accordion 2" title="Proposez-vous des options végétariennes ?" className="bg-primary-50 text-primary-800">
+      <AccordionItem
+        key="2"
+        aria-label="Accordion 2"
+        title="Proposez-vous des options végétariennes ?"
+        className="bg-primary-50 text-primary-800 text-sm p-2" // Réduit la taille du texte et le padding
+      >
         {defaultContent}
       </AccordionItem>
-      <AccordionItem key="3" aria-label="Accordion 3" title="Le stationnement est-il disponilble ?" className="bg-primary-50 text-primary-800">
+      <AccordionItem
+        key="3"
+        aria-label="Accordion 3"
+        title="Le stationnement est-il disponible ?"
+        className="bg-primary-50 text-primary-800 text-sm p-2" // Réduit la taille du texte et le padding
+      >
         {defaultContent}
       </AccordionItem>
-      <AccordionItem key="4" aria-label="Accordion 4" title="Quels sont vos horaires d'ouverture ?" className="bg-primary-50 text-primary-800">
+      <AccordionItem
+        key="4"
+        aria-label="Accordion 4"
+        title="Quels sont vos horaires d'ouverture ?"
+        className="bg-primary-50 text-primary-800 text-sm p-2" // Réduit la taille du texte et le padding
+      >
         {defaultContent}
       </AccordionItem>
     </Accordion>
