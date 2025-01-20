@@ -1,5 +1,6 @@
 import React from 'react';
 import { Facebook, Github, Instagram,  } from 'lucide-react';
+import Image from 'next/image';
 
 const Footer = () => {
   return (
@@ -36,11 +37,12 @@ const Footer = () => {
         <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo Section */}
           <div className="flex flex-col items-center md:items-start">
-            <div className="w-32 h-32">
-              <img
-                src="assets/images/logo_2.png"
+            <div className="w-32 h-32 relative">
+              <Image
+                src="/assets/images/logo_2.png"
                 alt="Chicken Nation"
-                className="w-full h-full object-contain"
+                layout="fill" // Permet d'adapter l'image à la taille de son conteneur
+                objectFit="contain" // Équivalent à "object-contain" en CSS
               />
             </div>
           </div>

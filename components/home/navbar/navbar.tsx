@@ -14,10 +14,17 @@ import {
 } from "@nextui-org/react";
 import { Search, ShoppingCart } from "lucide-react";
 import { usePathname } from "next/navigation";
+import Image from 'next/image';
 
 export const ChickenLogo = () => {
   return (
-    <img src="assets/images/logo_1.png" alt="Chicken Nation Logo" />
+    <Image
+      src="/assets/images/logo_1.png"
+      alt="Chicken Nation Logo"
+      width={50} // Ajoutez la largeur (en pixels)
+      height={50} // Ajoutez la hauteur (en pixels)
+      priority // Optionnel, si vous voulez donner la priorité à ce chargement
+    />
   );
 };
 

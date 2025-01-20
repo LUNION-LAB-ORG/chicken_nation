@@ -1,4 +1,4 @@
-
+import Image from 'next/image';
 
 const Items = [
     {
@@ -21,7 +21,6 @@ const Items = [
     },
 ]
 
-
 export default function Testimonial(){
     return(
         <div className="bg-primary-50">
@@ -29,13 +28,19 @@ export default function Testimonial(){
             <div className="flex justify-center">
             {Items.map((list)=>(
                 <div key={list.id} className="relative bg-white flex flex-col gap-6 justify-between text-start items-start m-8 p-2 rounded-2xl">
-                <div className="text-primary pl-4">★★★★<span>★</span></div>
-                <div>{list.text}</div>
-                <div>
-                    <div>{list.name}</div>
+                    <div className="text-primary pl-4">★★★★<span>★</span></div>
+                    <div>{list.text}</div>
+                    <div>
+                        <div>{list.name}</div>
+                    </div>
+                    <Image 
+                        src={`/${list.picture}`}
+                        alt="frite"
+                        width={100}
+                        height={100}
+                        className="absolute bottom-0 right-0 overflow-hidden"
+                    /> 
                 </div>
-                <img src={list.picture} alt="frite" className="absolute bottom-0 right-0 overflow-hidden" /> 
-            </div>
             ))}
             </div>
         </div>

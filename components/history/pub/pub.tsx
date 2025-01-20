@@ -1,13 +1,17 @@
 import { PlayCircle } from "lucide-react";
+import Image from 'next/image';
 
 export default function Pub() {
   return (
     <div className="relative w-full h-screen overflow-hidden rounded-2xl">
       {/* Background Pattern */}
-      <img
-        className="absolute object-cover w-full h-full"
-        src="assets/images/illustrations/histoire/histoire-2.png"
+      <Image
+        className="absolute object-cover"
+        src="/assets/images/illustrations/histoire/histoire-2.png"
         alt="title"
+        fill
+        priority
+        sizes="100vw"
       />
       {/* Overlay */}
       <div className="bg-black/30 w-full h-full absolute inset-0"></div>
