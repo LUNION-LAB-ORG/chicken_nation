@@ -32,7 +32,7 @@ export default function Eat() {
         {restaurants.map((restaurant) => (
           <div
             key={restaurant.id}
-            className="flex flex-col md:flex-row gap-6 bg-gray-100 rounded-2xl"
+            className="flex flex-col md:flex-row gap-6 items-center bg-white md:bg-gray-100 rounded-2xl"
           >
             {/* Image Section */}
             <div className="flex-shrink-0 relative">
@@ -41,7 +41,7 @@ export default function Eat() {
                 alt={restaurant.imageAlt}
                 width={250}
                 height={150}
-                className="rounded-2xl"
+                className="rounded-xl"
               />
               <Button
                 color="primary"
@@ -60,7 +60,7 @@ export default function Eat() {
                   alt="Chicken Nation logo"
                   width={64}
                   height={64}
-                  className="w-16 h-16"
+                  className="w-16 h-16 hidden md:block"
                 />
                 {/* Text Content */}
                 <div className="flex flex-col justify-center">
@@ -79,9 +79,9 @@ export default function Eat() {
       </div>
 
       {/* Future Restaurants Section */}
-      <div className="flex flex-row gap-8 w-full bg-gray-100 my-8 rounded-lg">
+      <div className="flex flex-col md:flex-row items-center gap-8 w-full bg-white md:bg-gray-100 my-8 rounded-lg">
         <Image
-          src="/assets/images/illustrations/restaurant/card-items-3.png"
+          src="/assets/images/illustrations/restaurant/card-items-4.png"
           alt="Prochaine ouverture 2025"
           width={256}
           height={256}
