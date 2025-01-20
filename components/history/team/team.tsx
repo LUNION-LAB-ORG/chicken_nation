@@ -7,7 +7,7 @@ export default function Team() {
       <div className="font-title text-3xl text-center text-primary my-8">
         NOTRE EQUIPE
       </div>
-      <div className="flex flex-row justify-between gap-4">
+      <div className="flex flex-col-reverse md:flex-row justify-between gap-4">
         <div className="relative w-80 h-80">
           <Image
             src="/assets/images/illustrations/histoire/histoire-4.png"

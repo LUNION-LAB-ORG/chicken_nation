@@ -7,7 +7,7 @@ export default function Skill() {
       <div className="font-title text-3xl text-center text-primary my-8">
         NOTRE SAVOIR-FAIRE
       </div>
-      <div className="flex flex-row-reverse justify-between gap-4 p-6 m-4">
+      <div className="flex flex-col-reverse md:flex-row-reverse justify-between gap-4 p-6 m-4">
         <div className="relative w-80 h-80">
           <Image
             src="/assets/images/illustrations/histoire/histoire-3.png"
@@ -40,7 +40,7 @@ export default function Skill() {
               envies.
             </div>
           </div>
-          <Button color="primary" className="w-fit self-start px-8">
+          <Button color="primary" className="hidden md:block w-fit self-start px-8">
             Commander en ligne
           </Button>
         </div>

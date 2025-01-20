@@ -2,14 +2,21 @@ import Image from 'next/image';
 
 export default function About(){
     return(
-        <div className="flex flex-row justify-between gap-4 p-6 m-4">
+        <div className="flex flex-col md:flex-row justify-between gap-4 p-6 m-4">
             <div className="relative">
                 <Image 
                     src="/assets/images/illustrations/histoire/histoire-1.png" 
                     alt="histoire-1" 
                     width={500}  
                     height={600} 
-                    className="object-contain"
+                    className="object-contain hidden md:block"
+                />
+                <Image 
+                    src="/assets/images/illustrations/histoire/Play.png" 
+                    alt="histoire-1" 
+                    width={500}  
+                    height={600} 
+                    className="object-contain block md:hidden"
                 />
             </div>
             <div className="flex flex-col gap-8">

@@ -9,10 +9,10 @@ const serviceItems = [
 export default function Quality(){
     return(
         <div className="bg-white px-4 py-10 my-8 flex flex-col justify-center gap-6 items-center">
-            <div className="font-title text-4xl">DES VALEURS QUI <span className="text-primary">NOUS ANIMENT</span></div>
-            <div className="bg-white relative flex gap-6 justify-center items-center">
+            <div className="font-title text-4xl text-center">DES VALEURS QUI <span className="text-primary">NOUS ANIMENT</span></div>
+            <div className="bg-white relative flex flex-col md:flex-row gap-6 justify-center items-center">
                 {serviceItems.map((item)=>(
-                    <div key={item.id} className="bg-white flex flex-col p-4 justify-between items-center gap-4 rounded-2xl">
+                    <div key={item.id} className="bg-white flex flex-col p-4 justify-between items-center gap-1 md:gap-4 rounded-2xl">
                         <div className="relative w-30 h-30">
                             <Image 
                                 src={`/${item.picture}`} 

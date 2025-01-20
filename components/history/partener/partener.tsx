@@ -1,7 +1,7 @@
 import Image from 'next/image';
 
 const serviceItems = [
-    {id:1, name:"TURBO DELIVERY", picture:"assets/images/illustrations/histoire/partenaire-1.png"},
+    {id:1, name:"TURBO", picture:"assets/images/illustrations/histoire/partenaire-1.png"},
     {id:2, name:"JUMIA FOOD", picture:"assets/images/illustrations/histoire/partenaire-2.png"},
     {id:3, name:"GLOVO", picture:"assets/images/illustrations/histoire/partenaire-3.png"},
     {id:4, name:"YANGO DELI", picture:"assets/images/illustrations/histoire/partenaire-4.png"},
@@ -11,15 +11,15 @@ export default function Partner() {  // Fixed capitalization for component name
     return(
         <div className="bg-primary-100 px-8 py-16 flex flex-col justify-center gap-6">
             <div className="font-title text-4xl text-center">NOS PARTENAIRES</div>
-            <div className="relative flex gap-6 justify-around items-center">
+            <div className="relative grid md:flex flex-row grid-cols-2 grid-rows-2 justify-center md:justify-evenly text-center gap-2 md:gap-6 items-center">
                 {serviceItems.map((item)=>(
                     <div key={item.id} className="flex flex-col p-4 justify-between items-center gap-4 rounded-2xl">
                         <div className="relative w-30 h-30">
                             <Image 
                                 src={`/${item.picture}`} 
                                 alt={item.name}
-                                width={120}  // Adjust based on your needs
-                                height={120} // Adjust based on your needs
+                                width={120}  
+                                height={120} 
                                 className="object-contain"
                             />
                         </div>
