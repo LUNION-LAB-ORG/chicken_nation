@@ -32,7 +32,7 @@ export default function OderFood() {
           {/* Center Content */}
           <div className="flex-1 flex flex-col items-center gap-4">
             <h2 className="text-primary text-xl md:text-2xl font-semibold text-center md:text-left">
-              Commandez votre déjeuner aujourd'hui avec Chicken Nation
+              Commandez votre déjeuner aujourd`&apos;`hui avec Chicken Nation
             </h2>
 
             {/* Form */}

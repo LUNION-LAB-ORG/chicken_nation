@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Button } from "@nextui-org/react";
+
 
 export default function Asset() {
   return (
@@ -34,7 +34,7 @@ export default function Asset() {
               Innovation Constante
             </div>
             <div>
-              Nous sommes constamment à l'écoute de vos retours pour améliorer{" "}
+              Nous sommes constamment à l`&apos;`écoute de vos retours pour améliorer{" "}
               <br /> nos services et créer de nouvelles recettes qui répondent à
               vos <br /> envies.
             </div>

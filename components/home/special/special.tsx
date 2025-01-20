@@ -1,13 +1,11 @@
-'use client';
-import { useState } from 'react';
+"use client";
+
+import { Pagination } from "@nextui-org/react";
 import { ShoppingCart } from "lucide-react";
 import { Button } from "@nextui-org/react";
-import JumpPage from './pagination';
 import Image from 'next/image';
 
 export default function Special() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-
   const deals = [
     {
       id: 1,
@@ -48,19 +46,32 @@ export default function Special() {
           {/* Header */}
           <h1 className="text-4xl font-title font-bold text-primary mb-8">SPECIAL DEAL</h1>
 
-          {/* Pagination placeholder */}
-          <div className="mb-6">
-            <JumpPage />
-          </div>
+          {/* Pagination */}
+          <Pagination
+            className="text-primary-900"
+            showControls
+            initialPage={1}
+            total={3}
+            radius="full"
+            onChange={(page) => {
+              const container = document.getElementById('deals-container');
+              if (container) {
+                const scrollAmount = container.clientWidth * (page - 1); // Calculer le défilement en fonction de la page
+                container.scrollTo({ left: scrollAmount, behavior: 'smooth' });
+              }
+            }}
+          />
         </div>
 
         {/* Deals Container */}
-        <div className="flex md:grid md:grid-cols-3 gap-6 overflow-x-auto snap-x snap-mandatory">
-          {deals.map((deal, index) => (
+        <div
+          id="deals-container"
+          className="flex md:grid md:grid-cols-3 gap-6 overflow-x-auto snap-x snap-mandatory"
+        >
+          {deals.map((deal) => (
             <div
               key={deal.id}
-              className={`bg-[#FFF5EE] rounded-2xl p-6 shadow-lg transition-all duration-300 flex-shrink-0
-                ${index === currentSlide ? 'opacity-100 scale-100' : 'opacity-50 scale-95'}`}
+              className="bg-[#FFF5EE] rounded-2xl p-6 shadow-lg transition-all duration-300 flex-shrink-0"
               style={{ width: "90%", maxWidth: "300px" }}
             >
               <h2 className="text-xl font-bold text-primary-800 mb-4">{deal.title}</h2>
@@ -109,4 +120,4 @@ export default function Special() {
       </div>
     </section>
   );
-}
+};
