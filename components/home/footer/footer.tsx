@@ -19,17 +19,26 @@ const Footer = () => {
         <span className="flex items-center">
           🕒 Tous les jours - 10h à 23h
         </span>
-            <div className="bg-primary text-white py-2 flex justify-center space-x-4">
-            <a href="#" className="hover:text-primary-200">
-            <Facebook className="w-6 h-6" />
-            </a>
-            <a href="#" className="hover:text-primary-200">
-            <Instagram className="w-6 h-6" />
-            </a>
-            <a href="#" className="hover:text-primary-200">
-            <Github className="w-6 h-6" />
-            </a>
-            </div>
+        <div className="bg-primary text-white py-2 flex justify-center space-x-4">
+              <a href="#">
+                <Facebook className="w-6 h-6" />
+              </a>
+              <a href="#">
+                <Instagram className="w-6 h-6" />
+              </a>
+              <div className="w-6 h-6 relative">
+                <a href="#">
+                  <Image
+                    src="/assets/images/illustrations/page-accueil/Icon-whatsapp.png"
+                    alt="WhatsApp Icon"
+                    width={28}
+                    height={28}
+                    className="object-contain" 
+                  />
+                </a>
+              </div>
+          </div>
+
       </div>
 
       {/* Main Footer Content */}
