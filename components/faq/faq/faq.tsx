@@ -12,7 +12,7 @@ export default function Quiz() {
         className="bg-gray-100 text-black text-sm p-2"
       >
         <div className="space-y-2">
-          <p>Plusieurs options s'offrent à vous :</p>
+          <p>Plusieurs options s&apos;offrent à vous :</p>
           <ul className="list-none space-y-1">
             <li>- Sur place dans notre restaurant</li>
             <li>- Par téléphone au +225 0747000034</li>

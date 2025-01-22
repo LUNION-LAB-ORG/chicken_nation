@@ -11,11 +11,11 @@ export default function Policy() {
           <div className="space-y-4">
             <div>
               <h3 className="font-medium mb-2">1.1 Objet</h3>
-              <p className="text-gray-700">Les présentes conditions générales définissent les modalités de vente et de service entre Saveur Express, ci-après dénommé "le restaurant", et ses clients.</p>
+              <p className="text-gray-700">Les présentes conditions générales définissent les modalités de vente et de service entre Saveur Express, ci-après dénommé &quot;le restaurant&quot;, et ses clients.</p>
             </div>
             <div>
               <h3 className="font-medium mb-2">1.2 Application</h3>
-              <p className="text-gray-700">Ces conditions s'appliquent à toutes les commandes et services proposés par le restaurant, que ce soit sur place, à emporter ou en livraison.</p>
+              <p className="text-gray-700">Ces conditions s&apos;appliquent à toutes les commandes et services proposés par le restaurant, que ce soit sur place, à emporter ou en livraison.</p>
             </div>
           </div>
         </div>
@@ -86,7 +86,7 @@ export default function Policy() {
               <ul className="list-disc pl-5 space-y-1 text-gray-700">
                 <li>Points valables 12 mois</li>
                 <li>Non convertibles en espèces</li>
-                <li>Non cumulables avec d'autres promotions sauf mention contraire</li>
+                <li>Non cumulables avec d&apos;autres promotions sauf mention contraire</li>
               </ul>
             </div>
           </div>
@@ -97,9 +97,9 @@ export default function Policy() {
           <div className="space-y-4">
             <div>
               <h3 className="font-medium mb-2">5.1 Engagement Qualité</h3>
-              <p className="text-gray-700">Le restaurant s'engage à :</p>
+              <p className="text-gray-700">Le restaurant s&apos;engage à :</p>
               <ul className="list-disc pl-5 space-y-1 text-gray-700">
-                <li>Respecter les normes d'hygiène en vigueur</li>
+                <li>Respecter les normes d&apos;hygiène en vigueur</li>
                 <li>Utiliser des produits frais</li>
                 <li>Former régulièrement son personnel</li>
                 <li>Effectuer des contrôles qualité réguliers</li>
@@ -124,7 +124,7 @@ export default function Policy() {
               <p className="text-gray-700">Le restaurant est responsable :</p>
               <ul className="list-disc pl-5 space-y-1 text-gray-700">
                 <li>De la qualité des produits servis</li>
-                <li>Du respect des normes d'hygiène</li>
+                <li>Du respect des normes d&apos;hygiène</li>
                 <li>De la formation de son personnel</li>
                 <li>Du respect des délais annoncés</li>
               </ul>
@@ -154,12 +154,12 @@ export default function Policy() {
             </div>
             <div>
               <h3 className="font-medium mb-2">7.2 Droits des Clients</h3>
-              <p className="text-gray-700">Le client dispose d'un droit :</p>
+              <p className="text-gray-700">Le client dispose d&apos;un droit :</p>
               <ul className="list-disc pl-5 space-y-1 text-gray-700">
-                <li>D'accès à ses données</li>
+                <li>D&apos;accès à ses données</li>
                 <li>De rectification</li>
-                <li>D'effacement</li>
-                <li>D'opposition au traitement</li>
+                <li>D&apos;effacement</li>
+                <li>D&apos;opposition au traitement</li>
               </ul>
             </div>
           </div>
