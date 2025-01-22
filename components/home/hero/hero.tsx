@@ -34,9 +34,9 @@ export default function Hero() {
               </div>
             </div>
             <div className="relative w-full flex justify-center">
-              <div className="absolute left-0 size-20 xl:size-40 bottom-12">
+              <div className="absolute left-2 rotate-90 size-20 xl:size-40 bottom-12">
                 <Image
-                  src="/assets/images/illustrations/page-accueil/piment.png"
+                  src="/assets/images/illustrations/page-accueil/percil.png"
                   alt="Ellipse decoration"
                   layout="fill"
                   objectFit="contain"
@@ -50,9 +50,9 @@ export default function Hero() {
                   objectFit="cover"
                 />
               </div>
-              <div className="absolute right-0 size-20 xl:size-40 bottom-12">
+              <div className="absolute right-4 size-20 xl:size-40 bottom-12">
                 <Image
-                  src="/assets/images/illustrations/page-accueil/piment.png"
+                  src="/assets/images/illustrations/page-accueil/piment-vert.png"
                   alt="Ellipse decoration"
                   layout="fill"
                   objectFit="contain"
@@ -69,7 +69,7 @@ export default function Hero() {
         </div>
       </div>
       {/* Other */}
-      <div className="absolute hidden xl:flex z-[2] z-[2] top-1/2 right-48 2xl:right-69 bg-white rounded-xl p-4 items-center space-x-2">
+      <div className="absolute hidden xl:flex z-[2] top-1/2 right-48 2xl:right-69 bg-white rounded-xl p-4 items-center space-x-2">
         <div className="relative w-12 h-12">
           <Image
             src="/assets/images/illustrations/page-accueil/horloge.png"

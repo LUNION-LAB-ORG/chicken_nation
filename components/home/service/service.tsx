@@ -10,14 +10,13 @@ export default function Service() {
     return (
         <div className="bg-primary-50 px-4 py-10 my-0 md:my-8 relative flex flex-col md:flex-row gap-6 justify-center items-center">
             {serviceItems.map((item) => (
-                <div key={item.id} className="bg-white flex flex-col p-4 justify-between w-full md:w-auto items-center gap-4 rounded-2xl">
-                    <div className="relative w-30 h-30">
+                <div key={item.id} className="bg-white flex flex-col p-8 justify-between w-full md:w-auto items-center gap-4 rounded-2xl">
+                    <div className="relative w-32 h-32 ">
                         <Image 
                             src={`/${item.picture}`} 
                             alt={item.name} 
-                            width={100}
-                            height={100}
-                            className="object-contain"
+                            fill
+                            className="object-cover"
                         />
                     </div>
                     <div className="text-center text-xl text-primary-900">{item.name}</div>

@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function Hero() {
   return (
-    <div className="relative w-full h-screen overflow-hidden">
+    <div className="relative w-full h-[calc(100vh-70px)] overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0">
         <Image
