@@ -10,7 +10,7 @@ export default function AccordionComponent() {
         key="1"
         aria-label="Accordion 1"
         title="Comment peut t-on faire une réservation ?"
-        className="bg-primary-50 text-primary-800 text-sm p-2" // Réduit la taille du texte et le padding
+        className="bg-primary-50 text-primary-800 text-sm" // Réduit la taille du texte et le padding
       >
         {defaultContent}
       </AccordionItem>
@@ -18,7 +18,7 @@ export default function AccordionComponent() {
         key="2"
         aria-label="Accordion 2"
         title="Proposez-vous des options végétariennes ?"
-        className="bg-primary-50 text-primary-800 text-sm p-2" // Réduit la taille du texte et le padding
+        className="bg-primary-50 text-primary-800 text-sm" // Réduit la taille du texte et le padding
       >
         {defaultContent}
       </AccordionItem>
@@ -26,7 +26,7 @@ export default function AccordionComponent() {
         key="3"
         aria-label="Accordion 3"
         title="Le stationnement est-il disponible ?"
-        className="bg-primary-50 text-primary-800 text-sm p-2" // Réduit la taille du texte et le padding
+        className="bg-primary-50 text-primary-800 text-sm" // Réduit la taille du texte et le padding
       >
         {defaultContent}
       </AccordionItem>
@@ -34,7 +34,7 @@ export default function AccordionComponent() {
         key="4"
         aria-label="Accordion 4"
         title="Quels sont vos horaires d'ouverture ?"
-        className="bg-primary-50 text-primary-800 text-sm p-2" // Réduit la taille du texte et le padding
+        className="bg-primary-50 text-primary-800 text-sm" // Réduit la taille du texte et le padding
       >
         {defaultContent}
       </AccordionItem>

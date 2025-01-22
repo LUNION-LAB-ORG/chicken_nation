@@ -14,7 +14,7 @@ import {
 } from "@nextui-org/react";
 import { Search, ShoppingCart } from "lucide-react";
 import { usePathname } from "next/navigation";
-import Image from 'next/image';
+import Image from "next/image";
 
 export const ChickenLogo = () => {
   return (
@@ -53,36 +53,43 @@ export default function Head() {
         />
         <NavbarBrand>
           <ChickenLogo />
-          <p className="hidden md:block font-bold text-white text-xl ml-2">CHICKEN NATION</p>
+          <p className="hidden md:block font-bold text-white text-xl ml-2">
+            CHICKEN NATION
+          </p>
         </NavbarBrand>
       </NavbarContent>
 
-
-       <NavbarContent className="hidden sm:flex gap-6" justify="center">
-      {menuItems.map((item) => (
-        <NavbarItem
-          key={item.name}
-          className={`${
-            pathname === item.link ? "bg-white clip-polygon-custom text-primary py-1 px-2" : ""
-          }`}
-        >
-          <Link
-            href={item.link}
-            className="text-white px-4 py-2 rounded hover:bg-white/10 transition"
+      <NavbarContent className="hidden sm:flex gap-6" justify="center">
+        {menuItems.map((item) => (
+          <NavbarItem
+            key={item.name}
+            className={`${
+              pathname === item.link
+                ? "bg-white clip-polygon-custom text-primary py-1 px-2"
+                : "text-white"
+            }`}
           >
-            {item.name}
-          </Link>
-        </NavbarItem>
-      ))}
-    </NavbarContent>
-
+            <Link
+              href={item.link}
+              className={`px-4 py-2 rounded hover:bg-white/10 transition ${
+                pathname === item.link ? "text-primary" : "text-white"
+              }`}
+            >
+              {item.name}
+            </Link>
+          </NavbarItem>
+        ))}
+      </NavbarContent>
 
       <NavbarContent justify="end">
         <NavbarItem>
           <Search className="text-white cursor-pointer" size={24} />
         </NavbarItem>
         <NavbarItem>
-          <ShoppingCart className="text-white cursor-pointer hidden md:block" size={24} />
+          <ShoppingCart
+            className="text-white cursor-pointer hidden md:block"
+            size={24}
+          />
         </NavbarItem>
         <NavbarItem>
           <Button
@@ -95,7 +102,6 @@ export default function Head() {
           </Button>
         </NavbarItem>
       </NavbarContent>
-
 
       <NavbarMenu className="bg-primary">
         {menuItems.map((item) => (

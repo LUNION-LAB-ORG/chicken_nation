@@ -40,7 +40,7 @@ export default function Special() {
   ];
 
   return (
-    <section className="w-full max-w-7xl mx-auto p-10">
+    <section className="w-full mx-auto px-4 py-16 md:p-20">
       <div className="relative">
         <div className="flex justify-between gap-4">
           {/* Header */}
@@ -66,17 +66,16 @@ export default function Special() {
         {/* Deals Container */}
         <div
           id="deals-container"
-          className="flex md:grid md:grid-cols-3 gap-6 overflow-x-auto snap-x snap-mandatory"
+          className="flex md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto snap-x snap-mandatory"
         >
           {deals.map((deal) => (
             <div
               key={deal.id}
-              className="bg-[#FFF5EE] rounded-2xl p-6 shadow-lg transition-all duration-300 flex-shrink-0"
-              style={{ width: "90%", maxWidth: "300px" }}
+              className="bg-[#FFF5EE] flex flex-col justify-between rounded-2xl p-6 shadow-lg transition-all duration-300 w-full"
             >
               <h2 className="text-xl font-bold text-primary-800 mb-4">{deal.title}</h2>
 
-              <div className="flex justify-between items-start mb-6">
+              <div className="flex justify-between items-start">
                 <div className="space-y-4">
                   {deal.items.map((item, i) => (
                     <div key={i} className="flex items-center gap-2">

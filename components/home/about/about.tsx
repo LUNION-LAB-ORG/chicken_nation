@@ -7,7 +7,7 @@ import Image from 'next/image';
 
 export default function About() {
   return (
-    <section className="relative w-full min-h-screen bg-white py-16 overflow-hidden">
+    <section className="relative w-full bg-white  overflow-hidden px-4 py-16 md:p-20 lg:p-32">
       {/* Title */}
       <h2 className="text-center font-title text-primary text-5xl font-bold mb-16">
         À PROPOS
@@ -17,7 +17,7 @@ export default function About() {
       <div className="relative w-full px-4">
         <div className="relative flex flex-col md:flex-row items-center justify-center">
           {/* Left Image - Fried Chicken */}
-          <div className="hidden md:flex absolute -left-24 top-1/2 transform -translate-y-1/2 w-1/3">
+          <div className="hidden md:flex absolute -left-48 top-1/2 transform -translate-y-1/2 w-1/3">
             <div className="relative w-full h-auto">
               <Image
                 src="/assets/images/illustrations/page-accueil/chicken-2.png"
@@ -30,7 +30,7 @@ export default function About() {
           </div>
 
           {/* Center Content */}
-          <div className="relative w-full md:w-1/3 text-center flex flex-col items-center z-10">
+          <div className="relative w-full  text-center flex flex-col items-center z-10">
             <p className="text-lg md:text-sm mb-8 max-w-xl w-full md:w-auto">
               Née de la passion pour le poulet de qualité,{' '}
               <span className="text-red-500 font-bold">Chicken Nation</span>{' '}
@@ -57,14 +57,14 @@ export default function About() {
             {/* CTA Button */}
             <Button
               color="primary"
-              className="text-white px-8 py-3 rounded-full w-3/4 md:w-1/2"
+              className="text-white px-8 py-3 rounded-full"
             >
               Voir plus
             </Button>
           </div>
 
           {/* Right Image - Burger */}
-          <div className="hidden md:flex absolute -right-24 top-1/2 transform -translate-y-1/2 w-1/3">
+          <div className="hidden md:flex absolute -right-48 top-1/2 transform -translate-y-1/2 w-1/3">
             <div className="relative w-full h-auto">
               <Image
                 src="/assets/images/illustrations/page-accueil/burger.png"
