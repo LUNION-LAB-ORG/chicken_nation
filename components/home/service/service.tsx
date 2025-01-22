@@ -15,8 +15,8 @@ export default function Service() {
                         <Image 
                             src={`/${item.picture}`} 
                             alt={item.name} 
-                            width={50}
-                            height={50}
+                            width={100}
+                            height={100}
                             className="object-contain"
                         />
                     </div>

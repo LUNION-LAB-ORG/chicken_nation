@@ -1,7 +1,6 @@
 import { nextui } from "@nextui-org/theme";
 import type { Config } from "tailwindcss";
 
-
 export default {
   darkMode: ["class"],
   content: [
