@@ -1,6 +1,6 @@
 import { nextui } from "@nextui-org/theme";
 import type { Config } from "tailwindcss";
-const { nextui } = require("@nextui-org/react");
+
 
 export default {
   darkMode: ["class"],
