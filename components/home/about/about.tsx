@@ -3,6 +3,7 @@
 import { Button } from '@nextui-org/react';
 import React from 'react';
 import { Play } from 'lucide-react';
+import Image from 'next/image';
 
 export default function About() {
   return (
@@ -17,11 +18,15 @@ export default function About() {
         <div className="relative flex flex-col md:flex-row items-center justify-center">
           {/* Left Image - Fried Chicken */}
           <div className="hidden md:flex absolute -left-24 top-1/2 transform -translate-y-1/2 w-1/3">
-            <img
-              src="assets/images/illustrations/page-accueil/chicken-2.png"
-              alt="Boîte de poulet frit"
-              className="object-contain w-full h-auto"
-            />
+            <div className="relative w-full h-auto">
+              <Image
+                src="/assets/images/illustrations/page-accueil/chicken-2.png"
+                alt="Boîte de poulet frit"
+                width={500}
+                height={500}
+                className="object-contain"
+              />
+            </div>
           </div>
 
           {/* Center Content */}
@@ -29,14 +34,16 @@ export default function About() {
             <p className="text-lg md:text-sm mb-8 max-w-xl w-full md:w-auto">
               Née de la passion pour le poulet de qualité,{' '}
               <span className="text-red-500 font-bold">Chicken Nation</span>{' '}
-              s'est établie comme une référence en matière de restauration rapide en Côte d'Ivoire.
+              s`&apos;`est établie comme une référence en matière de restauration rapide en Côte d`&apos;`Ivoire.
             </p>
 
             {/* Video Preview Container */}
             <div className="relative max-w-xs sm:max-w-sm md:max-w-md aspect-video bg-gray-100 rounded-2xl overflow-hidden mb-8 mx-auto">
-              <img
-                src="assets/images/backgrounds/background.png"
+              <Image
+                src="/assets/images/backgrounds/background.png"
                 alt="Aperçu de la vidéo"
+                width={1280}
+                height={720}
                 className="object-cover w-full h-full"
               />
               {/* Play Button Overlay */}
@@ -58,11 +65,15 @@ export default function About() {
 
           {/* Right Image - Burger */}
           <div className="hidden md:flex absolute -right-24 top-1/2 transform -translate-y-1/2 w-1/3">
-            <img
-              src="assets/images/illustrations/page-accueil/burger.png"
-              alt="Burger au poulet"
-              className="object-contain w-full h-auto"
-            />
+            <div className="relative w-full h-auto">
+              <Image
+                src="/assets/images/illustrations/page-accueil/burger.png"
+                alt="Burger au poulet"
+                width={500}
+                height={500}
+                className="object-contain"
+              />
+            </div>
           </div>
         </div>
       </div>

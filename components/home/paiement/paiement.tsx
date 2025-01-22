@@ -1,5 +1,5 @@
 'use client';
-import { Image } from '@nextui-org/react';
+import Image from 'next/image';
 
 export default function Paiement() {
   const paymentData = [
@@ -18,36 +18,47 @@ export default function Paiement() {
   ];
 
   return (
-    <div className="relative">
+    <div className="relative bg-primary-100 pt-16 md:pt-0">
       {/* Background Image */}
-      <div className="h-96 w-full">
-        <img
-          src="assets/images/backgrounds/special-menu.png"
+      <div className="bg-primary-100 md:bg-transparent h-auto md:h-96 w-full">
+        <Image
+          src="/assets/images/backgrounds/special-menu.png"
           alt="Food background"
-          className=
-            "w-full h-full object-cover"
+          width={1920}
+          height={1080}
+          className="hidden md:block w-full h-full object-cover"
         />
       </div>
-      <div className="bg-primary w-full h-40 absolute bottom-0"></div>      
-                        <div className="absolute bottom-10 flex flex-col md:flex-row justify-center items-center gap-8">
-                            {paymentData.map((item, index) => (
-                            <div key={index} className="flex-1 min-w-[250px]">
-                                <div className="p-6 flex flex-col items-center text-center">
-                                <div className="w-32 h-32 bg-white rounded-2xl shadow-lg flex items-center justify-center mb-4">
-                                    <Image
-                                    src={item.icon}
-                                    alt="Payment method"
-                                    width={48}
-                                    height={48}
-                                    />
-                                </div>
-                                <p className="text-sm text-white">
-                                    {item.description}
-                                </p>
-                                </div>
-                            </div>
-                            ))}
-                        </div>    
+      
+      {/* Background overlay */}
+      <div className="bg-primary-100 md:bg-primary w-full h-40 absolute bottom-0"></div>      
+      
+      {/* Cards container */}
+      <div className="relative md:absolute my-auto md:my-auto bottom-10 w-full px-4">
+        <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 max-w-6xl mx-auto">
+          {paymentData.map((item, index) => (
+            <div 
+              key={index} 
+              className="w-full md:flex-1 md:min-w-[250px] max-w-sm"
+            >
+              <div className="bg-[#FFF5EE] rounded-3xl p-6 md:p-4 flex flex-col items-center text-center md:bg-transparent">
+                <div className="w-20 h-20 md:w-32 md:h-32 bg-white rounded-2xl shadow-lg flex items-center justify-center mb-4">
+                  <Image
+                    src={`/${item.icon}`}
+                    alt="Payment method"
+                    width={48}
+                    height={48}
+                    className="object-contain"
+                  />
+                </div>
+                <p className="text-sm text-primary md:text-white">
+                  {item.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>    
     </div>
   );
 }
