@@ -9,11 +9,12 @@ export default function About() {
   return (
     <section className="relative w-full bg-white  overflow-hidden px-4 py-16 md:p-20 lg:p-32">
       {/* Title */}
-      <h2 className="text-center font-title text-primary text-5xl font-bold mb-16">
+      <h2 className=" text-center font-title text-primary text-5xl font-bold mb-16">
         À PROPOS
       </h2>
 
-      {/* Main Content Container */}
+
+      {/* Main content container bottom */}
       <div className="relative w-full px-4">
         <div className="relative flex flex-col md:flex-row items-center justify-center">
           {/* Left Image - Fried Chicken */}
@@ -76,6 +77,26 @@ export default function About() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Top Main Content Container */}
+      {/* <div className="absolute inset-x-0 -top-6 w-full h-32 z-10">
+      <Image
+              className="hidden md:block object-bottom"
+              src="/assets/images/backgrounds/background-special.png"
+              alt="title"
+              layout="fill"
+              objectFit="cover"
+            />
+      </div> */}
+      <div className="absolute -top-8 right-0 size-48">
+      <Image
+              className="hidden md:block"
+              src="/assets/images/illustrations/page-accueil/borrito.png"
+              alt="title"
+              layout="fill"
+              objectFit="cover"
+            />
       </div>
     </section>
   );
