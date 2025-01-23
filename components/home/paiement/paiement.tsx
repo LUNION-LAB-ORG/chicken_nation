@@ -18,7 +18,7 @@ export default function Paiement() {
   ];
 
   return (
-    <div className="relative min-h-[70vh] bg-primary-100 pt-16 md:py-0">
+    <div className="relative min-h-[85vh] bg-primary-100 pt-16 md:py-0">
       {/* Background Image */}
       <div className="h-full w-full hidden md:block">
         <Image
@@ -41,8 +41,8 @@ export default function Paiement() {
               key={index} 
               className="w-full md:flex-1 md:min-w-[250px] max-w-sm"
             >
-              <div className="bg-[#FFF5EE] rounded-3xl p-6 md:p-4 flex flex-col items-center text-center md:bg-transparent">
-                <div className="w-20 h-20 md:w-32 md:h-32 bg-white rounded-2xl shadow-lg flex items-center justify-center mb-4">
+              <div className="bg-white rounded-3xl p-6 md:p-4 flex flex-col items-center text-center md:bg-transparent">
+                <div className="w-28 h-28 md:w-32 md:h-32 bg-white rounded-none md:rounded-2xl shadow-none md:shadow-lg flex items-center justify-center mb-4">
                   <Image
                     src={`/${item.icon}`}
                     alt="Payment method"

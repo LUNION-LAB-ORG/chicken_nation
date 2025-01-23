@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function OderFood() {
   return (
-    <section className="relative min-h-[60vh] flex justify-center items-center  w-full py-16">
+    <section className="relative min-h-[60vh] flex justify-center items-center w-full py-16">
       {/* Background Image */}
       <div className="absolute inset-0 w-full h-full">
         <Image
@@ -14,7 +14,7 @@ export default function OderFood() {
         />
       </div>
 
-      <div className="absolute inset-0 w-full h-full bg-black/30"></div>
+      <div className="absolute inset-0 w-full h-full bg-black/50"></div>
 
       {/* Content Container */}
       <div className="relative z-10 w-full max-w-screen-lg  mx-auto px-4">

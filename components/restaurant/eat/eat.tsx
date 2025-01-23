@@ -1,4 +1,4 @@
-import { Button } from "@nextui-org/react";
+import { Button, Link } from "@nextui-org/react";
 import { Mail } from "lucide-react";
 import Image from "next/image";
 import React from "react";
@@ -13,6 +13,7 @@ export default function Eat() {
       email: "your.email.inbox@here.com",
       image: "/assets/images/illustrations/restaurant/card-items-1.png",
       imageAlt: "Chicken sandwich with fries",
+      link:"/restaurants/marcory"
     },
     {
       id: 2,
@@ -22,6 +23,7 @@ export default function Eat() {
       email: "your.email.inbox@here.com",
       image: "/assets/images/illustrations/restaurant/card-items-2.png",
       imageAlt: "Restaurant exterior",
+      link:"/restaurants/angre"
     },
   ];
 
@@ -43,12 +45,19 @@ export default function Eat() {
                 height={150}
                 className="rounded-xl"
               />
-              <Button
-                color="primary"
-                className="text-white absolute inset-x-0 bottom-4 w-fit mx-auto px-8"
-              >
-                Réserver une table
-              </Button>
+              <div className="absolute inset-x-0 bottom-4 w-fit mx-auto">
+              <Link href={restaurant.link} >
+                <Button
+                  color="primary"
+                  className=""
+                >
+                  Réserver une table
+                </Button>
+              </Link>
+
+              </div>
+              
+
             </div>
 
             {/* Details Section */}
