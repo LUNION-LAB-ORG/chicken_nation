@@ -71,7 +71,7 @@ export default function Head() {
           >
             <Link
               href={item.link}
-              className={`px-4 py-2 rounded hover:bg-white/10 transition ${
+              className={`px-4 py-2 rounded hover:bg-white/40 hover:clip-polygon-custom transition-all ${
                 pathname === item.link ? "text-primary" : "text-white"
               }`}
             >
