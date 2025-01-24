@@ -10,7 +10,7 @@ export default function AddNotice() {
       <p className="text-gray-600 text-center mb-2">
         Ton adresse ne sera pas publiée. Remplis les champs indiqués
       </p>
-      <p className="flex flex-col md:flex-row text-gray-400 text-center mb-6">Donne un score <span>★★★★★</span></p>
+      <p className="flex flex-col md:flex-row justify-center text-gray-400 text-center mb-6 gap-3 md:gap-4">Donne un score <span>★★★★★</span></p>
 
 
     <div className="px-0 md:px-32">
@@ -51,7 +51,7 @@ export default function AddNotice() {
 
 
         <div className="text-center">
-          <Button type="submit" color="primary" className="w-full md:w-0">
+          <Button type="submit" color="primary" className="w-full md:w-32">
             Poster l'avis
           </Button>
         </div>

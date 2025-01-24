@@ -7,7 +7,7 @@ export default function Burger(){
     return(
         <div>
             <Header/>
-                <TabComponents/>
+            <TabComponents/>
             <Special/>
         </div>
     );
