@@ -14,7 +14,7 @@ export default function News() {
           <MapPin className="h-8 w-8 border-2 border-gray-600 rounded-full text-gray-600" />
           <p className="text-xl font-medium text-gray-600">Siège</p>
           <div className="flex flex-col text-center gap-1">
-          <p className="text-primary">Angré 8ème tranche, face à la station Shell, Abidjan, Côte d'Ivoire</p>
+          <p className="text-primary">Angré 8ème tranche, face à la station Shell, Abidjan, Côte d&apos;Ivoire</p>
           <p className="text-primary">Marcory Zone 4</p>
           </div>
         </div>

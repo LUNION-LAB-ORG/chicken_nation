@@ -8,13 +8,13 @@ export default function Description() {
   
         <ul className="list-disc pl-6  space-y-2">
           <li>Une généreuse tranche de foie gras mi-cuit</li>
-          <li>Une délicate compotée d'oignons caramélisés au vin rouge</li>
+          <li>Une délicate compotée d&apos;oignons caramélisés au vin rouge</li>
           <li>Des jeunes pousses de roquette fraîches</li>
           <li>Une sauce secrète aux truffes</li>
         </ul>
   
         <h3 className=" mt-8 mb-4">
-          L'Art de la Préparation
+          L&apos;Art de la Préparation
         </h3>
   
         <ol className="list-decimal pl-6 space-y-2">
@@ -25,7 +25,7 @@ export default function Description() {
         </ol>
   
         <h3 className="mt-8 mb-4">
-          Suggestions d'Accompagnement
+          Suggestions d&apos;Accompagnement
         </h3>
   
         <ul className="list-disc pl-6 space-y-2">

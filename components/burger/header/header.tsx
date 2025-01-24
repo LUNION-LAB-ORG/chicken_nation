@@ -56,7 +56,7 @@ export default function Header(){
                               <div className="text-primary text-lg font-title">5500 FCFA</div>
                               <div className="line-through text-center text-sm text-gray-400">6500 FCFA</div>
                         </div>
-                        <div className="text-start">Laissez-vous tenter par notre création signature, Le Gourmet, une symphonie de saveurs qui éveillera vos papilles. Ce burger d'exception commence par un pain brioché artisanal, légèrement toasté, aux graines de sésame dorées</div>
+                        <div className="text-start">Laissez-vous tenter par notre création signature, Le Gourmet, une symphonie de saveurs qui éveillera vos papilles. Ce burger d&apos;exception commence par un pain brioché artisanal, légèrement toasté, aux graines de sésame dorées</div>
                         <div className="flex items-center gap-8">
                             <div>
                             <Pagination showControls initialPage={1} total={1} />

@@ -18,13 +18,16 @@ import Image from "next/image";
 
 export const ChickenLogo = () => {
   return (
-    <Image
-      src="/assets/images/logo_1.png"
-      alt="Chicken Nation Logo"
-      width={50} // Ajoutez la largeur (en pixels)
-      height={50} // Ajoutez la hauteur (en pixels)
-      priority // Optionnel, si vous voulez donner la priorité à ce chargement
-    />
+    <Link href="/" >
+      <Image
+        src="/assets/images/logo_1.png"
+        alt="Chicken Nation Logo"
+        width={50} // Ajoutez la largeur (en pixels)
+        height={50} // Ajoutez la hauteur (en pixels)
+        priority // Optionnel, si vous voulez donner la priorité à ce chargement
+        className="cursor-pointer" // Ajout de la classe pour le curseur
+      />
+    </Link>
   );
 };
 

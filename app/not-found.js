@@ -14,7 +14,7 @@ export default function NotFound() {
       />
       <p className="mt-4 text-xl font-semibold text-center text-black">Oops ! Nous rencontrons un problème avec la page</p>
       <p className="mt-2 text-center text-gray-600">
-      Nous vous suggérons de revenir en arrière et d'essayer un autre lien
+      Nous vous suggérons de revenir en arrière et d&apos;essayer un autre lien
       </p>
 
       <Link href="/" passHref>
@@ -24,7 +24,7 @@ export default function NotFound() {
           color="primary"
           size="lg"
         >
-          Retour à l'accueil
+          Retour à l&apos;accueil
         </Button>
       </Link>
     </div>

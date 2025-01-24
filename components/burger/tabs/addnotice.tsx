@@ -52,7 +52,7 @@ export default function AddNotice() {
 
         <div className="text-center">
           <Button type="submit" color="primary" className="w-full md:w-32">
-            Poster l'avis
+            Poster l&apos;avis
           </Button>
         </div>
       </form>
