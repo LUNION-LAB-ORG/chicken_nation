@@ -40,7 +40,7 @@ export default function Notice() {
     ];
   
     return (
-      <div className="mx-16 my-2 flex flex-col gap-6">
+      <div className="mx-2 md:mx-16 my-2 flex flex-col gap-6">
         {reviews.map((review, index) => (
           <div key={index} className="flex items-start text-start space-x-4">
             <img src={review.image} alt={review.author} className="w-10 h-10 rounded-full" />

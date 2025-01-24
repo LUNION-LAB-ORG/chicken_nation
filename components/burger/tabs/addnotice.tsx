@@ -10,48 +10,54 @@ export default function AddNotice() {
       <p className="text-gray-600 text-center mb-2">
         Ton adresse ne sera pas publiée. Remplis les champs indiqués
       </p>
-      <p className="text-gray-400 text-center mb-6">Donne un score ★★★★★</p>
+      <p className="flex flex-col md:flex-row text-gray-400 text-center mb-6">Donne un score <span>★★★★★</span></p>
 
+
+    <div className="px-0 md:px-32">
 
       <form className="space-y-6">
 
-        <div className="flex flex-wrap gap-6">
+        <div className="flex flex-col md:flex-row gap-6">
           <input
             type="text"
             placeholder="Ton nom"
-            className="flex-1 rounded-lg px-4 py-2 focus:outline-none "
+            className="flex flex-row w-full md:w-1/2 rounded-3xl p-4 md:p-8 focus:outline-none "
           />
           <input
             type="email"
             placeholder="Ton email"
-            className="flex-1 rounded-lg px-4 py-2 focus:outline-none "
+            className="flex flex-row w-full md:w-1/2 rounded-3xl p-4 md:p-8 focus:outline-none "
           />
         </div>
 
-
+        <div className="flex justify-center items-center">
         <textarea
           placeholder="Rédige ton point de vue"
-          className="w-full rounded-lg px-4 py-2 focus:outline-none resize-none h-32 border "
+          className="w-full rounded-3xl p-4 md:p-8 focus:outline-none resize-none h-40"
         ></textarea>
+        </div>
+        
 
 
         <div className="flex items-center justify-center text-center gap-2">
           <input
             type="checkbox"
-            className="w-4 h-4 text-orange-500  rounded focus:ring-orange-500"
+            className="w-4 h-4 text-primary  rounded focus:ring-primary"
           />
-          <span className="text-gray-600">
+          <span className="text-gray-600 text-sm md:text-base">
             Sauvegarder mon nom et mon mail sur ce navigateur pour un prochain commentaire
           </span>
         </div>
 
 
         <div className="text-center">
-          <Button type="submit" color="primary">
+          <Button type="submit" color="primary" className="w-full md:w-0">
             Poster l'avis
           </Button>
         </div>
       </form>
+
+    </div>
     </div>
   );
 }
