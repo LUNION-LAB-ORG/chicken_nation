@@ -95,7 +95,7 @@ export default function Head() {
           <Button
             as={Link}
             className="hidden md:flex bg-primary-800 text-white font-semibold"
-            href="#"
+            href="/login"
             variant="flat"
           >
             Connexion

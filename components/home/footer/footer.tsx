@@ -61,10 +61,10 @@ const Footer = () => {
             <h3 className="text-xl font-title font-bold mb-4">EXPLORER</h3>
             <ul className="space-y-6">
               <li><a href="/accueil" className="hover:text-primary-300">Accueil</a></li>
-              <li><a href="/notre-restaurant" className="hover:text-primary-300">Notre restaurant</a></li>
-              <li><a href="/notre-carte" className="hover:text-primary-300">Notre carte</a></li>
+              <li><a href="/restaurants" className="hover:text-primary-300">Notre restaurant</a></li>
+              <li><a href="/histoire" className="hover:text-primary-300">Histoire</a></li>
               <li><a href="/franchise" className="hover:text-primary-300">Franchise</a></li>
-              <li><a href="/conditions" className="hover:text-primary-300">Conditions d`&apos;`utilisation</a></li>
+              <li><a href="/contact" className="hover:text-primary-300">Contacts</a></li>
             </ul>
           </div>
 
@@ -73,7 +73,7 @@ const Footer = () => {
             <h3 className="text-xl font-title font-bold mb-4">LÉGALES</h3>
             <ul className="space-y-6">
               <li><a href="/politique" className="hover:text-primary-300">Politique et Confidentialité</a></li>
-              <li><a href="/faq" className="hover:text-primary-300">Termes et Conditions</a></li>
+              <li><a href="/faq" className="hover:text-primary-300">FAQ</a></li>
             </ul>
           </div>
 
@@ -81,11 +81,11 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-title font-bold mb-4">NOS PLATS</h3>
             <ul className="space-y-6">
-              <li><a href="/poulets" className="hover:text-primary-300">Poulets grillés</a></li>
-              <li><a href="/lunchs" className="hover:text-primary-300">Lunchs</a></li>
-              <li><a href="/combos" className="hover:text-primary-300">Combos</a></li>
-              <li><a href="/plats" className="hover:text-primary-300">Plats</a></li>
-              <li><a href="/plus" className="hover:text-primary-300">Plus</a></li>
+              <li><a href="/restaurants/marcory/burger" className="hover:text-primary-300">Poulets grillés</a></li>
+              <li><a href="/restaurants/marcory/burger" className="hover:text-primary-300">Lunchs</a></li>
+              <li><a href="/restaurants/marcory/burger" className="hover:text-primary-300">Combos</a></li>
+              <li><a href="/restaurants/marcory/burger" className="hover:text-primary-300">Plats</a></li>
+              <li><a href="/restaurants/marcory/burger" className="hover:text-primary-300">Plus</a></li>
             </ul>
           </div>
         </div>

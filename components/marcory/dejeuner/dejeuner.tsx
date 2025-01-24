@@ -1,6 +1,7 @@
 import { ShoppingCart } from "lucide-react";
 import FilterMenu from "./tabs";
 import Image from "next/image";
+import Link from "next/link";
 
 
 const Items = [
@@ -55,7 +56,14 @@ export default function Dejeuner(){
                         <div>{item.substile}</div>
                         <div className="flex justify-between items-center">
                             <div className="text-primary text-lg font-title">{item.price} FCFA</div>
-                            <div><ShoppingCart className="text-primary cursor-pointer rounded-lg border-2 border-primary p-2" size={48} /></div>
+                            <div>
+                            <Link href="/restaurants/marcory/burger">
+                                <ShoppingCart
+                                className="text-primary cursor-pointer rounded-lg border-2 border-primary p-2"
+                                size={48}
+                                />
+                            </Link>
+                            </div>
                         </div>
                     </div>
                 </div>
