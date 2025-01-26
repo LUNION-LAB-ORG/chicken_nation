@@ -20,7 +20,7 @@ export const ChickenLogo = () => {
   return (
     <Link href="/" >
       <Image
-        src="/assets/images/logo.png"
+        src="/assets/images/logo_2.png"
         alt="Chicken Nation Logo"
         width={50} // Ajoutez la largeur (en pixels)
         height={50} // Ajoutez la hauteur (en pixels)
