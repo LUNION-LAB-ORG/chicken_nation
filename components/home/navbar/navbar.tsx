@@ -20,7 +20,7 @@ export const ChickenLogo = () => {
   return (
     <Link href="/" >
       <Image
-        src="/assets/images/logo_2.png"
+        src="/assets/images/icone.png"
         alt="Chicken Nation Logo"
         width={50} // Ajoutez la largeur (en pixels)
         height={50} // Ajoutez la hauteur (en pixels)
@@ -97,7 +97,7 @@ export default function Head() {
         <NavbarItem>
           <Button
             as={Link}
-            className="hidden md:flex bg-primary-800 text-white font-semibold"
+            className="hidden md:flex bg-secondary text-secondary-foreground font-semibold"
             href="/login"
             variant="flat"
           >
@@ -117,7 +117,7 @@ export default function Head() {
         <NavbarItem>
           <Button
             as={Link}
-            className=" bg-primary-800 text-white font-semibold w-full"
+            className=" bg-secondary text-secondary-foreground font-semibold w-full"
             href="#"
             variant="flat"
           >
