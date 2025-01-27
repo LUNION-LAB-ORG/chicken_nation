@@ -35,7 +35,7 @@ export default function About() {
             <p className="text-lg md:text-sm mb-8 max-w-xl w-full md:w-auto">
               Née de la passion pour le poulet de qualité,{' '}
               <span className="text-red-500 font-bold">Chicken Nation</span>{' '}
-              s`&apos;`est établie comme une référence en matière de restauration rapide en Côte d`&apos;`Ivoire.
+              s&apos;est établie comme une référence en matière de restauration rapide en Côte d&apos;Ivoire.
             </p>
 
             {/* Video Preview Container */}

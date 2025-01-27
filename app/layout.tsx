@@ -27,7 +27,7 @@ const poppins = Poppins (
 );
 
 const title = localFont({
-   src: "../public/assets/fonts/Blocklyn_Font/Blocklyn-Grunge.otf",
+   src: "../public/assets/fonts/balbeer/Balbeer-Rustic.ttf",
    variable: "--font-title", 
   });
 
