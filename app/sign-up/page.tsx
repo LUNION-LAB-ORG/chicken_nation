@@ -1,5 +1,6 @@
 import Image from 'next/image';
 
+
 export default function Signup() {
   return (
     <div className="relative w-full h-screen bg-cover bg-center bg-no-repeat">
@@ -83,3 +84,4 @@ export default function Signup() {
     </div>
   );
 }
+

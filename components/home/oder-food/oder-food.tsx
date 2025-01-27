@@ -42,7 +42,7 @@ export default function OderFood() {
                 placeholder="Adresse e-mail"
                 className="relative z-10 flex-1 px-6 py-3 w-full rounded-full md:rounded-l-full text-primary-900 placeholder-primary-900 bg-orange-200 border-none"
               />
-              <Button className="px-12 py-8 text-white bg-primary-800 rounded-full ">
+              <Button className="px-12 py-8 bg-secondary text-secondary-foreground rounded-full ">
                 Réserver
               </Button>
             </div>
