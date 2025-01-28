@@ -88,9 +88,22 @@ const Footer = () => {
       </div>
 
       {/* Copyright Bar */}
-      <div className="bg-white py-2 px-4 text-center text-primary text-sm">
-        <p>Copyright Chicken Nation, 2024 Tous droits réservés</p>
-      </div>
+        <div className="bg-white py-2 px-4 text-center text-primary text-sm">
+          <p>
+            Copyright Chicken Nation, 2024 Tous droits réservés |{" "}
+            <span>
+              Designed by{" "}
+              <a 
+                href="https://lunion-lab.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-primary font-semibold underline hover:text-primary-700"
+              >
+                Lunions-Lab
+              </a>
+            </span>
+          </p>
+        </div>
     </footer>
   );
 };

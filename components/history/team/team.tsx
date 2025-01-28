@@ -34,7 +34,7 @@ export default function Team() {
             </div>
             <div>
               Nous investissons dans la formation régulière de notre personnel{" "}
-              <br /> pour maintenir un niveau d`&apos;`excellence constant. Chaque
+              <br /> pour maintenir un niveau d&apos;excellence constant. Chaque
               membre de <br /> notre équipe est un expert dans son domaine.
             </div>
           </div>

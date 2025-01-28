@@ -2,7 +2,7 @@
 
 
 
-export default function Layout({
+export default function SignupLayout({
     children,
   }: Readonly<{
     children: React.ReactNode;

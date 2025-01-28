@@ -10,7 +10,7 @@ export default function About() {
     <section className="relative w-full bg-white  overflow-hidden px-4 py-16 md:p-20 lg:p-32">
       {/* Title */}
       <h2 className=" text-center font-title text-primary text-5xl font-bold mb-16">
-        À PROPOS
+        A PROPOS
       </h2>
 
 

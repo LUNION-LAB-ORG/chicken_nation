@@ -14,7 +14,7 @@ export default function Hero() {
       </div>
       <div className="bg-black/30 py-8 w-full absolute bottom-0 mx-auto">
         <div className="font-title text-primary text-center text-3xl md:text-6xl mx-auto flex justify-center gap-4">
-            <span className="hidden md:block">CHICKEN NATION</span> ANGRE 8è TRANCHE
+            <span className="hidden md:block">CHICKEN NATION</span> ANGRE 8e TRANCHE
         </div>
       </div>
     </div>

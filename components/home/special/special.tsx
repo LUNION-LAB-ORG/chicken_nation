@@ -42,13 +42,14 @@ export default function Special() {
   return (
     <section className="w-full mx-auto px-4 py-16 md:p-20">
       <div className="relative">
-        <div className="flex justify-between gap-4">
+        <div className="flex justify-start sm:justify-between md:justify-between sm:gap-2 md:gap-4">
           {/* Header */}
           <h1 className="text-4xl font-title font-bold text-primary mb-8">SPECIAL DEAL</h1>
 
           {/* Pagination */}
           <Pagination
             className="text-primary-900"
+            size="sm"
             showControls
             initialPage={1}
             total={3}
