@@ -43,7 +43,7 @@ export default function Dejeuner(){
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
                 {Items.map((item)=>(
-                    <div key={item.title} className="flex flex-col md:flex-row gap-3 border items-center md:items-start justify-center md:justify-start border-black rounded-3xl p-6">
+                    <div key={item.picture} className="flex flex-col md:flex-row gap-3 border items-center md:items-start justify-center md:justify-start border-black rounded-3xl p-6">
                     <Image
                      src={item.picture}
                       alt={item.title}

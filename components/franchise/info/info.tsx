@@ -4,16 +4,16 @@ export default function Info() {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
       <h1 className="text-4xl font-bold text-center font-title text-primary">
-        REJOIGNEZ L`&apos;`AVENTURE CHICKEN NATION
+        REJOIGNEZ L&apos;AVENTURE CHICKEN NATION
       </h1>
 
       <div className="bg-gray-100 p-8 rounded-lg">
         <h2 className="text-3xl font-bold mb-2">Devenez Franchisé</h2>
         <h3 className="text-xl text-primary mb-4">Une Success Story en Pleine Croissance</h3>
         <p className="text-gray-700 leading-relaxed">
-          Depuis notre création, Saveur Express s`&apos;`est imposé comme une référence dans la restauration rapide
-          de qualité. Notre concept unique et notre engagement envers l`&apos;`excellence ont séduit des milliers de
-          clients. Aujourd`&apos;`hui, nous cherchons des entrepreneurs passionnés pour développer notre réseau de
+          Depuis notre création, Saveur Express s&apos;est imposé comme une référence dans la restauration rapide
+          de qualité. Notre concept unique et notre engagement envers l&apos;excellence ont séduit des milliers de
+          clients. Aujourd&apos;hui, nous cherchons des entrepreneurs passionnés pour développer notre réseau de
           franchises.
         </p>
       </div>
@@ -54,7 +54,7 @@ export default function Info() {
             </h3>
             <ul className="list-disc pl-5 space-y-2">
               <li>Formation initiale de 6 semaines</li>
-              <li>Support continu à l`&apos;`ouverture</li>
+              <li>Support continu à l&apos;ouverture</li>
               <li>Assistance marketing personnalisée</li>
               <li>Suivi opérationnel régulier</li>
             </ul>
