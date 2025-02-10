@@ -1,6 +1,9 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
 import { Button } from "@nextui-org/react";
+import Motion from "@/lib/motion";
 
 export default function Hero() {
   return (
@@ -22,11 +25,13 @@ export default function Hero() {
           <div className="relative flex-1 flex flex-col justify-center items-center">
             <div className="relative top-0 md:top-8 lg:top-12">
               {/* Titre principal */}
-              <h1 className="relative z-[0] text-white font-title text-5xl sm:text-7xl md:text-8xl font-bold text-center tracking-wider">
-                CHAMPION
-                <br />
-                DANS POULET
-              </h1>
+              <Motion>
+                <h1 className="relative z-[0] text-white font-title text-5xl sm:text-7xl md:text-8xl font-bold text-center tracking-wider">
+                  CHAMPION
+                  <br />
+                  DANS POULET
+                </h1>
+              </Motion>
 
               {/* Illustration : tomate à côté du titre */}
               <div className="absolute hidden xl:block z-[1] size-12 md:size-20 top-[20px] -right-8">
