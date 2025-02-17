@@ -17,16 +17,15 @@ export default function NotFound() {
       Nous vous suggérons de revenir en arrière et d&apos;essayer un autre lien
       </p>
 
-      <Link href="/" passHref>
         <Button
-          as="a"
+          as={Link}
+          href="/"
           className="mt-6"
           color="primary"
           size="lg"
         >
           Retour à l&apos;accueil
         </Button>
-      </Link>
     </div>
   );
 }

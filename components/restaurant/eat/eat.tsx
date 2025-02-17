@@ -1,7 +1,8 @@
-import { Button, Link } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
 import { Mail } from "lucide-react";
 import Image from "next/image";
 import React from "react";
+import Link from "next/link";
 
 export default function Eat() {
   const restaurants = [
