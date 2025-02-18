@@ -36,7 +36,7 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-title font-bold mb-4">EXPLORER</h3>
             <ul className="space-y-6">
-              <li><Link href="/accueil" className="hover:text-primary-300">Accueil</Link></li>
+              <li><Link href="/" className="hover:text-primary-300">Accueil</Link></li>
               <li><Link href="/restaurants" className="hover:text-primary-300">Notre restaurant</Link></li>
               <li><Link href="/histoire" className="hover:text-primary-300">Histoire</Link></li>
               <li><Link href="/franchise" className="hover:text-primary-300">Franchise</Link></li>
@@ -46,9 +46,9 @@ const Footer = () => {
 
           {/* Légales Section */}
           <div>
-            <h3 className="text-xl font-title font-bold mb-4">LÉGALES</h3>
+            <h3 className="text-xl font-title font-bold mb-4">LEGALE</h3>
             <ul className="space-y-6">
-              <li><Link href="/politique" className="hover:text-primary-300">Politique et Confidentialité</Link></li>
+              {/* <li><Link href="/politique" className="hover:text-primary-300">Politique et Confidentialité</Link></li> */}
               <li><Link href="/faq" className="hover:text-primary-300">FAQ</Link></li>
             </ul>
           </div>

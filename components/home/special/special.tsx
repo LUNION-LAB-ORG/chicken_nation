@@ -1,8 +1,8 @@
 "use client";
 
-import { Pagination } from "@nextui-org/react";
+import { Pagination } from "@heroui/react";
 import { ShoppingCart } from "lucide-react";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import Image from 'next/image';
 
 export default function Special() {

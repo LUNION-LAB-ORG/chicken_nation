@@ -10,7 +10,7 @@ import {
   NavbarMenu,
   NavbarMenuItem,
   Button,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { Search, ShoppingCart } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";

@@ -1,6 +1,6 @@
 "use client";
 
-import {Tabs, Tab, Card, CardBody} from "@nextui-org/react";
+import {Tabs, Tab, Card, CardBody} from "@heroui/react";
 import Description from "./description";
 import Avis from "./avis";
 
