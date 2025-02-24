@@ -8,7 +8,7 @@ export default function News() {
         <div className="flex flex-col items-center gap-2">
           <Mail className="h-8 w-8 border-2 border-gray-600 rounded-full text-gray-600" />
           <p className="text-xl font-medium text-gray-600">Email</p>
-          <p className="text-primary">your.email.inbox@here.com</p>
+          <p className="text-primary">info@chicken-nation.com</p>
         </div>
         <div className="flex flex-col items-center gap-2">
           <MapPin className="h-8 w-8 border-2 border-gray-600 rounded-full text-gray-600" />
@@ -21,7 +21,7 @@ export default function News() {
         <div className="flex flex-col items-center gap-2">
           <Phone className="h-8 w-8 border-2 border-gray-600 rounded-full text-gray-600" />
           <p className="text-xl font-medium text-gray-600">Téléphone</p>
-          <p className="text-primary">+225 0747000034</p>
+          <p className="text-primary">07 47 00 00 34 <br /> 07 20 35 35 35</p>
         </div>
       </div>
     </div>

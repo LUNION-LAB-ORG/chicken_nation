@@ -98,7 +98,7 @@ export default function Head() {
           <Button
             as={Link}
             className="hidden md:flex bg-secondary text-secondary-foreground font-semibold"
-            href="/login"
+            href="/soonapp"
             variant="flat"
           >
             Connexion
@@ -118,7 +118,7 @@ export default function Head() {
           <Button
             as={Link}
             className=" bg-secondary text-secondary-foreground font-semibold w-full"
-            href="#"
+            href="/soonapp"
             variant="flat"
           >
             Connexion

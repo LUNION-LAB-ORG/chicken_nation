@@ -61,7 +61,7 @@ export default function Dejeuner(){
                         <div className="flex justify-between items-center">
                             <div className="text-primary text-lg font-title">{item.price} FCFA</div>
                             <div>
-                            <Link href="/restaurants/angre/burger">
+                            <Link href="/restaurants/angre/soonapp">
                                 <ShoppingCart
                                 className="text-primary cursor-pointer rounded-lg border-2 border-primary p-2"
                                 size={48}
