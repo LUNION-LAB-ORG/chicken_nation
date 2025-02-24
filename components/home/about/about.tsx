@@ -2,6 +2,7 @@
 
 import HeroVideoDialog from "@/components/magicui/hero-video-dialog";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function About() {
   return (
@@ -45,9 +46,9 @@ export default function About() {
             </div>
 
             {/* CTA Button */}
-            <button className="bg-primary text-white px-8 py-3 rounded-full">
+            <Link href={"/histoire"} className="bg-primary text-white px-8 py-3 rounded-full">
               Voir plus
-            </button>
+            </Link>
           </div>
 
           {/* Right Image - Burger */}
