@@ -36,17 +36,10 @@ export default function About() {
             {/* Video Dialog */}
             <div className="relative max-w-xs sm:max-w-sm md:max-w-md aspect-video rounded-2xl overflow-hidden mb-8 mx-auto">
               <HeroVideoDialog
-                className="block dark:hidden"
+                className="block"
                 animationStyle="from-center"
                 videoSrc="/assets/videos/video.mp4" // Vidéo locale
                 thumbnailSrc="/assets/images/backgrounds/background.png" // Miniature avant lancement
-                thumbnailAlt="Vidéo Chicken Nation - Web"
-              />
-              <HeroVideoDialog
-                className="hidden dark:block"
-                animationStyle="from-center"
-                videoSrc="/assets/videos/video.mp4"
-                thumbnailSrc="/assets/images/backgrounds/background.png"
                 thumbnailAlt="Vidéo Chicken Nation - Web"
               />
             </div>
