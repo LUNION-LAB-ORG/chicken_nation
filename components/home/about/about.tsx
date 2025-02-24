@@ -1,6 +1,7 @@
 "use client";
 
 import HeroVideoDialog from "@/components/magicui/hero-video-dialog";
+import Image from "next/image";
 
 export default function About() {
   return (
@@ -15,11 +16,13 @@ export default function About() {
         <div className="relative flex flex-col md:flex-row items-center justify-center">
           {/* Left Image - Fried Chicken */}
           <div className="hidden md:flex absolute -left-48 top-1/2 transform -translate-y-1/2 w-1/3">
-            <img
-              src="/assets/images/illustrations/page-accueil/chicken-2.png"
-              alt="Boîte de poulet frit"
-              className="object-contain w-full"
-            />
+          <Image
+            src="/assets/images/illustrations/page-accueil/chicken-2.png"
+            alt="Boîte de poulet frit"
+            width={500} // Ajuste la largeur selon ton besoin
+            height={300} // Ajuste la hauteur selon ton besoin
+            className="object-contain w-full"
+          />
           </div>
 
           {/* Center Content */}
@@ -56,11 +59,13 @@ export default function About() {
 
           {/* Right Image - Burger */}
           <div className="hidden md:flex absolute -right-48 top-1/2 transform -translate-y-1/2 w-1/3">
-            <img
-              src="/assets/images/illustrations/page-accueil/burger.png"
-              alt="Burger au poulet"
-              className="object-contain w-full"
-            />
+          <Image
+            src="/assets/images/illustrations/page-accueil/burger.png"
+            alt="Burger au poulet"
+            width={500} // Ajuste la largeur selon ton besoin
+            height={300} // Ajuste la hauteur selon ton besoin
+            className="object-contain w-full"
+          />
           </div>
         </div>
       </div>

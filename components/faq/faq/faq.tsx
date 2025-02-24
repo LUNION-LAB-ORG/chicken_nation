@@ -101,7 +101,7 @@ export default function Quiz() {
         title="Comment utiliser mes points fidélité ?"
         className="bg-gray-100 text-black text-sm p-2"
       >
-        <p>Les conditions d'éligibilité et les conditions générales d'utilisations de la carte de fidélités, vous seront communniquées très prochainement via l'application</p>
+        <p>Les conditions d&apos;éligibilité et les conditions générales d&apos;utilisations de la carte de fidélités, vous seront communniquées très prochainement via l&apos;application</p>
       </AccordionItem>
 
       <AccordionItem
