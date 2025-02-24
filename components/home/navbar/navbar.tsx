@@ -12,7 +12,7 @@ import {
   Button,
 } from "@heroui/react";
 import { Search, ShoppingCart } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -34,7 +34,7 @@ export const ChickenLogo = () => {
 export default function Head() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
-
+  const router = useRouter();
   const menuItems = [
     { name: "Accueil", link: "/" },
     { name: "Histoire", link: "/histoire" },
@@ -115,12 +115,14 @@ export default function Head() {
             </Link>
           </NavbarMenuItem>
         ))}
-        <NavbarItem onClick={() => setIsMenuOpen(false)}>
+        <NavbarItem>
           <Button
-            as={Link}
             className=" bg-secondary text-secondary-foreground font-semibold w-full"
-            href="/soonapp"
             variant="flat"
+            onPress={() => {
+              router.push("/soonapp");
+              setIsMenuOpen(false);
+            }}
           >
             Connexion
           </Button>
