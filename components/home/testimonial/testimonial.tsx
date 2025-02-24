@@ -25,7 +25,7 @@ export default function Testimonial() {
     return (
         <div className="bg-primary-50 overflow-hidden px-4 py-16 xl:p-20">
             <div className="container mx-auto px-4">
-                <div className="text-center font-title text-primary text-5xl font-bold pt-10 mb-16 fade-in">
+                <div className="text-center font-title text-primary text-4xl md:text-5xl font-bold pt-10 mb-16 fade-in">
                     FEEDBACK DES CONSOMMATEURS
                 </div>
 

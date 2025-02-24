@@ -18,7 +18,7 @@ import Link from "next/link";
 
 export const ChickenLogo = () => {
   return (
-    <Link href="/" >
+    <Link href="/">
       <Image
         src="/assets/images/icone.png"
         alt="Chicken Nation Logo"
@@ -44,6 +44,7 @@ export default function Head() {
 
   return (
     <Navbar
+      isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
       className="bg-primary"
       maxWidth="full"
@@ -108,13 +109,13 @@ export default function Head() {
 
       <NavbarMenu className="bg-primary">
         {menuItems.map((item) => (
-          <NavbarMenuItem key={item.name}>
+          <NavbarMenuItem key={item.name} onClick={() => setIsMenuOpen(false)}>
             <Link className="w-full h-full text-white" href={item.link}>
               {item.name}
             </Link>
           </NavbarMenuItem>
         ))}
-        <NavbarItem>
+        <NavbarItem onClick={() => setIsMenuOpen(false)}>
           <Button
             as={Link}
             className=" bg-secondary text-secondary-foreground font-semibold w-full"
