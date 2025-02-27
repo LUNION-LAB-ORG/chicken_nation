@@ -6,6 +6,6 @@ interface EmailTemplateProps {
 
 export const EmailTemplate: React.FC<EmailTemplateProps> = async ({ email }) => {
   return (
-    
+
   );
 };

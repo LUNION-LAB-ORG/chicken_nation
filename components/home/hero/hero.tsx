@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { Button } from "@heroui/react";
-import Motion from "@/lib/motion";
+ import Motion from "@/lib/motion";
 
 export default function Hero() {
   return (
@@ -11,7 +11,7 @@ export default function Hero() {
       {/* Section : Image de fond en pleine largeur et hauteur */}
       <Image
         className="absolute inset-0 w-full h-full object-cover z-0"
-        src="/assets/images/backgrounds/background1.png"
+        src="/assets/images/backgrounds/BgNew.png"
         alt="title"
         layout="fill"
         objectFit="cover"
@@ -25,65 +25,65 @@ export default function Hero() {
           <div className="relative flex-1 flex flex-col justify-center items-center">
             <div className="relative top-0 md:top-8 lg:top-12">
               {/* Titre principal */}
-              <Motion>
-                <h1 className="relative z-[0] text-white font-title text-5xl sm:text-7xl md:text-8xl font-bold text-center tracking-wider">
-                  CHAMPION
+               <Motion>
+                <h1 className="relative z-[0] text-[#ff6200] font-title text-5xl sm:text-7xl md:text-8xl font-bold text-center tracking-wider">
+                  DELICICEUX
                   <br />
-                  DANS POULET
+                  JUSQU&apos;A L&apos;OS
                 </h1>
-              </Motion>
+              </Motion> 
 
               {/* Illustration : tomate à côté du titre */}
-              <div className="absolute hidden xl:block z-[1] size-12 md:size-20 top-[20px] -right-8">
+              {/* <div className="absolute hidden xl:block z-[1] size-12 md:size-20 top-[20px] -right-8">
                 <Image
                   src="/assets/images/illustrations/page-accueil/tomate.png"
                   alt="Hot indicator"
                   layout="fill"
                   objectFit="contain"
                 />
-              </div>
+              </div> */}
             </div>
 
             {/* Section centrale avec illustration du poulet */}
             <div className="relative w-full flex justify-center">
               {/* Illustration : persil (gauche) */}
-              <div className="absolute left-0 md:left-20 lg:left-2 rotate-90 size-20 xl:size-40 bottom-12">
+              {/* <div className="absolute left-0 md:left-20 lg:left-2 rotate-90 size-20 xl:size-40 bottom-12">
                 <Image
                   src="/assets/images/illustrations/page-accueil/percil.png"
                   alt="Ellipse decoration"
                   layout="fill"
                   objectFit="contain"
                 />
-              </div>
+              </div> */}
 
               {/* Illustration : poulet central */}
-              <div className="relative -top-12 size-64 md:size-96 xl:size-[450px] mx-auto">
+               <div className="relative -top-0 size-64 md:size-96 xl:size-[390px] mx-auto">
                 <Image
-                  src="/assets/images/illustrations/page-accueil/chicken.png"
+                  src="/assets/images/illustrations/page-accueil/seau.png"
                   alt="Chicken Nation Bucket"
                   layout="fill"
-                  objectFit="cover"
+                  objectFit="contain"
                 />
-              </div>
+              </div> 
 
               {/* Illustration : piment (droite) */}
-              <div className="absolute right-4 md:right-32 lg:right-4 size-20 xl:size-40 bottom-12">
+              {/* <div className="absolute right-4 md:right-32 lg:right-4 size-20 xl:size-40 bottom-12">
                 <Image
                   src="/assets/images/illustrations/page-accueil/piment-vert.png"
                   alt="Ellipse decoration"
                   layout="fill"
                   objectFit="contain"
                 />
-              </div>
+              </div> */}
             </div>
           </div>
 
           {/* Bouton principal */}
-          <div className="absolute bottom-0 pb-4">
+          {/* <div className="absolute  pb-4">
             <Button color="primary" className="bg-white text-primary">
               Réserver une table
             </Button>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -104,27 +104,27 @@ export default function Hero() {
       </div>
 
       {/* Cercle décoratif (fond, à droite) */}
-      <div className="absolute -top-1/3 mt-12 xl:-top-1/2 -right-1/2 z-[1] size-[150%] md:size-full">
+      {/* <div className="absolute -top-1/3 mt-12 xl:-top-1/2 -right-1/2 z-[1] size-[150%] md:size-full">
         <Image
           src="/assets/images/backgrounds/Ellipse-3.png"
           alt="Chili pepper"
           layout="fill"
           objectFit="contain"
         />
-      </div>
+      </div> */}
 
       {/* Persil décoratif (haut, à gauche) */}
-      <div className="absolute hidden xl:block top-32 -left-16 z-[2] size-52">
+      {/* <div className="absolute hidden xl:block top-32 -left-16 z-[2] size-52">
         <Image
           src="/assets/images/illustrations/page-accueil/percil.png"
           alt="Parsley decoration"
           layout="fill"
           objectFit="contain"
         />
-      </div>
+      </div> */}
 
       {/* Cercle décoratif (bas, à gauche) */}
-      <div className="absolute hidden xl:block z-[2] -left-5 -bottom-8">
+      {/* <div className="absolute hidden xl:block z-[2] -left-5 -bottom-8">
         <div className="relative w-80 h-80">
           <Image
             src="/assets/images/backgrounds/Ellipse-2.png"
@@ -133,10 +133,10 @@ export default function Hero() {
             objectFit="contain"
           />
         </div>
-      </div>
+      </div> */}
 
       {/* Illustration piment (droite, milieu) */}
-      <div className="absolute hidden xl:block z-[2] -right-12 top-[calc(50%-100px)]">
+      {/* <div className="absolute hidden xl:block z-[2] -right-12 top-[calc(50%-100px)]">
         <div className="relative size-52">
           <Image
             src="/assets/images/illustrations/page-accueil/piment.png"
@@ -145,7 +145,7 @@ export default function Hero() {
             objectFit="contain"
           />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

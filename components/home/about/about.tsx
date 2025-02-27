@@ -16,9 +16,9 @@ export default function About() {
       <div className="relative w-full px-4">
         <div className="relative flex flex-col md:flex-row items-center justify-center">
           {/* Left Image - Fried Chicken */}
-          <div className="hidden md:flex absolute -left-48 top-1/2 transform -translate-y-1/2 w-1/3">
+          <div className="hidden md:flex absolute -left-48 top-1/2 transform -translate-y-1/2 w-1/3 scale-x-[-1]">
           <Image
-            src="/assets/images/illustrations/page-accueil/chicken-2.png"
+            src="/assets/images/illustrations/page-accueil/seauR.png"
             alt="Boîte de poulet frit"
             width={500} // Ajuste la largeur selon ton besoin
             height={300} // Ajuste la hauteur selon ton besoin
@@ -40,7 +40,14 @@ export default function About() {
                 className="block"
                 animationStyle="from-center"
                 videoSrc="/assets/videos/video.mp4" // Vidéo locale
-                thumbnailSrc="/assets/images/backgrounds/background.png" // Miniature avant lancement
+                thumbnailSrc="/assets/images/backgrounds/movieCN.png" // Miniature avant lancement
+                thumbnailAlt="Vidéo Chicken Nation - Web"
+              />
+              <HeroVideoDialog
+                className="hidden dark:block"
+                animationStyle="from-center"
+                videoSrc="/assets/videos/video.mp4"
+                thumbnailSrc="/assets/images/backgrounds/movieCN.png"
                 thumbnailAlt="Vidéo Chicken Nation - Web"
               />
             </div>
@@ -52,7 +59,7 @@ export default function About() {
           </div>
 
           {/* Right Image - Burger */}
-          <div className="hidden md:flex absolute -right-48 top-1/2 transform -translate-y-1/2 w-1/3">
+          <div className="hidden md:flex absolute -right-60 top-1/2 transform -translate-y-1/2 w-1/3">
           <Image
             src="/assets/images/illustrations/page-accueil/burger.png"
             alt="Burger au poulet"

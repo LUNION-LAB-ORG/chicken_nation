@@ -1,5 +1,5 @@
 import { Button } from "@heroui/react";
-import { sendEmail } from "@/actions/send-contact.action";
+// import { sendEmail } from "@/actions/send-contact.action";
 
 export default function AddContact() {
   return (
@@ -8,9 +8,9 @@ export default function AddContact() {
 
       <div className="p-0 md:p-24 w-full">
         <form
-        action={(formData) => {
-          sendEmail(formData);
-        }} 
+        // action={(formData) => {
+        //   sendEmail(formData);
+        // }} 
         className="space-y-6">
           {/* Nom et Prénom */}
           <div className="flex flex-col md:flex-row gap-6">
