@@ -1,42 +1,32 @@
 "use client";
 
 import { Pagination } from "@heroui/react";
-import { ShoppingCart } from "lucide-react";
-import { Button } from "@heroui/react";
-import Image from 'next/image';
+import Image from "next/image";
+import Link from "next/link";
 
 export default function Special() {
   const deals = [
     {
       id: 1,
-      title: "LUNCH DU CHAMPION XL NORMAL",
-      items: [
-        { icon: "assets/images/illustrations/page-accueil/repas-items-details-1.png", name: "Frites" },
-        { icon: "assets/images/illustrations/page-accueil/repas-items-details-2.png", name: "Sauce tomate" }
-      ],
-      image: "assets/images/illustrations/page-accueil/repas-items-1.png",
-      price: "7 500 FCFA"
+      title: "LUNCH BURGER XL",
+      image: "assets/images/illustrations/page-accueil/special1.png",
+      price: "8 000 FCFA",
+      link: "#",
     },
     {
       id: 2,
-      title: "DEMI POULET BRAISE + FRITE NORMAL",
-      items: [
-        { icon: "assets/images/illustrations/page-accueil/repas-items-details-1.png", name: "Frites" },
-        { icon: "assets/images/illustrations/page-accueil/repas-items-details-2.png", name: "Sauce tomate" }
-      ],
-      image: "assets/images/illustrations/page-accueil/repas-items-2.png",
-      price: "7 500 FCFA"
+      title: "LES MECHANT MECHANT",
+      image: "assets/images/illustrations/page-accueil/special2.png",
+      price: "7 000 FCFA",
+      link: "#",
     },
     {
       id: 3,
-      title: "LUNCH DU CHAMPION XL NORMAL",
-      items: [
-        { icon: "assets/images/illustrations/page-accueil/repas-items-details-1.png", name: "Frites" },
-        { icon: "assets/images/illustrations/page-accueil/repas-items-details-2.png", name: "Sauce tomate" }
-      ],
-      image: "assets/images/illustrations/page-accueil/menu-1.png",
-      price: "7 500 FCFA"
-    }
+      title: "CHICKEN DAY",
+      image: "assets/images/illustrations/page-accueil/special3.png",
+      price: "6 000 FCFA",
+      link: "#",
+    },
   ];
 
   return (
@@ -44,7 +34,9 @@ export default function Special() {
       <div className="relative">
         <div className="flex justify-start sm:justify-between md:justify-between sm:gap-2 md:gap-4">
           {/* Header */}
-          <h1 className="text-4xl font-title font-bold text-primary mb-8">SPECIAL DEAL</h1>
+          <h1 className="text-4xl font-title font-bold text-primary mb-8">
+            SPECIAL DEAL
+          </h1>
 
           {/* Pagination */}
           <Pagination
@@ -55,10 +47,10 @@ export default function Special() {
             total={3}
             radius="full"
             onChange={(page) => {
-              const container = document.getElementById('deals-container');
+              const container = document.getElementById("deals-container");
               if (container) {
-                const scrollAmount = container.clientWidth * (page - 1); // Calculer le défilement en fonction de la page
-                container.scrollTo({ left: scrollAmount, behavior: 'smooth' });
+                const scrollAmount = container.clientWidth * (page - 1);
+                container.scrollTo({ left: scrollAmount, behavior: "smooth" });
               }
             }}
           />
@@ -70,54 +62,32 @@ export default function Special() {
           className="flex md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto snap-x snap-mandatory"
         >
           {deals.map((deal) => (
-            <div
-              key={deal.id}
-              className="bg-[#FFF5EE] flex flex-col justify-between rounded-2xl p-6 shadow-lg transition-all duration-300 w-full"
-            >
-              <h2 className="text-xl font-bold text-primary-800 mb-4">{deal.title}</h2>
+            <Link key={deal.id} href={deal.link} className="relative w-full h-[350px] rounded-2xl overflow-hidden border border-primary shadow-lg transition-opacity duration-300 hover:opacity-70">
+              {/* Image de fond */}
+              <Image
+                src={`/${deal.image}`}
+                alt={deal.title}
+                layout="fill"
+                objectFit="cover"
+                className="w-full h-full"
+              />
 
-              <div className="flex justify-between items-start">
-                <div className="space-y-4">
-                  {deal.items.map((item, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <div className="w-8 h-8 relative">
-                        <Image
-                          src={`/${item.icon}`}
-                          alt={item.name}
-                          width={32}
-                          height={32}
-                          className="object-contain"
-                        />
-                      </div>
-                      <span className="text-primary-800">{item.name}</span>
-                    </div>
-                  ))}
-                </div>
+              {/* Overlay avec opacité */}
+              {/* <div className="absolute inset-0 bg-black opacity-40"></div> */}
 
-                <div className="w-40 h-40 relative">
-                  <Image
-                    src={`/${deal.image}`}
-                    alt={deal.title}
-                    width={160}
-                    height={160}
-                    className="object-contain"
-                  />
-                </div>
+              {/* Titre en haut */}
+              <h2 className="absolute top-4 left-4 text-white text-xl font-bold font-title">
+                {deal.title}
+              </h2>
+
+              {/* Prix en bas à droite dans un cercle */}
+              <div className="absolute bottom-4 left-4 bg-secondary text-black text-lg font-semibold px-4 py-2 rounded-full">
+                {deal.price}
               </div>
-
-              <div className="flex justify-between items-center">
-                <p className="text-lg font-semibold">
-                  Prix: <span className="text-primary">{deal.price}</span>
-                </p>
-                <Button isDisabled className="bg-transparent border-2 border-primary text-primary px-6 py-2 rounded-full hover:bg-[#FF6B00] hover:text-white transition-colors">
-                  <ShoppingCart size={20} />
-                  Commander
-                </Button>
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
     </section>
   );
-};
+}

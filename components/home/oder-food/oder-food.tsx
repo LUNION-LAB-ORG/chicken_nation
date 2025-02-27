@@ -1,6 +1,6 @@
 import { Button } from "@heroui/react";
 import Image from "next/image";
-import { sendEmail } from "@/actions/send-email.action";
+// import { sendEmail } from "@/actions/send-email.action";
 
 
 export default function OderFood() {
@@ -40,9 +40,11 @@ export default function OderFood() {
             </h2>
 
             {/* Form */}
-            <form  action={(formData) => {
-              sendEmail(formData);
-            }} className="w-full relative max-w-md flex flex-col gap-4 md:gap-0 md:flex-row bg-transparent md:bg-primary-100 rounded-none md:rounded-full">
+            <form
+            //   action={(formData) => {
+            //   sendEmail(formData);
+            // }}
+             className="w-full relative max-w-md flex flex-col gap-4 md:gap-0 md:flex-row bg-transparent md:bg-primary-100 rounded-none md:rounded-full">
               <input
                 type="email"
                 placeholder="Adresse e-mail"
