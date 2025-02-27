@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { Button } from "@heroui/react";
+// import { Button } from "@heroui/react";
  import Motion from "@/lib/motion";
 
 export default function Hero() {
