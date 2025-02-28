@@ -1,64 +1,57 @@
-'use client';
-import Image from 'next/image';
+"use client";
+
+import Image from "next/image";
 
 export default function Paiement() {
   const paymentData = [
     {
       icon: "assets/images/illustrations/page-accueil/card-1.png",
-      description: "Cartes acceptées au restaurant pour tous paiements"
+      description: "Cartes acceptées au restaurant pour tous paiements",
     },
     {
       icon: "assets/images/illustrations/page-accueil/card-2.png",
-      description: "Cartes acceptées au restaurant pour tous paiements"
+      description: "Cartes acceptées au restaurant pour tous paiements",
     },
     {
       icon: "assets/images/illustrations/page-accueil/card-3.png",
-      description: "Cartes acceptées au restaurant pour tous paiements"
-    }
+      description: "Cartes acceptées au restaurant pour tous paiements",
+    },
   ];
 
   return (
-    <div className="relative min-h-[85vh] bg-primary-100 pt-16 md:py-0">
-      {/* Background Image */}
-      <div className="h-full w-full hidden md:block">
+    <div className="bg-secondary">
+      {/* Image en haut */}
+      <div className="hidden md:block w-full h-[60vh] md:h-[80vh] relative">
         <Image
-          src="/assets/images/backgrounds/special-menu.png"
+          src="/assets/images/backgrounds/paiement2.png"
           alt="Food background"
-          width={1920}
-          height={1080}
-          className="w-full h-full object-cover"
+          layout="fill"
+          objectFit="cover"
+          className="w-full h-full"
         />
       </div>
-      
-      {/* Background overlay */}
-      <div className="hidden md:block bg-primary-100 md:bg-primary w-full h-40 absolute bottom-0"></div>      
-      
-      {/* Cards container */}
-      <div className="relative md:absolute my-auto md:my-auto bottom-10 w-full px-4">
-        <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 max-w-6xl mx-auto">
+
+      {/* Cartes en dessous */}
+      <div className="px-4 py-8">
+        <div className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-8 max-w-6xl mx-auto">
           {paymentData.map((item, index) => (
-            <div 
-              key={index} 
-              className="w-full md:flex-1 md:min-w-[250px] max-w-sm"
-            >
-              <div className="bg-white rounded-3xl p-6 md:p-4 flex flex-col items-center text-center md:bg-transparent">
-                <div className="w-28 h-28 md:w-32 md:h-32 bg-white rounded-none md:rounded-2xl shadow-none md:shadow-lg flex items-center justify-center mb-4">
+            <div key={index} className="w-full md:w-1/3 max-w-sm">
+              <div className=" p-6 flex flex-col items-center text-center">
+                <div className="w-24 h-24 bg-white rounded-3xl flex items-center justify-center mb-4">
                   <Image
                     src={`/${item.icon}`}
                     alt="Payment method"
-                    width={48}
-                    height={48}
+                    width={64}
+                    height={64}
                     className="object-contain"
                   />
                 </div>
-                <p className="text-sm text-primary md:text-white">
-                  {item.description}
-                </p>
+                <p className="text-sm text-primary-900">{item.description}</p>
               </div>
             </div>
           ))}
         </div>
-      </div>    
+      </div>
     </div>
   );
 }

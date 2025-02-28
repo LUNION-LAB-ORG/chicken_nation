@@ -26,13 +26,13 @@ export default function Service() {
           <div className="text-center text-xl text-primary-900">{item.name}</div>
         </a>
       ))}
-      <div className="hidden md:block absolute bottom-10 left-0 mt-4">
-        <div className="relative w-32 h-32">
+      <div className="hidden md:block absolute bottom-20 left-0 mt-4">
+        <div className="relative w-48 h-36">
           <Image 
             src="/assets/images/illustrations/page-accueil/paq-chick.png" 
             alt="frite" 
-            width={235}
-            height={235}
+            width={400}
+            height={400}
             className="object-contain"
           />
         </div>

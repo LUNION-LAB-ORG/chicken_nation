@@ -6,7 +6,7 @@ export default function Hero() {
       {/* Background Pattern */}
       <div className="absolute inset-0">
         <Image
-          src="/assets/images/backgrounds/background-restaurant.png"
+          src="/assets/images/backgrounds/restaurant.png"
           alt="title"
           layout="fill"
           objectFit="cover"

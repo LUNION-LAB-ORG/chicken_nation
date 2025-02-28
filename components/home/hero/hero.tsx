@@ -47,14 +47,14 @@ export default function Hero() {
             {/* Section centrale avec illustration du poulet */}
             <div className="relative w-full flex justify-center">
               {/* Illustration : persil (gauche) */}
-              {/* <div className="absolute left-0 md:left-20 lg:left-2 rotate-90 size-20 xl:size-40 bottom-12">
+               <div className="absolute left-0 md:left-20 lg:left-2 rotate-90 size-20 xl:size-40 bottom-12">
                 <Image
-                  src="/assets/images/illustrations/page-accueil/percil.png"
+                  src="/assets/images/illustrations/page-accueil/poul3.png"
                   alt="Ellipse decoration"
                   layout="fill"
                   objectFit="contain"
                 />
-              </div> */}
+              </div>
 
               {/* Illustration : poulet central */}
                <div className="relative -top-0 size-64 md:size-96 xl:size-[390px] mx-auto">
@@ -67,14 +67,14 @@ export default function Hero() {
               </div> 
 
               {/* Illustration : piment (droite) */}
-              {/* <div className="absolute right-4 md:right-32 lg:right-4 size-20 xl:size-40 bottom-12">
+               <div className="absolute right-4 md:right-32 lg:right-4 size-20 xl:size-40 bottom-12">
                 <Image
-                  src="/assets/images/illustrations/page-accueil/piment-vert.png"
+                  src="/assets/images/illustrations/page-accueil/poul2.png"
                   alt="Ellipse decoration"
                   layout="fill"
                   objectFit="contain"
                 />
-              </div> */}
+              </div> 
             </div>
           </div>
 

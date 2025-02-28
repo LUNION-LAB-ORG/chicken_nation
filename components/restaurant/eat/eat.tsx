@@ -88,7 +88,7 @@ export default function Eat() {
         ))}
       </div>
 
-      {/* Future Restaurants Section */}
+      {/* Future Restaurants Section
       <div className="flex flex-col md:flex-row items-center gap-8 w-full bg-white md:bg-gray-100 my-8 rounded-lg">
         <Image
           src="/assets/images/illustrations/restaurant/card-items-4.png"
@@ -105,7 +105,7 @@ export default function Eat() {
             4 nouvelles adresses à venir en 2025
           </p>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

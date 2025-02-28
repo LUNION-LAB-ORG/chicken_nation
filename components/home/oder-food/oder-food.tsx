@@ -24,14 +24,14 @@ export default function OderFood() {
       <div className="relative z-10 w-full max-w-screen-lg mx-auto px-4">
         <div className="bg-transparent md:bg-white relative rounded-3xl p-12 flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Left Image */}
-          <div className="hidden md:block absolute left-0 top-0 w-24 h-24">
+          {/* <div className="hidden md:block absolute left-0 top-0 w-24 h-24">
             <Image
               src="/assets/images/illustrations/page-accueil/chicken.png"
               alt="Chicken bucket"
               layout="fill"
               objectFit="contain"
             />
-          </div>
+          </div> */}
 
           {/* Center Content */}
           <div className="flex-1 flex flex-col items-center gap-10 md:gap-4">
@@ -58,14 +58,14 @@ export default function OderFood() {
           </div>
 
           {/* Right Image */}
-          <div className="hidden md:block absolute bottom-0 right-0 w-24 h-24">
+          {/* <div className="hidden md:block absolute bottom-0 right-0 w-24 h-24">
             <Image
               src="/assets/images/illustrations/page-accueil/repas-items-1.png"
               alt="Meal"
               layout="fill"
               objectFit="contain"
             />
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

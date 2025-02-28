@@ -9,7 +9,7 @@ export default function Pub() {
       {/* Background Pattern */}
       <Image
         className="absolute object-contain md:object-cover w-full"
-        src="/assets/images/illustrations/histoire/histoire-2.png"
+        src="/assets/images/illustrations/histoire/couverture.png"
         alt="title"
         fill
         priority
@@ -24,8 +24,8 @@ export default function Pub() {
         <HeroVideoDialog
           className="relative w-full h-auto"
           // animationStyle="from-center"
-          videoSrc="/assets/videos/video.mp4"
-          thumbnailSrc="/assets/images/illustrations/histoire/histoire-2.png"
+          videoSrc="/assets/videos/PRESENTATION ANGRE.mp4"
+          thumbnailSrc="/assets/images/illustrations/histoire/couverture.png"
           thumbnailAlt="Découvrez Notre Histoire"
         />
       </div>
