@@ -3,20 +3,20 @@ import Image from 'next/image';
 const Items = [
     {
         id: "1", 
-        text: "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui animi quas dolorem, sed harum adipisci voluptate fugit facere ex delectus distinctio impedit expedita necessitatibus molestiae libero! Eligendi omnis consequatur et.",
-        name: "Paul Aka",
+        text: "Les meilleures",
+        name: "444davs_",
         picture: "assets/images/illustrations/page-accueil/frite-2.png"
     },
     {
         id: "2", 
-        text: "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui animi quas dolorem, sed harum adipisci voluptate fugit facere ex delectus distinctio impedit expedita necessitatibus molestiae libero! Eligendi omnis consequatur et.",
-        name: "Paul Aka",
+        text: "Vous êtes top j'ai beaucoup aimé délicieux continuer ainsi merci e €",
+        name: "ass_bing",
         picture: "assets/images/illustrations/page-accueil/frite-2.png"
     },
     {
         id: "3", 
-        text: "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Qui animi quas dolorem, sed harum adipisci voluptate fugit facere ex delectus distinctio impedit expedita necessitatibus molestiae libero! Eligendi omnis consequatur et.",
-        name: "Paul Aka",
+        text: "Merveilleux poulets gros bien croustillants cuisinés avec une touche d'originalité culinaire parfait",
+        name: "Niako Dally",
         picture: "assets/images/illustrations/page-accueil/frite-2.png"
     },
 ];
@@ -44,13 +44,13 @@ export default function Testimonial() {
                                 <div>
                                     <div>{list.name}</div>
                                 </div>
-                                <Image
+                                {/* <Image
                                     src={`/${list.picture}`}
                                     alt="frite"
                                     width={100}
                                     height={100}
                                     className="absolute bottom-0 right-0 overflow-hidden"
-                                />
+                                /> */}
                             </div>
                         ))}
                     </div>

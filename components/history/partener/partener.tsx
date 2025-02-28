@@ -3,6 +3,7 @@ import Image from 'next/image';
 const serviceItems = [
     {id:1, name:"TURBO", picture:"assets/images/illustrations/histoire/partenaire-1.png"},
     {id:2, name:"GLOVO", picture:"assets/images/illustrations/histoire/partenaire-3.png"},
+    {id:3, name:"YANGO DELIVERY", picture:"assets/images/illustrations/histoire/partenaire-4.png"},
 ]
 
 export default function Partner() {  // Fixed capitalization for component name

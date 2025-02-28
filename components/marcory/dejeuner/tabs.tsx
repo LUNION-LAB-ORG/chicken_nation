@@ -9,25 +9,22 @@ export default function FilterMenu() {
         <Tabs color="primary" aria-label="Tabs variants" variant="light" radius="full">
         <Tab key="poulets-grilles" title="Poulets grillés" />
         </Tabs>
-        <Tabs color="primary" aria-label="Tabs variants" variant="light" radius="full" isDisabled>
+        <Tabs color="primary" aria-label="Tabs variants" variant="light" radius="full" >
         <Tab key="plats" title="Les plats" />
         </Tabs>
-        <Tabs color="primary" aria-label="Tabs variants" variant="light" radius="full" isDisabled>
+        <Tabs color="primary" aria-label="Tabs variants" variant="light" radius="full" >
         <Tab key="lunchs" title="Les Lunchs" />
         </Tabs>
-        <Tabs color="primary" aria-label="Tabs variants" variant="light" radius="full" isDisabled>
-        <Tab key="poulet-braise" title="Poulet Braisé" />
-        </Tabs>
-        <Tabs color="primary" aria-label="Tabs variants" variant="light" radius="full" isDisabled>
+        <Tabs color="primary" aria-label="Tabs variants" variant="light" radius="full" >
         <Tab key="burgers-sandwichs" title="Burgers & Swandichs" />
         </Tabs>
-        <Tabs color="primary" aria-label="Tabs variants" variant="light" radius="full" isDisabled>
+        <Tabs color="primary" aria-label="Tabs variants" variant="light" radius="full" >
         <Tab key="supplements" title="Suppléments" />
         </Tabs>
-        <Tabs color="primary" aria-label="Tabs variants" variant="light" radius="full" isDisabled>
+        <Tabs color="primary" aria-label="Tabs variants" variant="light" radius="full" >
         <Tab key="grandes-sauces" title="Grandes Sauces" />
         </Tabs>
-        <Tabs color="primary" aria-label="Tabs variants" variant="light" radius="full" isDisabled>
+        <Tabs color="primary" aria-label="Tabs variants" variant="light" radius="full" >
         <Tab key="boissons" title="Boissons" />
         </Tabs>
     </div>

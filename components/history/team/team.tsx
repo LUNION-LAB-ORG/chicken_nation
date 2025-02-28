@@ -10,7 +10,7 @@ export default function Team() {
       <div className="flex flex-col-reverse md:flex-row justify-between gap-4">
         <div className="relative w-80 h-80">
           <Image
-            src="/assets/images/illustrations/histoire/histoire-4.png"
+            src="/assets/images/illustrations/histoire/team.png"
             alt="histoire-4"
             layout="fill"
             objectFit="contain"

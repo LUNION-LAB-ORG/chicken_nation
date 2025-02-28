@@ -9,19 +9,19 @@ export default function Eat() {
     {
       id: 1,
       name: "Marcory Zone 4",
-      hours: "10h - 23h",
-      description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Expedita repudiandae neque illum aspernatur fugiat maiores id magni, modi, quaerat vitae.",
-      email: "your.email.inbox@here.com",
-      image: "/assets/images/illustrations/restaurant/card-items-1.png",
+      hours: "10h30 - 23h30 & week-end 10h30 - 01h30",
+      description: "Chicken Nation Zone 4 est un restaurant de type Fast-food spécialisé dans des recettes de poulet.",
+      email: "chicken.marcory@gmail.com",
+      image: "/assets/images/illustrations/restaurant/marcory.png",
       imageAlt: "Chicken sandwich with fries",
       link:"/restaurants/marcory"
     },
     {
       id: 2,
       name: "Angré 8è Tranche",
-      hours: "10h - 23h",
-      description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Expedita repudiandae neque illum aspernatur fugiat maiores id magni, modi, quaerat vitae.",
-      email: "your.email.inbox@here.com",
+      hours: "10h30 - 23h30 & week-end 10h30 - 01h30",
+      description: "Chicken nation Angré est un restaurant de type Fast-food spécialisé dans des recettes de poulet.",
+      email: "chicken.djibi@gmail.com",
       image: "/assets/images/illustrations/restaurant/card-items-2.png",
       imageAlt: "Restaurant exterior",
       link:"/restaurants/angre"
@@ -88,7 +88,7 @@ export default function Eat() {
         ))}
       </div>
 
-      {/* Future Restaurants Section */}
+      {/* Future Restaurants Section
       <div className="flex flex-col md:flex-row items-center gap-8 w-full bg-white md:bg-gray-100 my-8 rounded-lg">
         <Image
           src="/assets/images/illustrations/restaurant/card-items-4.png"
@@ -105,7 +105,7 @@ export default function Eat() {
             4 nouvelles adresses à venir en 2025
           </p>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

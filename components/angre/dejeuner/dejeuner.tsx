@@ -25,14 +25,6 @@ const Items = [
                         title:"DUO",
                          substile:"Laissez-vous tenter par notre création signature, Le Gourmet, une symphonie de saveurs qui éveillera vos papilles.",
                           price:"13000"},
-                          { picture:"/assets/images/illustrations/restaurant-detail/card-items-6.png",
-                            title:"poulet braisé 3p",
-                             substile:"Laissez-vous tenter par notre création signature, Le Gourmet, une symphonie de saveurs qui éveillera vos papilles.",
-                              price:"5000"},
-                              { picture:"/assets/images/illustrations/restaurant-detail/card-items-7.png",
-                                title:"poulet braisé 9p",
-                                substile:"Laissez-vous tenter par notre création signature, Le Gourmet, une symphonie de saveurs qui éveillera vos papilles.",
-                                price:"12000"},
                                                                 
 ]
 
