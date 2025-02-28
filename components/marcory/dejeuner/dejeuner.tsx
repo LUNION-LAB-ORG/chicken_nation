@@ -1,7 +1,10 @@
+"use client";
+
 import { ShoppingCart } from "lucide-react";
-import FilterMenu from "./tabs";
+// import FilterMenu from "./tabs";
 import Image from "next/image";
 import Link from "next/link";
+import { Tabs, Tab, Card, CardBody } from "@heroui/react";
 
 
 const Items = [
@@ -162,7 +165,7 @@ const Items = [
     },
     {
         picture: "/assets/images/illustrations/restaurant-menu/poulet-grille/les-familiaux/babatche.png",
-        title: "babatché",
+        title: "babatche",
         substile: "20 pcs de poulet grillé épicé ou non + frites",
         price: "20000",
         category: "Poulets Grillés Familiaux"
@@ -215,7 +218,7 @@ const Items = [
     // SUPPLÉMENTS
     {
         picture: "/assets/images/illustrations/restaurant-menu/suplements/1-pcs-poulet.png",
-        title: "1 pce poulet (épicé ou non)",
+        title: "1 pce poulet (epice ou non)",
         substile: "Morceau de poulet supplémentaire épicé ou non",
         price: "1500",
         category: "Suppléments"
@@ -280,14 +283,14 @@ const Items = [
     // BOISSONS
     {
         picture: "/assets/images/illustrations/restaurant-menu/boisson/celeste-grand.png",
-        title: "eau minérale",
+        title: "eau minerale",
         substile: "Bouteille d'eau minérale",
         price: "1000",
         category: "Boissons"
     },
     {
         picture: "/assets/images/illustrations/restaurant-menu/boisson/celest-petit.png",
-        title: "eau glacée",
+        title: "eau glacee",
         substile: "Eau glacée",
         price: "500",
         category: "Boissons"
@@ -359,7 +362,7 @@ const Items = [
     },
     {
         picture: "/assets/images/illustrations/restaurant-menu/sauces/creme-a-l-ail.png",
-        title: "crème à l'ail",
+        title: "creme a l'ail",
         substile: "Sauce à base de crème et d'ail",
         price: "1000",
         category: "Grandes Sauces"
@@ -388,44 +391,54 @@ const Items = [
 ]
 
 
+const categories = [...new Set(Items.map(item => item.category))];
+
+
 export default function Dejeuner(){
     return(
-        <div>
-            <div className="flex flex-col justify-center text-center items-center gap-8 p-8">
-            <FilterMenu/>
-            <div className="font-title text-2xl text-primary">
-                DEJEUNERS
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
-                {Items.map((item)=>(
-                    <div key={item.picture} className="flex flex-col md:flex-row gap-3 border items-center md:items-start justify-center md:justify-start border-black rounded-3xl p-6">
+        <div className="flex w-full flex-col py-16 px-6">
+        <Tabs aria-label="Menu" size="lg" color="primary" variant="light">
+          {categories.map(category => (
+            <Tab key={category} title={category}>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Items.filter(item => item.category === category).map((item, index) => (
+                  <Card key={index}>
+                    <CardBody>
+                    {/* Image du produit */}
+                <div className="flex flex-col gap-6  rounded-3xl p-6 items-center ">
                     <Image
-                     src={item.picture}
-                      alt={item.title}
-                      width={200}
-                      height={200}
-                      objectFit="contain"
+                        src={item.picture}
+                        alt={item.title}
+                        width={200}
+                        height={200}
+                        className="object-cover md:object-contain rounded-3xl"
                     />
-                    <div className="flex flex-col text-center md:text-start justify-between gap-4">
+                    {/* Contenu de la carte */}
+                    <div className="flex flex-col justify-between h-full w-full text-center ">
+                        <div>
                         <div className="text-xl font-title font-semibold">{item.title}</div>
-                        <div>{item.substile}</div>
-                        <div className="flex justify-between items-center">
-                            <div className="text-primary text-lg font-title">{item.price} FCFA</div>
-                            <div>
-                            <Link href="/restaurants/marcory/soonapp">
-                                <ShoppingCart
-                                className="text-primary cursor-pointer rounded-lg border-2 border-primary p-2"
-                                size={48}
-                                />
-                            </Link>
-                            </div>
+                        <div className="text-gray-600">{item.substile}</div>
+                        </div>
+
+                        {/* Prix et icône panier */}
+                        <div className="flex justify-between items-center mt-4">
+                        <div className="text-primary text-lg font-title">{item.price} FCFA</div>
+                        <Link href="/restaurants/marcory/soonapp">
+                            <ShoppingCart
+                            className="text-primary cursor-pointer rounded-lg border-2 border-primary p-2"
+                            size={48}
+                            />
+                        </Link>
                         </div>
                     </div>
                 </div>
+                    </CardBody>
+                  </Card>
                 ))}
-            
-            </div>
-            </div>
-        </div>
+              </div>
+            </Tab>
+          ))}
+        </Tabs>
+      </div>
     );
 }
