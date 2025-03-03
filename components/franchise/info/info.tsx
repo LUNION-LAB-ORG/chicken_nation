@@ -8,13 +8,10 @@ export default function Info() {
       </h1>
 
       <div className="bg-gray-100 p-8 rounded-lg">
-        <h2 className="text-3xl font-bold mb-2">Devenez Franchisé</h2>
+        <h2 className="text-3xl font-bold mb-2">Devenez Franchisé et Rejoignez CHICKEN NATION !</h2>
         <h3 className="text-xl text-primary mb-4">Une Success Story en Pleine Croissance</h3>
         <p className="text-gray-700 leading-relaxed">
-          Depuis notre création, Saveur Express s&apos;est imposé comme une référence dans la restauration rapide
-          de qualité. Notre concept unique et notre engagement envers l&apos;excellence ont séduit des milliers de
-          clients. Aujourd&apos;hui, nous cherchons des entrepreneurs passionnés pour développer notre réseau de
-          franchises.
+        Moi, c&apos;est le père Champion dans poulet ! Parti d&apos;un petit village, je suis venu me chercher à Abidjan et j&apos;ai créé CHICKEN NATION . Aujourd&apos;hui, notre poulet pané fait croustiller des milliers de gourmands, et bientôt, il y en aura partout dans la ville !
         </p>
       </div>
 
