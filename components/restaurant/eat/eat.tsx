@@ -4,6 +4,7 @@ import Image from "next/image";
 import React from "react";
 import Link from "next/link";
 
+
 export default function Eat() {
   const restaurants = [
     {
@@ -12,7 +13,7 @@ export default function Eat() {
       hours: "10h30 - 23h30 & week-end 10h30 - 01h30",
       description: "Chicken Nation Zone 4 est un restaurant de type Fast-food spécialisé dans des recettes de poulet.",
       email: "chicken.marcory@gmail.com",
-      image: "/assets/images/illustrations/restaurant/marcory.png",
+      image: "/assets/images/illustrations/restaurant/marcory-1.png",
       imageAlt: "Chicken sandwich with fries",
       link:"/restaurants/marcory"
     },

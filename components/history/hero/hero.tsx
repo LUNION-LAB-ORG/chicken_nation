@@ -7,7 +7,7 @@ export default function Hero() {
       {/* Background Pattern */}
       <Image
         className="absolute inset-0 object-cover"
-        src="/assets/images/backgrounds/bg-histoire.png"
+        src="/assets/images/backgrounds/bg-histoire-1.png"
         alt="title"
         fill
         priority
