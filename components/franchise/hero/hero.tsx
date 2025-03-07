@@ -6,7 +6,7 @@ export default function Hero() {
       {/* Background Pattern */}
       <Image
         className="absolute inset-0 w-full h-full object-cover"
-        src="/assets/images/backgrounds/franchise.png"
+        src="/assets/images/backgrounds/bg-franchise.png"
         alt="title"
         layout="fill" 
         objectFit="cover" 

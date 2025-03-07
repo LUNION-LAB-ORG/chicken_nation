@@ -11,7 +11,7 @@ export default function OderFood() {
       {/* Background Image */}
       <div className="absolute inset-0 w-full h-full">
         <Image
-          src="/assets/images/backgrounds/special-menu.png"
+          src="/assets/images/backgrounds/BgNew.png"
           alt="Food background"
           layout="fill"
           objectFit="cover"
