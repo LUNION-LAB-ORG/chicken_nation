@@ -3,6 +3,7 @@
 import { Pagination } from "@heroui/react";
 import Image from "next/image";
 import Link from "next/link";
+import Motion from "@/lib/motion";
 
 export default function Special() {
   const deals = [
@@ -32,10 +33,13 @@ export default function Special() {
   return (
     <section className="w-full mx-auto px-4 py-16 md:p-20">
       <div className="relative">
+      <Motion variant="verticalSlideIn">
         <div className="flex justify-start sm:justify-between md:justify-between sm:gap-2 md:gap-4">
+          
           <h1 className="text-4xl font-title font-bold text-primary mb-8">
             SPECIAL DEAL
           </h1>
+          
 
           <Pagination
             className="text-primary-900"
@@ -52,9 +56,12 @@ export default function Special() {
               }
             }}
           />
+          
         </div>
+        </Motion>
 
         {/* Deals Container avec scroll horizontal */}
+        <Motion variant="verticalSlideIn">
         <div
           id="deals-container"
           className="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth scrollbar-hide 
@@ -83,6 +90,7 @@ export default function Special() {
             </Link>
           ))}
         </div>
+        </Motion>
       </div>
     </section>
   );

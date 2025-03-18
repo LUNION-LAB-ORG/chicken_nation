@@ -1,3 +1,4 @@
+import Motion from "@/lib/motion";
 import { Button } from "@heroui/react";
 import Image from "next/image";
 // import { sendEmail } from "@/actions/send-email.action";
@@ -22,6 +23,7 @@ export default function OderFood() {
 
       {/* Content Container */}
       <div className="relative z-10 w-full max-w-screen-lg mx-auto px-4">
+      <Motion variant="verticalSlideIn">
         <div className="bg-transparent md:bg-white relative rounded-3xl p-12 flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Left Image */}
           {/* <div className="hidden md:block absolute left-0 top-0 w-24 h-24">
@@ -35,11 +37,14 @@ export default function OderFood() {
 
           {/* Center Content */}
           <div className="flex-1 flex flex-col items-center gap-10 md:gap-4">
+            <Motion variant="verticalSlideIn">
             <h2 className="text-white md:text-primary text-xl md:text-2xl font-normal md:font-semibold text-center md:text-left">
               Commandez votre déjeuner aujourd&apos;hui avec Chicken Nation
             </h2>
+            </Motion>
 
             {/* Form */}
+            <Motion variant="verticalSlideIn">
             <form
             //   action={(formData) => {
             //   sendEmail(formData);
@@ -55,6 +60,7 @@ export default function OderFood() {
                 Réserver
               </Button>
             </form>
+            </Motion>
           </div>
 
           {/* Right Image */}
@@ -67,6 +73,7 @@ export default function OderFood() {
             />
           </div> */}
         </div>
+      </Motion>
       </div>
     </section>
   );

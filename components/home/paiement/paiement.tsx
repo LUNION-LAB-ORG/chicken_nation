@@ -1,5 +1,6 @@
 "use client";
 
+import Motion from "@/lib/motion";
 import Image from "next/image";
 
 export default function Paiement() {
@@ -21,6 +22,7 @@ export default function Paiement() {
   return (
     <div className="bg-secondary">
       {/* Image en haut */}
+      <Motion variant="verticalSlideIn">
       <div className="hidden md:block w-full h-[60vh] md:h-[80vh] relative">
         <Image
           src="/assets/images/backgrounds/paiement2.png"
@@ -30,9 +32,11 @@ export default function Paiement() {
           className="w-full h-full"
         />
       </div>
+      </Motion>
 
       {/* Cartes en dessous */}
       <div className="px-4 py-8">
+      <Motion variant="verticalSlideIn">
         <div className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-8 max-w-6xl mx-auto">
           {paymentData.map((item, index) => (
             <div key={index} className="w-full md:w-1/3 max-w-sm">
@@ -51,6 +55,7 @@ export default function Paiement() {
             </div>
           ))}
         </div>
+      </Motion>
       </div>
     </div>
   );

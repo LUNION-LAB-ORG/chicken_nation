@@ -1,5 +1,7 @@
 // import Image from 'next/image';
 
+import Motion from "@/lib/motion";
+
 const Items = [
     {
         id: "1", 
@@ -25,11 +27,14 @@ export default function Testimonial() {
     return (
         <div className="bg-primary-50 overflow-hidden px-4 py-16 xl:p-20">
             <div className="container mx-auto px-4">
+            <Motion variant="verticalSlideIn">
                 <div className="text-center font-title text-primary text-4xl md:text-5xl font-bold pt-10 mb-16 fade-in">
                     FEEDBACK DES CONSOMMATEURS
                 </div>
+            </Motion>
 
                 {/* Conteneur de défilement horizontal uniquement sur mobile */}
+                <Motion variant="verticalSlideIn">
                 <div className="overflow-x-auto md:overflow-x-hidden hide-scroll smooth-scroll pb-4 flex snap-x">
                     <div className="flex gap-6 snap-x snap-mandatory">
                         {Items.map((list) => (
@@ -55,6 +60,7 @@ export default function Testimonial() {
                         ))}
                     </div>
                 </div>
+                </Motion>
             </div>
         </div>
     );

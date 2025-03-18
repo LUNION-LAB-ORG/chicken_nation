@@ -25,7 +25,7 @@ export default function Hero() {
           <div className="relative flex-1 flex flex-col justify-center items-center">
             <div className="relative top-0 md:top-8 lg:top-12">
               {/* Titre principal */}
-               <Motion>
+               <Motion variant="verticalSlideIn">
                 <h1 className="relative z-[0] text-[#ff6200] font-title text-5xl sm:text-7xl md:text-8xl font-bold text-center tracking-wider">
                   DELICICEUX
                   <br />
@@ -47,6 +47,7 @@ export default function Hero() {
             {/* Section centrale avec illustration du poulet */}
             <div className="relative w-full flex justify-center">
               {/* Illustration : persil (gauche) */}
+               <Motion variant="verticalSlideIn">
                <div className="absolute left-0 md:left-20 lg:left-2 rotate-90 size-20 xl:size-40 bottom-12">
                 <Image
                   src="/assets/images/illustrations/page-accueil/poul3.png"
@@ -55,8 +56,11 @@ export default function Hero() {
                   objectFit="contain"
                 />
               </div>
+              </Motion>
+
 
               {/* Illustration : poulet central */}
+              <Motion variant="verticalSlideIn">
                <div className="relative -top-0 size-64 md:size-96 xl:size-[390px] mx-auto">
                 <Image
                   src="/assets/images/illustrations/page-accueil/seau.png"
@@ -64,9 +68,11 @@ export default function Hero() {
                   layout="fill"
                   objectFit="contain"
                 />
-              </div> 
+              </div>
+              </Motion> 
 
               {/* Illustration : piment (droite) */}
+              <Motion variant="verticalSlideIn">
                <div className="absolute right-4 md:right-32 lg:right-4 size-20 xl:size-40 bottom-12">
                 <Image
                   src="/assets/images/illustrations/page-accueil/poul2.png"
@@ -74,7 +80,8 @@ export default function Hero() {
                   layout="fill"
                   objectFit="contain"
                 />
-              </div> 
+              </div>
+              </Motion> 
             </div>
           </div>
 
@@ -88,6 +95,7 @@ export default function Hero() {
       </div>
 
       {/* Étiquette "Livraison rapide" (droite, mi-hauteur) */}
+      
       <div className="absolute hidden xl:flex z-[2] top-1/2 right-48 2xl:right-69 bg-white rounded-xl p-4 items-center space-x-2">
         <div className="relative w-12 h-12">
           <Image

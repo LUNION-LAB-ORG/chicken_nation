@@ -3,7 +3,7 @@
 import React, { MutableRefObject, ReactNode } from "react";
 import { motion, Variants } from "framer-motion";
 
-type VariantCreator = (params?: AnimationParams) => Variants;
+type VariantCreator = (params?: any) => Variants;
 
 interface MotionProps {
   variant?: keyof typeof variantCreators;
