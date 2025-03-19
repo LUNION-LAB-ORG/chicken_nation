@@ -1,9 +1,11 @@
+import Motion from '@/lib/motion';
 import Image from 'next/image';
 
 export default function About() {
   return (
     <div className="flex flex-col md:flex-row justify-between gap-4 p-6 m-4">
       {/* Image à gauche */}
+      <Motion variant="horizontalSlideIn" animationParams={{ delay: 0.4, offset: -50 }}>
       <div className="relative">
         <Image 
           src="/assets/images/illustrations/histoire/seau.png" 
@@ -20,8 +22,10 @@ export default function About() {
           className="object-contain block md:hidden"
         />
       </div>
+      </Motion>
 
       {/* Contenu à droite */}
+      <Motion variant="horizontalSlideIn" animationParams={{ delay: 0.4, offset: 50 }}>
       <div className="flex flex-col gap-8 max-w-2xl">
         <div className="font-title text-2xl text-primary font-bold">À̀ propos de nous</div>
         <div className="text-lg leading-relaxed text-gray-800">
@@ -45,6 +49,7 @@ export default function About() {
           <span className="font-bold">Chicken Nation — Du bon. Du frais. Du champion !</span>
         </div>
       </div>
+      </Motion>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import Motion from '@/lib/motion';
 import Image from 'next/image';
 
 const serviceItems = [
@@ -9,7 +10,10 @@ const serviceItems = [
 export default function Partner() {  // Fixed capitalization for component name
     return(
         <div className="bg-primary-100 px-8 py-16 flex flex-col justify-center gap-6">
+            <Motion variant="verticalSlideIn">
             <div className="font-title text-4xl text-center">NOS PARTENAIRES</div>
+            </Motion>
+            <Motion variant="verticalSlideIn">
             <div className="relative flex flex-row justify-center md:justify-evenly text-center gap-2 md:gap-6 items-center">
                 {serviceItems.map((item)=>(
                     <div key={item.id} className="flex flex-col p-4 justify-between items-center gap-4 rounded-2xl">
@@ -26,6 +30,7 @@ export default function Partner() {  // Fixed capitalization for component name
                     </div>
                 ))}
             </div>
+            </Motion>
         </div>
     );
 }

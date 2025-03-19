@@ -1,3 +1,4 @@
+import Motion from "@/lib/motion";
 import Image from "next/image";
 
 export default function Commitment() {
@@ -39,10 +40,13 @@ export default function Commitment() {
 
   return (
     <div className="bg-orange-50 py-12 px-4">
+      <Motion variant="verticalSlideIn">
       <h1 className="text-4xl font-bold text-center mb-12 font-title">
         NOS ENGAGEMENTS
       </h1>
+      </Motion>
 
+      <Motion variant="verticalSlideIn">
       <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
         {commitments.map((commitment) => (
           <div key={commitment.id} className="flex flex-col items-center">
@@ -72,6 +76,7 @@ export default function Commitment() {
           </div>
         ))}
       </div>
+      </Motion>
     </div>
   );
 }

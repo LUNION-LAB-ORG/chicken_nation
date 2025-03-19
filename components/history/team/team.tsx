@@ -1,13 +1,17 @@
+import Motion from "@/lib/motion";
 import Image from "next/image";
 
 
 export default function Team() {
   return (
     <div className="flex flex-col gap-4 p-6 m-4">
+      <Motion variant="verticalSlideIn">
       <div className="font-title text-3xl text-center text-primary my-8">
         NOTRE EQUIPE
       </div>
+      </Motion>
       <div className="flex flex-col-reverse md:flex-row justify-between gap-4">
+      <Motion variant="horizontalSlideIn" animationParams={{ delay: 0.4, offset: -50 }}>
         <div className="relative w-80 h-80">
           <Image
             src="/assets/images/illustrations/histoire/team.png"
@@ -17,6 +21,8 @@ export default function Team() {
             className="rounded-lg"
           />
         </div>
+        </Motion>
+        <Motion variant="horizontalSlideIn" animationParams={{ delay: 0.4, offset: 50 }}>
         <div className="flex flex-col justify-around gap-8">
           <div className="flex flex-col gap-8">
             <div className="text-primary text-lg font-semibold">
@@ -39,6 +45,7 @@ export default function Team() {
             </div>
           </div>
         </div>
+        </Motion>
       </div>
     </div>
   );

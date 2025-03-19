@@ -1,13 +1,18 @@
 import Image from "next/image";
 import { Button } from "@heroui/react";
+import Motion from "@/lib/motion";
+
 
 export default function Skill() {
   return (
     <div className="flex flex-col gap-4 p-6 m-4">
+      <Motion variant="verticalSlideIn">
       <div className="font-title text-3xl text-center text-primary my-8">
         NOTRE SAVOIR-FAIRE
       </div>
+      </Motion>
       <div className="flex flex-col-reverse md:flex-row-reverse justify-between gap-4 p-6 m-4">
+      <Motion variant="horizontalSlideIn" animationParams={{ delay: 0.4, offset: 50 }}>
         <div className="relative w-80 h-80">
           <Image
             src="/assets/images/illustrations/histoire/s-faire.png"
@@ -17,6 +22,8 @@ export default function Skill() {
             className="rounded-lg"
           />
         </div>
+        </Motion>
+        <Motion variant="horizontalSlideIn" animationParams={{ delay: 0.4, offset: -50 }}>
         <div className="flex flex-col justify-between gap-8">
           <div className="flex flex-col gap-8">
             <div className="text-primary text-lg font-semibold">
@@ -44,6 +51,7 @@ export default function Skill() {
             Commander en ligne
           </Button>
         </div>
+        </Motion>
       </div>
     </div>
   );

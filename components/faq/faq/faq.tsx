@@ -1,10 +1,13 @@
 "use client";
 
+// import Motion from "@/lib/motion";
 import { Accordion, AccordionItem } from "@heroui/react";
 
 export default function Quiz() {
   return (
+    <div>
     <Accordion variant="splitted" className="text-primary-800">
+
       <AccordionItem
         key="1"
         aria-label="Comment puis-je commander"
@@ -56,7 +59,7 @@ export default function Quiz() {
         title="Proposez-vous des options végétariennes ?"
         className="bg-gray-100 text-black text-sm p-2"
       >
-        <p>Nous avons une option végétarienne : notre salade de choux , qui est disponible en supplément </p>
+        <p>Nous avons une option végétarienne : notre salade de choux , qui est disponible en supplément</p>
       </AccordionItem>
 
       <AccordionItem
@@ -101,7 +104,10 @@ export default function Quiz() {
         title="Comment utiliser mes points fidélité ?"
         className="bg-gray-100 text-black text-sm p-2"
       >
-        <p>Les conditions d&apos;éligibilité et les conditions générales d&apos;utilisations de la carte de fidélités, vous seront communniquées très prochainement via l&apos;application</p>
+        <p>
+          Les conditions d&apos;éligibilité et les conditions générales d&apos;utilisations de la carte de fidélité vous seront
+          communiquées très prochainement via l&apos;application.
+        </p>
       </AccordionItem>
 
       <AccordionItem
@@ -110,7 +116,7 @@ export default function Quiz() {
         title="Quels sont vos horaires d'ouverture ?"
         className="bg-gray-100 text-black text-sm p-2"
       >
-        <p>Nous sommes ouverts du lundi au Vendredi de 10h30 à 23h et les week end de 10h30 à minuit</p>
+        <p>Nous sommes ouverts du lundi au vendredi de 10h30 à 23h et les week-ends de 10h30 à minuit</p>
       </AccordionItem>
 
       <AccordionItem
@@ -119,7 +125,10 @@ export default function Quiz() {
         title="Peut-on réserver une table ?"
         className="bg-gray-100 text-black text-sm p-2"
       >
-        <p>Pour effectuer une réservation, nous vous invitons à nous contacter par téléphone aux numéros : 07 47 00 00 34 - chicken nation angré 07 20 35 35 35 - chicken nation marcory zone 4</p>
+        <p>
+          Pour effectuer une réservation, nous vous invitons à nous contacter par téléphone aux numéros : 07 47 00 00 34 - Chicken
+          Nation Angré, 07 20 35 35 35 - Chicken Nation Marcory Zone 4
+        </p>
       </AccordionItem>
 
       <AccordionItem
@@ -155,7 +164,9 @@ export default function Quiz() {
         title="Comment puis-je vous contacter ?"
         className="bg-gray-100 text-black text-sm p-2"
       >
-        <p>Contactez-nous via téléphone : 07 47 00 00 34 - chicken nation angré; 07 20 35 35 35 - chicken nation marcory zone 4</p>
+        <p>
+          Contactez-nous via téléphone : 07 47 00 00 34 - Chicken Nation Angré; 07 20 35 35 35 - Chicken Nation Marcory Zone 4
+        </p>
       </AccordionItem>
 
       <AccordionItem
@@ -167,5 +178,6 @@ export default function Quiz() {
         <p>Appelez notre service client pour toute réclamation.</p>
       </AccordionItem>
     </Accordion>
+    </div>
   );
 }

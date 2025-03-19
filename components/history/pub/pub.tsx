@@ -1,10 +1,12 @@
 "use client";
 
 import HeroVideoDialog from "@/components/magicui/hero-video-dialog";
+import Motion from "@/lib/motion";
 import Image from "next/image";
 
 export default function Pub() {
   return (
+    <Motion variant="verticalSlideIn">
     <div className="relative w-full h-[200px] md:h-screen overflow-hidden rounded-2xl">
       {/* Background Pattern */}
       <Image
@@ -30,5 +32,6 @@ export default function Pub() {
         />
       </div>
     </div>
+    </Motion>
   );
 }

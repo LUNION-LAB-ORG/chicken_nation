@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Tabs, Tab, Card, CardBody } from "@heroui/react";
 
 
+
 const Items = [
     // PLATS
     {
@@ -396,6 +397,7 @@ const categories = [...new Set(Items.map(item => item.category))];
 
 export default function Dejeuner(){
     return(
+        
         <div className="flex w-full flex-col py-16 px-6">
         <Tabs aria-label="Menu" size="lg" color="primary" variant="light">
           {categories.map(category => (
@@ -440,5 +442,6 @@ export default function Dejeuner(){
           ))}
         </Tabs>
       </div>
+      
     );
 }

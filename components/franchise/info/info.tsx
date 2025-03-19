@@ -1,12 +1,16 @@
+import Motion from '@/lib/motion';
 import React from 'react';
 
 export default function Info() {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
+      <Motion variant="verticalSlideIn">
       <h1 className="text-4xl font-bold text-center font-title text-primary">
         REJOIGNEZ L&apos;AVENTURE CHICKEN NATION
       </h1>
+      </Motion>
 
+      <Motion variant="verticalSlideIn">      
       <div className="bg-gray-100 p-8 rounded-lg">
         <h2 className="text-3xl font-bold mb-2">Devenez Franchisé et Rejoignez CHICKEN NATION !</h2>
         <h3 className="text-xl text-primary mb-4">Une Success Story en Pleine Croissance</h3>
@@ -14,7 +18,8 @@ export default function Info() {
         Moi, c&apos;est le père Champion dans poulet ! Parti d&apos;un petit village, je suis venu me chercher à Abidjan et j&apos;ai créé CHICKEN NATION . Aujourd&apos;hui, notre poulet pané fait croustiller des milliers de gourmands, et bientôt, il y en aura partout dans la ville !
         </p>
       </div>
-
+      </Motion>
+      <Motion variant="verticalSlideIn">
       <div className="bg-gray-100 p-8 rounded-lg">
         <h2 className="text-3xl font-bold mb-6">Pourquoi Nous Rejoindre ?</h2>
         
@@ -58,6 +63,7 @@ export default function Info() {
           </div>
         </div>
       </div>
+      </Motion>
     </div>
   );
 }
