@@ -21,6 +21,12 @@ const Items = [
         name: "Niako Dally",
         picture: "assets/images/illustrations/page-accueil/frite-2.png"
     },
+      {
+        id: "4", 
+        text: "Merveilleux poulets gros bien croustillants cuisinés avec une touche d'originalité culinaire parfait",
+        name: "Niako Dally",
+        picture: "assets/images/illustrations/page-accueil/img1"
+    },
 ];
 
 export default function Testimonial() {

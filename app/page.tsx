@@ -10,6 +10,7 @@ import Testimonial from "@/components/home/testimonial/testimonial";
 
 
 
+
 export default function Home() {
   return (
     <div>
@@ -17,7 +18,7 @@ export default function Home() {
       <About/>
       <Service/>
       <Special/>
-      <Paiement/>
+      {/* <Paiement/> */}
       <OderFood/>
       <Testimonial/>
       <Download/>
