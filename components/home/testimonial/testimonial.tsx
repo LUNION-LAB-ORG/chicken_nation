@@ -95,7 +95,7 @@ const Items = [
 
 export default function Testimonial() {
   return (
-    <div className="bg-primary-50 overflow-hidden px-4 ppy-16 xl:p-20">
+    <div className="bg-primary-50 overflow-hidden px-4 ppy-16 xxl:p-20">
       <div className="container mx-auto px-4">
         <Motion variant="verticalSlideIn">
           <div className="text-center font-title text-primary text-4xl md:text-5xl font-bold pt-10 mb-16 fade-in">
@@ -104,7 +104,6 @@ export default function Testimonial() {
         </Motion>
 
         {/* Conteneur de défilement horizontal uniquement sur mobile */}
-        {/* <Motion variant="verticalSlideIn"> */}
         <div className="min-w-[300px] llg:h-[200px] ooverflow-x-auto mmd:overflow-x-hidden hhide-scroll ssmooth-scroll pb-4 fllex ssnap-x">
           <Swiper
             modules={[Autoplay]}
@@ -156,7 +155,6 @@ export default function Testimonial() {
             ))}
           </Swiper>
         </div>
-        {/* </Motion> */}
       </div>
     </div>
   );
