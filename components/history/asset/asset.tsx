@@ -29,10 +29,19 @@ export default function Asset() {
               Une Cuisine Authentique
             </div>
             <div>
-              Tous nos plats sont préparés sur place, à la commande. Nos <br />{" "}
+            Chez CHICKEN NATION, tout commence bien avant la cuisine.<br />{" "}
+            De l''élevage au service, nous maîtrisons chaque étape pour garantir un poulet<br />
+             de qualité supérieure, élevé dans les meilleures conditions.<br />
+            Cette maîtrise totale de la chaîne nous permet de vous offrir un goût unique,<br />
+             constant, et surtout… authentique.<br /> <br />
+             👉 Quand vous croquez dans notre poulet,<br />
+              vous croquez dans un vrai savoir-faire local.
+
+
+              {/* Tous nos plats sont préparés sur place, à la commande. Nos <br />{" "}
               recettes, développées par notre chef, mêlent tradition et
               innovation <br /> pour vous offrir une expérience gustative
-              unique.
+              unique. */}
             </div>
           </div>
           <div className="flex flex-col gap-8">

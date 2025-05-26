@@ -29,9 +29,9 @@ export default function Team() {
               Une Famille Passionnée
             </div>
             <div>
-              Derrière chaque burger et chaque plat se cache une équipe de 15
-              <br /> travaillent main dans la main pour vous garantir une
-              expérience <br /> unique à chaque visite.
+            Derrière chaque burger et chaque plat, se cache une famille
+              <br /> qui travaille main dans la main pour vous 
+              procurer <br /> satisfaction à chaque visite.
             </div>
           </div>
           <div className="flex flex-col gap-8">
