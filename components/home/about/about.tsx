@@ -19,8 +19,7 @@ export default function About() {
       <Motion variant="verticalSlideIn">
       <div className="relative w-full px-4">
         <div className="relative flex flex-col md:flex-row items-center justify-center">
-          {/* Left Image - Fried Chicken */}
-          
+          {/* Left Image - Fried Chicken */}   
           <div className="hidden md:flex absolute -left-48 top-1/2 transform -translate-y-1/2 w-1/3 scale-x-[-1]">
           <Image
             src="/assets/images/illustrations/page-accueil/seauR.png"
@@ -30,7 +29,6 @@ export default function About() {
             className="object-contain w-full"
           />
           </div>
-
           {/* Center Content */}
           <div className="relative w-full text-center flex flex-col items-center z-10">
             <Motion variant="verticalSlideIn">

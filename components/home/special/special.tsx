@@ -12,21 +12,21 @@ export default function Special() {
       title: "LUNCH BURGER XL",
       image: "assets/images/illustrations/page-accueil/special1.png",
       price: "8 000 FCFA",
-      link: "#",
+      link: "/restaurants/marcory/burger",
     },
     {
       id: 2,
       title: "LES MECHANT MECHANT",
       image: "assets/images/illustrations/page-accueil/special2.png",
       price: "7 000 FCFA",
-      link: "#",
+      link: "/restaurants/marcory/burger",
     },
     {
       id: 3,
       title: "CHICKEN DAY",
       image: "assets/images/illustrations/page-accueil/special3.png",
       price: "6 000 FCFA",
-      link: "#",
+      link: "/restaurants/marcory/burger",
     },
   ];
 
