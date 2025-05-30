@@ -2,7 +2,6 @@
 
 import HeroVideoDialog from "@/components/magicui/hero-video-dialog";
 import Motion from "@/lib/motion";
-import Image from "next/image";
 
 export default function Pub() {
   return (
