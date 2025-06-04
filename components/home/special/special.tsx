@@ -41,7 +41,7 @@ export default function Special() {
           </h1>
           
 
-          <Pagination
+          {/* <Pagination
             className="text-primary-900"
             size="sm"
             showControls
@@ -55,7 +55,7 @@ export default function Special() {
                 container.scrollTo({ left: scrollAmount, behavior: "smooth" });
               }
             }}
-          />
+          /> */}
           
         </div>
         </Motion>

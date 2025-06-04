@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@heroui/avatar": "^2.2.16",
     "@heroui/react": "2.6.14",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

@@ -57,12 +57,12 @@ export default function Header(){
                               <div className="line-through text-center text-sm text-gray-400">6500 FCFA</div>
                         </div>
                         <div className="text-start">Laissez-vous tenter par notre création signature, Le Gourmet, une symphonie de saveurs qui éveillera vos papilles. Ce burger d&apos;exception commence par un pain brioché artisanal, légèrement toasté, aux graines de sésame dorées</div>
-                        <div className="flex items-center gap-8">
+                        {/* <div className="flex items-center gap-8">
                             <div>
                             <Pagination showControls initialPage={1} total={1} />
                             </div>
                             <div className="text-gray-400 text-xl">♥</div>
-                        </div>
+                        </div> */}
                         <Button
                                 color="primary"
                                 className="flex items-center gap-2 px-4 py-2 self-start"

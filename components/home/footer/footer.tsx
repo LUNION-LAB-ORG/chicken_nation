@@ -1,7 +1,7 @@
-import React from 'react';
-import Link from 'next/link';
-import { Facebook, Instagram } from 'lucide-react';
-import Image from 'next/image';
+import React from "react";
+import Link from "next/link";
+import { Facebook, Instagram } from "lucide-react";
+import Image from "next/image";
 
 const Footer = () => {
   return (
@@ -13,12 +13,22 @@ const Footer = () => {
             📍 Chicken Nation Marcory Zone 4 / Chicken Nation Angré
           </span>
         </div>
-        <span className="flex items-center">
-          🕒 Tous les jours - 10h à 23h
-        </span>
+        <span className="flex items-center">🕒 Tous les jours - 10h à 23h</span>
         <div className="bg-secondary text-secondary-foreground py-2 flex justify-center space-x-4">
-          <a href="#"><Facebook className="w-6 h-6" /></a>
-          <a href="#"><Instagram className="w-6 h-6" /></a>
+          <a
+            href="https://www.facebook.com/chickennationabj"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Facebook className="w-6 h-6" />
+          </a>
+          <a
+            href="https://www.instagram.com/chickennationabj/?hl=fr"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Instagram className="w-6 h-6" />
+          </a>
         </div>
       </div>
 
@@ -28,7 +38,12 @@ const Footer = () => {
           {/* Logo Section */}
           <div className="flex flex-col justify-start md:justify-center items-start md:items-center">
             <div className="w-32 h-32 relative">
-              <Image src="/assets/images/logo_2.png" alt="Chicken Nation" layout="fill" objectFit="contain" />
+              <Image
+                src="/assets/images/logo_2.png"
+                alt="Chicken Nation"
+                layout="fill"
+                objectFit="contain"
+              />
             </div>
           </div>
 
@@ -36,11 +51,31 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-title font-bold mb-4">EXPLORER</h3>
             <ul className="space-y-6">
-              <li><Link href="/" className="hover:text-primary-300">Accueil</Link></li>
-              <li><Link href="/restaurants" className="hover:text-primary-300">Notre restaurant</Link></li>
-              <li><Link href="/histoire" className="hover:text-primary-300">Histoire</Link></li>
-              <li><Link href="/franchise" className="hover:text-primary-300">Franchise</Link></li>
-              <li><Link href="/contact" className="hover:text-primary-300">Contacts</Link></li>
+              <li>
+                <Link href="/" className="hover:text-primary-300">
+                  Accueil
+                </Link>
+              </li>
+              <li>
+                <Link href="/restaurants" className="hover:text-primary-300">
+                  Notre restaurant
+                </Link>
+              </li>
+              <li>
+                <Link href="/histoire" className="hover:text-primary-300">
+                  Histoire
+                </Link>
+              </li>
+              <li>
+                <Link href="/franchise" className="hover:text-primary-300">
+                  Franchise
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="hover:text-primary-300">
+                  Contacts
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -49,7 +84,11 @@ const Footer = () => {
             <h3 className="text-xl font-title font-bold mb-4">LEGALE</h3>
             <ul className="space-y-6">
               {/* <li><Link href="/politique" className="hover:text-primary-300">Politique et Confidentialité</Link></li> */}
-              <li><Link href="/faq" className="hover:text-primary-300">FAQ</Link></li>
+              <li>
+                <Link href="/faq" className="hover:text-primary-300">
+                  FAQ
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -57,11 +96,46 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-title font-bold mb-4">NOS PLATS</h3>
             <ul className="space-y-6">
-              <li><Link href="/restaurants/marcory/burger" className="hover:text-primary-300">Poulets grillés</Link></li>
-              <li><Link href="/restaurants/marcory/burger" className="hover:text-primary-300">Lunchs</Link></li>
-              <li><Link href="/restaurants/marcory/burger" className="hover:text-primary-300">Combos</Link></li>
-              <li><Link href="/restaurants/marcory/burger" className="hover:text-primary-300">Plats</Link></li>
-              <li><Link href="/restaurants/marcory/burger" className="hover:text-primary-300">Plus</Link></li>
+              <li>
+                <Link
+                  href="/restaurants/marcory/burger"
+                  className="hover:text-primary-300"
+                >
+                  Poulets grillés
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/restaurants/marcory/burger"
+                  className="hover:text-primary-300"
+                >
+                  Lunchs
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/restaurants/marcory/burger"
+                  className="hover:text-primary-300"
+                >
+                  Combos
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/restaurants/marcory/burger"
+                  className="hover:text-primary-300"
+                >
+                  Plats
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/restaurants/marcory/burger"
+                  className="hover:text-primary-300"
+                >
+                  Plus
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
@@ -73,7 +147,12 @@ const Footer = () => {
           Copyright Chicken Nation, 2024 Tous droits réservés |{" "}
           <span>
             designed and developed by{" "}
-            <a href="https://lunion-lab.com" target="_blank" rel="noopener noreferrer" className="text-primary font-semibold underline hover:text-primary-700">
+            <a
+              href="https://lunion-lab.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary font-semibold underline hover:text-primary-700"
+            >
               Lunion-Lab
             </a>
           </span>

@@ -1,44 +1,53 @@
-import Image from "next/image";
+import { Avatar } from "@heroui/react";
 
 export default function Notice() {
+
   const reviews = [
     {
-      author: "Pauline AKA",
+      author: "aKaKA charles_ ",
       date: "Mar 10 oct 2023",
       rating: 5,
       review:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec dictum nulla vel aliquam ultrices. Nam ultrices justo eget elit condimentum, nec pharetra erat mollis. Etiam vel justo sem. Etiam in leo vitae quam pellentesque tincidunt nec eget enim.",
-      image: "/assets/images/illustrations/restaurant-detail/Fotoprofessional.jpeg",
+      "Ma  femme devais accouché le 10 le 11 a midi l'enfant ne vient pas l'es docteurs voulais l opérer elle a refuser elle m'a dit bb je veux manger Chiken nation l enfant va venir je suis allée chercher elle à croquer à pousser mon fils est venue au monde depuis se jours Chicken nation au menu au 2 fois dans la semaine quand il auras 1 ans on viendras avec lui à  Chicken nation ❤️ merci encore à  vous 😍 ",
+      image: "assets/images/illustrations/page-accueil/img1",
     },
     {
-      author: "Paul AKA",
+      author: "Rebecca Koffi",
       date: "Mar 10 oct 2023",
       rating: 5,
       review:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec dictum nulla vel aliquam ultrices. Nam ultrices justo eget elit condimentum, nec pharetra erat mollis.",
-      image: "/assets/images/illustrations/restaurant-detail/Fotoprofessional.jpeg",
+      "belle déco, belle ambiance, merci pour le nouveau cadre adéquat pour manger en toute quiétude... on est ensemble Chicken Nation 🥳",
+      image: "assets/images/illustrations/page-accueil/img1",
     },
     {
-      author: "Paul AKA",
+      author: "Koné Djenebou",
+      date: "Mars 10 oct 2023",
+      rating: 5,
+      review:
+      "Vous être  les meilleurs en tout cas j'ai bien aimé surtout les frites 🤤🤤",
+      image: "assets/images/illustrations/page-accueil/img1",
+    },
+    {
+      author: "Jocelyn Bodehi Segnon",
       date: "Mar 10 oct 2023",
       rating: 5,
-      review: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      image: "/assets/images/illustrations/restaurant-detail/Fotoprofessional.jpeg",
+      review: "Le goût de ça Chiken Nation rester le meilleur restaurant en matière de poulet pané ❤️",
+      image: "assets/images/illustrations/page-accueil/img1",
     },
     {
-      author: "Paul Maissane",
+      author: "Christy 17A",
       date: "Mar 10 oct 2023",
       rating: 5,
       review:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec dictum nulla vel aliquam ultrices. Nam ultrices justo eget elit condimentum, nec pharetra erat mollis.",
-      image: "/assets/images/illustrations/restaurant-detail/Fotoprofessional.jpeg",
+      "c'est trop doux même 🤭 ",
+      image: "assets/images/illustrations/page-accueil/img1",
     },
     {
-      author: "Mariam Maïssane",
+      author: "Niako Dally",
       date: "Mar 10 oct 2023",
       rating: 5,
-      review: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ",
-      image: "/assets/images/illustrations/restaurant-detail/Fotoprofessional.jpeg",
+      review: "Merveilleux poulets gros bien croustillants cuisinés avec une touche d'originalité culinaire parfait",
+      image: "assets/images/illustrations/page-accueil/frite-2.png",
     },
   ];
 
@@ -46,13 +55,7 @@ export default function Notice() {
     <div className="mx-2 md:mx-16 my-2 flex flex-col gap-6">
       {reviews.map((review, index) => (
         <div key={index} className="flex items-start text-start space-x-4">
-          <Image
-            src={review.image}
-            alt={review.author}
-            width={40} // Correspond à "w-10" en Tailwind (10 * 4px)
-            height={40} // Correspond à "h-10" en Tailwind
-            className="rounded-full"
-          />
+           <Avatar className="hidden lg:block" name={review.author} />
           <div className="flex flex-col text-start items-start gap-3">
             <div className="flex flex-col gap-0">
               <h3 className="text-xl font-semibold">{review.author}</h3>
@@ -61,7 +64,7 @@ export default function Notice() {
             <div className="text-primary">
               ★★★★<span className="text-gray-400">★</span>
             </div>
-            <p>{review.review}</p>
+            <p className="max-w-7xl">{review.review}</p>
           </div>
         </div>
       ))}
