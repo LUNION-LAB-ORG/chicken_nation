@@ -17,8 +17,8 @@ const Footer = () => {
           🕒 Tous les jours - 10h à 23h
         </span>
         <div className="bg-secondary text-secondary-foreground py-2 flex justify-center space-x-4">
-          <Link target="_blank" href="https://www.instagram.com/chickennationabj/"><Facebook className="w-6 h-6" /></Link>
-          <Link target="_blank" href="https://www.facebook.com/chickennationabj"><Instagram className="w-6 h-6" /></Link>
+          <Link target="_blank" href="https://www.facebook.com/chickennationabj/"><Facebook className="w-6 h-6" /></Link>
+          <Link target="_blank" href="https://www.instagram.com/chickennationabj/"><Instagram className="w-6 h-6" /></Link>
         </div>
       </div>
 
