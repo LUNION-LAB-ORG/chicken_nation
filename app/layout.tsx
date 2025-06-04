@@ -50,7 +50,9 @@ export default function RootLayout({
       >
         <div className="font-poppins max-w-screen-2xl mx-auto ">
           <Head />
-          <Providers>{children}</Providers>
+          <Providers>
+            {children}
+            </Providers>
           <Footer />
         </div>
       </body>
