@@ -1,6 +1,6 @@
 "use client";
 
-import HeroVideoDialog from "@/components/magicui/hero-video-dialog";
+// import HeroVideoDialog from "@/components/magicui/hero-video-dialog";
 import Motion from "@/lib/motion";
 
 export default function Pub() {

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Pagination } from "@heroui/react";
+import { Button } from "@heroui/react";
 import { LayoutGrid, ShoppingCart, Tag } from "lucide-react";
 import Image from "next/image";
 
