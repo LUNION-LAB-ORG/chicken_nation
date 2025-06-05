@@ -30,7 +30,7 @@ export default function Asset() {
             </div>
             <div>
             Chez CHICKEN NATION, tout commence bien avant la cuisine.<br />{" "}
-            De l''élevage au service, nous maîtrisons chaque étape pour garantir un poulet<br />
+            De l&apost;élevage au service, nous maîtrisons chaque étape pour garantir un poulet<br />
              de qualité supérieure, élevé dans les meilleures conditions.<br />
             Cette maîtrise totale de la chaîne nous permet de vous offrir un goût unique,<br />
              constant, et surtout… authentique.<br /> <br />
