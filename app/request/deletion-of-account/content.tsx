@@ -10,7 +10,7 @@ export default function Content() {
       <div className="max-w-4xl mx-auto px-4 py-12">
         <div className="bg-white rounded-xl shadow-sm p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">
-            Suppression de compte <span className="text-color-one">LIVREUR</span>
+            Suppression de compte <span className="text-color-one">CLIENT</span>
           </h1>
 
           <div className="prose max-w-none">
@@ -39,27 +39,41 @@ export default function Content() {
                   1
                 </span>
                 <span>
+                  Ouvrez l'application Chicken Nation sur votre téléphone et connectez vous si ce n'est pas encore fait
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#EF3E2D] text-white flex items-center justify-center font-semibold">
+                 2
+                </span>
+                <span>
                   Ouvrez le menu principal (icône ≡ en haut à gauche de l&apos;écran
                   d&apos;accueil)
                 </span>
               </li>
               <li className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#EF3E2D] text-white flex items-center justify-center font-semibold">
-                  2
+                  3
                 </span>
                 <span>Sélectionnez &quot;Paramètres&quot; en bas du menu</span>
               </li>
               <li className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#EF3E2D] text-white flex items-center justify-center font-semibold">
-                  3
+                  4
                 </span>
                 <span>
-                  Dans l&apos;écran Paramètres, faites défiler jusqu&apos;en bas
+                  Dans l&apos;écran Paramètres, cliquez sur "Mon compte"
                 </span>
               </li>
               <li className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#EF3E2D] text-white flex items-center justify-center font-semibold">
-                  4
+                  5
+                </span>
+                <span>Faites défiler vers le bas</span>
+              </li>
+              <li className="flex gap-3">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#EF3E2D] text-white flex items-center justify-center font-semibold">
+                  6
                 </span>
                 <span>Appuyez sur &quot;Supprimer mon compte&quot;</span>
               </li>
