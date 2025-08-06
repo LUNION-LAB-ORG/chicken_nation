@@ -16,7 +16,7 @@ export default function PrivacyPolicyPage() {
 
       <div className="space-y-6 px-8">
         <h1 className="text-2xl font-bold text-center mb-8">
-          Politique de Confidentialité de l&apos;Application TURBOY
+          Politique de Confidentialité de l&apos;Application CHIKEN NATION
         </h1>
 
         <p className="text-sm text-gray-500 text-center">
@@ -25,9 +25,9 @@ export default function PrivacyPolicyPage() {
 
         <h2 className="text-xl font-semibold mt-6">1. Introduction</h2>
         <p>
-          La présente politique de confidentialité décrit comment TURBO DELIVERY
+          La présente politique de confidentialité décrit comment CHIKEN NATION
           SARL collecte, utilise, partage et protège les informations
-          personnelles des turboys qui utilisent l&apos;application mobile TURBOY.
+          personnelles des utilisateurs qui utilisent l&apos;application mobile CHIKEN NATION.
         </p>
         <p>
           Nous nous engageons à protéger votre vie privée et à respecter les
@@ -81,7 +81,7 @@ export default function PrivacyPolicyPage() {
 
         <h2 className="text-xl font-semibold mt-6">8. Contact</h2>
         <p>
-          Pour toute question, contactez-nous : info@turbodeliveryapp.com | 00225 07 78 68 74 08
+          Pour toute question, contactez-nous : info@chicken-nation.com | 002250778687408
         </p>
       </div>
     </div>
