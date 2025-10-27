@@ -1,0 +1,27 @@
+{
+  "locales": {
+    "ar": "العربية",
+    "en": "الإنجليزية",
+    "fr": "الفرنسية"
+  },
+  "menu_links": {
+    "home": "الرئيسية",
+    "docs": "الوثائق",
+    "pricing": "الأسعار",
+    "blog": "المدونة",
+    "about": "حول",
+    "profile": "الملف الشخصي",
+    "dashboard": "لوحة القيادة",
+    "projects": "المشاريع",
+    "team": "الفريق",
+    "calendar": "التقويم",
+    "settings": "الإعدادات",
+    "help_feedback": "المساعدة والتعليقات"
+  },
+  "social_links": {
+    "github": "GitHub",
+    "twitter": "Twitter",
+    "discord": "Discord",
+    "sponsor": "Sponsor"
+  }
+}

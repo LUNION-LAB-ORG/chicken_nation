@@ -1,0 +1,27 @@
+{
+  "locales": {
+    "ar": "Arabic",
+    "en": "English",
+    "fr": "French"
+  },
+  "menu_links": {
+    "home": "Home",
+    "docs": "Docs",
+    "pricing": "Pricing",
+    "blog": "Blog",
+    "about": "About",
+    "profile": "Profile",
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "team": "Team",
+    "calendar": "Calendar",
+    "settings": "Settings",
+    "help_feedback": "Help & Feedback"
+  },
+  "social_links": {
+    "github": "GitHub",
+    "twitter": "Twitter",
+    "discord": "Discord",
+    "sponsor": "Sponsor"
+  }
+}

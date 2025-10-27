@@ -1,0 +1,14 @@
+{
+  "navbar": {
+    "search": {
+      "placeholder": "بحث..."
+    },
+    "buttons": {
+      "login": "تسجيل الدخول",
+      "logout": "تسجيل الخروج"
+    }
+  },
+  "footer": {
+    "powered_by": "مدعوم من قبل"
+  }
+}

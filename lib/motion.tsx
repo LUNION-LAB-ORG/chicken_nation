@@ -17,7 +17,7 @@ interface MotionProps {
 const Motion: React.FC<MotionProps> = ({
   variant = "fadeIn",
   children,
-  className,
+  className = "flex justify-center items-center",
   ref,
   animationParams = {},
   viewport = { once: true, amount: 0.5 },

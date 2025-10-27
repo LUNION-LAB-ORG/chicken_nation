@@ -1,0 +1,12 @@
+{
+  "login_title": "Login",
+  "email_label": "Email Address",
+  "password_label": "Password",
+  "remember_me": "Remember me",
+  "forgot_password": "Forgot password?",
+  "sign_in": "Sign in",
+  "signing_in": "Signing in...",
+  "login_success": "Login successful",
+  "login_error": "Login error",
+  "login_footer": "Welcome to our secure platform"
+}

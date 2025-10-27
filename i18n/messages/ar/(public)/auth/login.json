@@ -1,0 +1,12 @@
+{
+  "login_title": "تسجيل الدخول",
+  "email_label": "البريد الإلكتروني",
+  "password_label": "كلمة المرور",
+  "remember_me": "تذكرني",
+  "forgot_password": "نسيت كلمة المرور؟",
+  "sign_in": "تسجيل الدخول",
+  "signing_in": "جاري تسجيل الدخول...",
+  "login_success": "تم تسجيل الدخول بنجاح",
+  "login_error": "خطأ في تسجيل الدخول",
+  "login_footer": "مرحبًا بك في منصتنا الآمنة"
+}

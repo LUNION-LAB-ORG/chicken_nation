@@ -1,0 +1,12 @@
+{
+  "login_title": "Connexion",
+  "email_label": "Adresse e-mail",
+  "password_label": "Mot de passe",
+  "remember_me": "Se souvenir de moi",
+  "forgot_password": "Mot de passe oublié ?",
+  "sign_in": "Se connecter",
+  "signing_in": "Connexion...",
+  "login_success": "Connexion réussie",
+  "login_error": "Erreur de connexion",
+  "login_footer": "Bienvenue sur notre plateforme sécurisée"
+}

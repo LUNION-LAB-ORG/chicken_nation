@@ -1,0 +1,14 @@
+{
+  "navbar": {
+    "search": {
+      "placeholder": "Rechercher..."
+    },
+    "buttons": {
+      "login": "Connexion",
+      "logout": "Déconnexion"
+    }
+  },
+  "footer": {
+    "powered_by": "Propulsé par"
+  }
+}
