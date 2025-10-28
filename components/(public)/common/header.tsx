@@ -86,7 +86,7 @@ export default function Header() {
           <Button
             as={Link}
             className="hidden md:flex bg-secondary text-secondary-foreground font-semibold"
-            href="/soonapp"
+            href="/app-mobile"
             variant="flat"
           >
             Connexion
@@ -107,7 +107,7 @@ export default function Header() {
             className=" bg-secondary text-secondary-foreground font-semibold w-full"
             variant="flat"
             onPress={() => {
-              router.push("/soonapp");
+              router.push("/app-mobile");
               setIsMenuOpen(false);
             }}
           >
