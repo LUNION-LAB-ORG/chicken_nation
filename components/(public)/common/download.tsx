@@ -9,9 +9,9 @@ import Link from "next/link";
 
 export default function Download() {
   return (
-    <Section padding="none" className="bg-secondary relative overflow-hidden">
+    <Section padding="none" className="bg-[#fcd424] relative overflow-hidden">
       <div className="relative grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="flex flex-col justify-center items-center md:items-start bg-secondary-600 p-6">
+        <div className="flex flex-col justify-center items-center md:items-start p-4">
           <Motion variant="verticalSlideIn">
             <h2 className="font-title text-2xl sm:text-3xl md:text-5xl text-center md:text-left font-semibold leading-tight">
               Pour commander appelez-nous au <br />

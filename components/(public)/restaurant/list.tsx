@@ -7,39 +7,17 @@ import Link from "next/link";
 import Motion from "@/lib/motion";
 import Section from "@/components/primitives/Section";
 import Title from "@/components/primitives/Title";
-
-const restaurants = [
-  {
-    id: 1,
-    name: "Marcory Zone 4",
-    hours: "10h30 - 23h30 & week-end 10h30 - 01h30",
-    description:
-      "Chicken Nation Zone 4 est un restaurant de type Fast-food spécialisé dans des recettes de poulet.",
-    email: "chicken.marcory@gmail.com",
-    image: "/assets/images/illustrations/restaurant/marcory-1.png",
-    link: "/restaurants/marcory",
-  },
-  {
-    id: 2,
-    name: "Angré 8è Tranche",
-    hours: "10h30 - 23h30 & week-end 10h30 - 01h30",
-    description:
-      "Chicken Nation Angré est un restaurant de type Fast-food spécialisé dans des recettes de poulet.",
-    email: "chicken.djibi@gmail.com",
-    image: "/assets/images/illustrations/restaurant/angre.png",
-    link: "/restaurants/angre",
-  },
-];
+import { listRestaurants } from "@/features/restaurants/data/list-restaurants";
 
 export default function List() {
   return (
     <Section className="flex flex-col gap-8 md:gap-12">
-      <Motion variant="verticalSlideIn">
+      {/* <Motion variant="verticalSlideIn">
         <Title size="md">NOS ADRESSES</Title>
-      </Motion>
+      </Motion> */}
       {/* Restaurants grid */}
       <div className="grid md:grid-cols-2 gap-10">
-        {restaurants.map((r) => (
+        {listRestaurants.map((r) => (
           <Motion
             key={r.id}
             animationParams={{ delay: r.id * 0.1 }}
@@ -55,13 +33,13 @@ export default function List() {
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-300 flex items-end justify-center pb-4">
-                  <Link href={r.link}>
+                  <Link href={"/restaurants/nos-menus"}>
                     <Button
                       color="primary"
                       variant="shadow"
                       className="font-medium"
                     >
-                      Réserver une table
+                      Commandez
                     </Button>
                   </Link>
                 </div>
@@ -96,7 +74,7 @@ export default function List() {
       </div>
 
       {/* Section future restaurants */}
-      <div className="mt-20 text-center">
+      <div className="text-center">
         <div className="bg-primary/10 rounded-2xl p-10 flex flex-col items-center justify-center">
           <Image
             src="/assets/images/illustrations/restaurant/card-items-4.png"
