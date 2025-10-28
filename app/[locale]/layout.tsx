@@ -38,7 +38,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
+    // { media: "(prefers-color-scheme: dark)", color: "black" },
   ],
 };
 
@@ -57,7 +57,7 @@ export default async function RootLayout({
   const direction = getLangDir(locale);
 
   return (
-    <html lang="en" dir={direction} suppressHydrationWarning>
+    <html lang="fr" dir={direction} suppressHydrationWarning>
       <head />
       <body
         className={cn(
@@ -69,7 +69,7 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages} locale={locale}>
           <QueryProvider>
             <ThemeProviders
-              themeProps={{ attribute: "class", defaultTheme: "dark" }}
+              themeProps={{ attribute: "class", defaultTheme: "light" }}
             >
               <ToastProvider
                 placement="top-center"
