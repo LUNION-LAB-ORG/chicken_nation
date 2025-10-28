@@ -1,46 +1,49 @@
-import Motion from "@/lib/motion";
-import { Progress } from "@heroui/progress";
 import Image from "next/image";
+import { Progress } from "@heroui/progress";
+import Motion from "@/lib/motion";
 import Section from "@/components/primitives/Section";
 
 export default function SoonApp() {
   return (
-    <Section className="bg-primary-200 min-h-screen w-full flex items-center justify-center">
-      <Motion variant="verticalSlideIn">
-        <div className="bg-white rounded-xl shadow-xl p-4 md:p-12 flex flex-col md:flex-row justify-around items-center md:items-stretch gap-8 max-w-screen-md m-8">
-          <div className="flex flex-col justify-between w-full">
-            <div className="text-xl lg:text-5xl font-bold text-primary flex flex-col gap-2">
-              Eh bien, tenez-vous prêts ! <br />
-              <span className="text-xl md:text-[2.7rem] md:leading-[2.7rem]">
-                L&apos;application de commande sera bientôt disponible
-              </span>
-            </div>
+    <Section className="relative flex items-center justify-center min-h-[90vh] bg-gradient-to-br from-secondary via-white to-primary-200">
+      <Motion variant="fadeIn">
+        <div className="backdrop-blur-lg bg-white/70 border border-white/30 rounded-3xl shadow-2xl p-6 md:p-12 flex flex-col md:flex-row items-center gap-10 max-w-6xl w-full">
+          
+          {/* Texte principal */}
+          <div className="flex flex-col justify-center md:w-1/2 space-y-6 text-center md:text-left">
+            <h1 className="text-3xl md:text-5xl font-bold text-primary">
+              L’attente touche à sa fin 🚀
+            </h1>
+            <p className="text-gray-700 text-lg md:text-2xl leading-relaxed">
+              Notre nouvelle application de commande arrive bientôt.  
+              Préparez-vous à découvrir une expérience fluide, rapide et intuitive.
+            </p>
 
-            <div className="text-base md:text-2xl mt-8">
-              Nous vous réservons bien des surprises.
-            </div>
-
-            <div className="flex flex-col gap-1 mt-4">
-              <div className="text-primary font-medium">
+            {/* Progression */}
+            <div className="space-y-2 pt-4">
+              <span className="text-primary font-medium">
                 Niveau de développement
-              </div>
+              </span>
               <Progress
                 aria-label="Progression du développement"
                 color="primary"
                 size="md"
-                className="max-w-md"
-                value={98}
+                value={92}
+                className="max-w-md mx-auto md:mx-0"
               />
             </div>
           </div>
 
-          <div className="object-contain">
+          {/* Illustration */}
+          <div className="relative md:w-1/2 flex justify-center">
+            <div className="absolute -top-8 -left-8 w-24 h-24 bg-primary/20 rounded-full blur-3xl" />
             <Image
               src="/assets/images/illustrations/page-introuvable/commande.png"
               alt="Aperçu de l'application mobile"
-              height={200}
-              width={250}
+              width={320}
+              height={640}
               priority
+              className="relative z-10 object-contain drop-shadow-2xl"
             />
           </div>
         </div>

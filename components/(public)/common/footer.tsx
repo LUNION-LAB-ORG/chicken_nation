@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Facebook, Instagram } from "lucide-react";
@@ -9,8 +8,7 @@ import Title from "@/components/primitives/Title";
 const Footer = () => {
   return (
     <footer className="w-full text-sm">
-      {/* === Top Info Bar === */}
-      <div className="bg-secondary border-t-20 border-secondary text-secondary-foreground py-3 px-4 flex flex-col md:flex-row justify-between items-center gap-3">
+      <div className="bg-secondary border-secondary text-secondary-foreground py-3 px-4 flex flex-col md:flex-row justify-between items-center gap-3">
         <span className="flex items-center text-center md:text-left">
           📍 Chicken Nation Marcory Zone 4 / Angré / Sococe
         </span>
@@ -37,10 +35,8 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* === Main Footer === */}
       <div className="bg-primary text-white py-12">
         <div className="max-w-6xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-10">
-          {/* Logo */}
           <div className="flex flex-col items-center md:items-start">
             <div className="relative w-28 h-28 mb-4">
               <Image
