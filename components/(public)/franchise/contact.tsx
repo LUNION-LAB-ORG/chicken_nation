@@ -1,33 +1,37 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import Motion from "@/lib/motion";
 import { Button } from "@heroui/button";
+import Section from "@/components/primitives/Section";
+import Title from "@/components/primitives/Title";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
-    nom: '',
-    prenom: '',
-    email: '',
-    telephone: '',
-    message: '',
+    nom: "",
+    prenom: "",
+    email: "",
+    telephone: "",
+    message: "",
   });
 
   const [sending, setSending] = useState(false);
-  const [feedback, setFeedback] = useState('');
+  const [feedback, setFeedback] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
-    setFeedback('');
+    setFeedback("");
 
-    const res = await fetch('/api/send-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch("/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
     });
 
@@ -35,17 +39,25 @@ export default function Contact() {
     setSending(false);
 
     if (result.success) {
-      setFeedback('✅ Message envoyé avec succès !');
-      setFormData({ nom: '', prenom: '', email: '', telephone: '', message: '' });
+      setFeedback("✅ Message envoyé avec succès !");
+      setFormData({
+        nom: "",
+        prenom: "",
+        email: "",
+        telephone: "",
+        message: "",
+      });
     } else {
-      setFeedback('❌ Une erreur est survenue. Réessaie plus tard.');
+      setFeedback("❌ Une erreur est survenue. Réessaie plus tard.");
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 my-4">
+    <Section className="max-w-4xl mx-auto space-y-8">
       <Motion variant="verticalSlideIn">
-        <h1 className="text-4xl font-bold font-title text-center mb-8">NOUS CONTACTER</h1>
+        <Title size="md" color="foreground">
+          NOUS CONTACTER
+        </Title>
       </Motion>
 
       <form className="space-y-6" onSubmit={handleSubmit}>
@@ -118,7 +130,7 @@ export default function Contact() {
               className="text-white px-8 py-3 rounded-full"
               disabled={sending}
             >
-              {sending ? 'Envoi en cours...' : 'Envoyer le message'}
+              {sending ? "Envoi en cours..." : "Envoyer le message"}
             </Button>
           </div>
         </Motion>
@@ -127,6 +139,6 @@ export default function Contact() {
           <p className="text-center mt-4 text-sm text-gray-700">{feedback}</p>
         )}
       </form>
-    </div>
+    </Section>
   );
 }

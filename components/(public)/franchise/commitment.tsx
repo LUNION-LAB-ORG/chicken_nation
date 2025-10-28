@@ -1,3 +1,5 @@
+import Section from "@/components/primitives/Section";
+import Title from "@/components/primitives/Title";
 import Motion from "@/lib/motion";
 import Image from "next/image";
 
@@ -6,7 +8,7 @@ export default function Commitment() {
     {
       id: 1,
       title: "Assistance Opérationnelle",
-      iconUrl: "/assets/images/illustrations/franchise/picture-1.png", 
+      iconUrl: "/assets/images/illustrations/franchise/picture-1.png",
       items: [
         "Visites régulières",
         "Audits qualité",
@@ -17,7 +19,7 @@ export default function Commitment() {
     {
       id: 2,
       title: "Support Marketing",
-      iconUrl: "/assets/images/illustrations/franchise/picture-2.png", 
+      iconUrl: "/assets/images/illustrations/franchise/picture-2.png",
       items: [
         "Kit de communication",
         "Campagnes nationales",
@@ -28,7 +30,7 @@ export default function Commitment() {
     {
       id: 3,
       title: "Support Administratif",
-      iconUrl: "/assets/images/illustrations/franchise/picture-3.png", 
+      iconUrl: "/assets/images/illustrations/franchise/picture-3.png",
       items: [
         "Aide à la gestion",
         "Reporting",
@@ -39,11 +41,11 @@ export default function Commitment() {
   ];
 
   return (
-    <div className="bg-orange-50 py-12 px-4">
+    <Section className="bg-orange-50 space-y-8">
       <Motion variant="verticalSlideIn">
-        <h1 className="text-4xl font-bold text-center mb-12 font-title">
+        <Title size="md" color="foreground">
           NOS ENGAGEMENTS
-        </h1>
+        </Title>
       </Motion>
 
       <Motion variant="verticalSlideIn">
@@ -77,6 +79,6 @@ export default function Commitment() {
           ))}
         </div>
       </Motion>
-    </div>
+    </Section>
   );
 }

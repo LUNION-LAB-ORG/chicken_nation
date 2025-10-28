@@ -1,17 +1,17 @@
+import Section from "@/components/primitives/Section";
+import Title from "@/components/primitives/Title";
 import Motion from "@/lib/motion";
 
 export default function Info() {
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
+    <Section className="max-w-4xl mx-auto space-y-8">
       <Motion variant="verticalSlideIn">
-        <h1 className="text-4xl font-bold text-center font-title text-primary">
-          REJOIGNEZ L&apos;AVENTURE CHICKEN NATION
-        </h1>
+        <Title size="sm">REJOIGNEZ L&apos;AVENTURE CHICKEN NATION</Title>
       </Motion>
 
       <Motion variant="verticalSlideIn">
         <div className="bg-gray-100 p-8 rounded-lg">
-          <h2 className="text-3xl font-bold mb-2">
+          <h2 className="text-2xl md:text-3xl font-bold mb-2">
             Devenez Franchisé et Rejoignez CHICKEN NATION !
           </h2>
           <h3 className="text-xl text-primary mb-4">
@@ -33,7 +33,7 @@ export default function Info() {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-6">
               <div>
-                <h3 className="text-xl text-white bg-primary p-3 rounded-full mb-4">
+                <h3 className="text-base md:text-xl text-white bg-primary p-3 rounded-full mb-4">
                   Un Concept Éprouvé
                 </h3>
                 <ul className="list-disc pl-5 space-y-2">
@@ -45,7 +45,7 @@ export default function Info() {
               </div>
 
               <div>
-                <h3 className="text-xl text-white bg-primary p-3 rounded-full mb-4">
+                <h3 className="text-base md:text-xl text-white bg-primary p-3 rounded-full mb-4">
                   Avantages concurrentiels
                 </h3>
                 <ul className="list-disc pl-5 space-y-2">
@@ -58,7 +58,7 @@ export default function Info() {
             </div>
 
             <div>
-              <h3 className="text-xl text-white bg-primary p-3 rounded-full mb-4">
+              <h3 className="text-base md:text-xl text-white bg-primary p-3 rounded-full mb-4">
                 Un Accompagnement Total
               </h3>
               <ul className="list-disc pl-5 space-y-2">
@@ -71,6 +71,6 @@ export default function Info() {
           </div>
         </div>
       </Motion>
-    </div>
+    </Section>
   );
 }

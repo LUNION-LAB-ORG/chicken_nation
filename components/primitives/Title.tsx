@@ -7,7 +7,7 @@ export const titleStyle = tv({
     color: {
       primary: "from-primary to-primary-600",
       secondary: "from-secondary to-secondary-600",
-      foreground: "from-foreground to-[#BBBBBB] dark:to-[#4B4B4B]",
+      foreground: "from-foreground to-gray-800",
       white: "text-white",
     },
     size: {
