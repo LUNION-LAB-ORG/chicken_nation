@@ -5,6 +5,8 @@ import Section from "@/components/primitives/Section";
 import { siteConfig } from "@/config/site";
 import { easeInOutCubic } from "@/lib/animation";
 import { motion, useScroll, useTransform } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
 
 export function Hero() {
   const { scrollY } = useScroll({
@@ -38,7 +40,7 @@ export function Hero() {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 1.2 }}
-            className="absolute inset-0 top-20 z-10"
+            className="absolute inset-0 top-20 z-10 text-lg font-bold"
           >
             {siteConfig.name}
           </motion.div>
@@ -49,9 +51,13 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.5, ease: easeInOutCubic }}
-            className="text-5xl font-bold mb-4 tracking-tighter"
+            className=" text-3xl md:text-5xl font-bold mb-4 tracking-tighter leading-tight"
           >
-            {siteConfig.description}
+            <span className="bg-linear-90 to-primary-600 from-secondary bg-clip-text text-transparent ">
+              Le goût, la rapidité, la simplicité.
+            </span>
+            <br />
+            Commandez, suivez et savourez vos repas préférés où que vous soyez.
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
@@ -59,27 +65,35 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.7, ease: easeInOutCubic }}
             className="max-w-2xl mx-auto text-xl mb-8 font-medium text-balance"
           >
-            {siteConfig.name} transforms your speech into text instantly.
-            Perfect for quick note-taking, content creation, and capturing ideas
-            on-the-go.
+            Téléchargez l&apos;application et savourez la différence.
           </motion.p>
-          <div className="flex justify-center mb-16">
-            <motion.img
-              src="/download-black.svg"
-              alt="Download"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 1 }}
-              className="w-40 flex-shrink-0 dark:hidden block"
-            />
-            <motion.img
-              src="/download-white.svg"
-              alt="Download"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 1 }}
-              className="w-40 flex-shrink-0 hidden dark:block"
-            />
+          <div className="flex justify-center items-center gap-4 mb-16">
+            <Link
+              target="_blank"
+              href="https://play.google.com/store/apps/details?id=com.chickennation.app"
+            >
+              <motion.img
+                src="/download-playstore-fr-FR.png"
+                alt="Download"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 1 }}
+                className="w-40 flex-shrink-0"
+              />
+            </Link>
+            <Link
+              target="_blank"
+              href="https://apps.apple.com/ci/app/chicken-nation/id6745905607"
+            >
+              <motion.img
+                src="/download-apple-fr-FR.svg"
+                alt="Download"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 1 }}
+                className="w-40 flex-shrink-0"
+              />
+            </Link>
           </div>
         </div>
         <div className="flex flex-nowrap items-center justify-center gap-4 sm:gap-8 h-auto sm:h-[500px] select-none">

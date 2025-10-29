@@ -4,11 +4,47 @@
 import Section from "@/components/primitives/Section";
 import { buttonVariants } from "@/components/ui/button";
 import { easeOutCubic } from "@/lib/animation";
-import { siteConfig } from "@/lib/config";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+
+const features = [
+  {
+    title: "Commande rapide",
+    description:
+      "Choisissez vos plats, personnalisez votre menu et passez commande en quelques secondes.",
+    imageSrc: "/assets/images/devices/Device-2.png",
+    direction: "rtl" as const,
+  },
+  {
+    title: "Modes de réception flexibles",
+    description:
+      "Faites-vous livrer, mangez sur place ou commandez à emporter selon votre envie du moment.",
+    imageSrc: "/assets/images/devices/Device-3.png",
+    direction: "ltr" as const,
+  },
+  {
+    title: "Paiement simplifié",
+    description: "Payez en ligne ou à la réception, en toute sécurité.",
+    imageSrc: "/assets/images/devices/Device-4.png",
+    direction: "rtl" as const,
+  },
+  {
+    title: "Suivi en temps réel",
+    description:
+      "Suivez votre commande pas à pas, de la cuisine jusqu'à votre porte.",
+    imageSrc: "/assets/images/devices/Device-5.png",
+    direction: "ltr" as const,
+  },
+  {
+    title: "Promotions & fidélité",
+    description:
+      "Profitez d'offres exclusives et cumulez des points à chaque commande.",
+    imageSrc: "/assets/images/devices/Device-6.png",
+    direction: "rtl" as const,
+  },
+];
 
 interface FeatureProps {
   title: string;
@@ -69,12 +105,12 @@ function Feature({
       >
         <div className="flex flex-col gap-4 max-w-sm text-center lg:text-left mx-auto">
           <motion.h2
-            className="text-4xl md:text-5xl lg:text-6xl font-bold"
+            className="text-3xl md:text-5xl lg:text-6xl font-bold"
             variants={itemVariants}
           >
             {title}
           </motion.h2>
-          <motion.p className="text-xl md:text-2xl" variants={itemVariants}>
+          <motion.p className="text-base md:text-2xl" variants={itemVariants}>
             {description}
           </motion.p>
           <motion.div variants={itemVariants}>
@@ -86,7 +122,7 @@ function Feature({
                 "mx-auto lg:mx-0"
               )}
             >
-              {siteConfig.cta}
+              Téléchargez l'application
             </Link>
           </motion.div>
         </div>
@@ -103,8 +139,6 @@ function Feature({
 }
 
 export function FeatureHighlight() {
-  const features = siteConfig.featureHighlight;
-
   const [activeFeature, setActiveFeature] = useState(-1);
   const containerRef = useRef<HTMLElement>(null);
 
@@ -130,8 +164,8 @@ export function FeatureHighlight() {
   return (
     <Section
       id="feature-highlight"
-      title="Features"
-      subtitle="Powerful features"
+      title="Des fonctionnalités savoureuses"
+      subtitle="tout ce qu'il faut pour vous régaler sans effort."
       className="container px-10 mx-auto max-w-[var(--max-container-width)]"
       ref={containerRef}
     >

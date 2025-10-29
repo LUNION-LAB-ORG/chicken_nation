@@ -8,6 +8,44 @@ import { cn } from "@/lib/utils";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
+const items = [
+  {
+    name: "Commander vos plats préférés",
+    description: "Un seul réflexe pour toutes vos envies : Chicken Nation.",
+    icon: "Utensils",
+    imageSrc: "/assets/images/devices/Device-1.png",
+    imageAlt: "AI scheduling illustration",
+    fullWidth: true,
+  },
+  {
+    name: "Découvrir nos menus et nouveautés",
+    description:
+      "Explorez nos plats du moment et laissez-vous tenter par nos recettes exclusives.",
+    icon: "Search",
+    imageSrc: "/assets/images/devices/Device-2.png",
+    imageAlt: "Time blocking illustration",
+    fullWidth: false,
+  },
+  {
+    name: "Gagner des récompenses",
+    description:
+      "Chaque commande vous rapproche de nouvelles réductions et surprises.",
+    icon: "Star",
+    imageSrc: "/assets/images/devices/Device-3.png",
+    imageAlt: "Smart reminders illustration",
+    fullWidth: false,
+  },
+  {
+    name: "Partager l'expérience",
+    description:
+      "Invitez vos amis à rejoindre la Nation et partagez vos moments gourmands.",
+    icon: "Share2",
+    imageSrc: "/assets/images/devices/Device-4.png",
+    imageAlt: "Team collaboration illustration",
+    fullWidth: true,
+  },
+];
+
 export function BentoGrid() {
   const ref = useRef(null);
 
@@ -49,38 +87,38 @@ export function BentoGrid() {
   return (
     <Section
       id="bento"
-      title="Benefits"
-      subtitle="It does a lot of things"
+      title="Tout ce que vous pouvez faire avec Chicken Nation"
+      subtitle="un plaisir à chaque clic"
       className="mx-auto max-w-screen-md px-10"
       ref={ref}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {siteConfig.bento.map((bentoItem, index) => (
+        {items.map((item, index) => (
           <motion.div
             key={index}
             style={{ opacity: opacities[index], y: yTransforms[index] }}
             className={cn(
               "bg-muted p-4 sm:p-6 !pb-0 rounded-3xl grid grid-rows-1",
-              bentoItem.fullWidth && "md:col-span-2"
+              item.fullWidth && "md:col-span-2"
             )}
           >
             <div className="flex flex-col">
               <h2 className="text-xl sm:text-2xl font-bold mb-2 text-foreground">
-                {bentoItem.title}
+                {item.name}
               </h2>
               <p className="text-sm sm:text-base text-foreground mb-4">
-                {bentoItem.content}
+                {item.description}
               </p>
             </div>
             <div
               className={cn(
                 "flex justify-center",
-                bentoItem.fullWidth && "sm:space-x-4"
+                item.fullWidth && "sm:space-x-4"
               )}
             >
               <img
-                src={bentoItem.imageSrc}
-                alt={bentoItem.imageAlt}
+                src={item.imageSrc}
+                alt={item.imageAlt}
                 className="w-full h-64 sm:h-96 rounded-xl object-cover object-top"
               />
             </div>

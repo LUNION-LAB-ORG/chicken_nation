@@ -7,6 +7,24 @@ import { siteConfig } from "@/lib/config";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useRef } from "react";
 
+const items = [
+  {
+    id: 1,
+    text: "Qualité garantie",
+    image: "/assets/images/devices/Device-6.png",
+  },
+  {
+    id: 2,
+    text: "Service rapide",
+    image: "/assets/images/devices/Device-7.png",
+  },
+  {
+    id: 3,
+    text: "Expérience fluide",
+    image: "/assets/images/devices/Device-8.png",
+  },
+];
+
 export function Benefits() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -24,8 +42,8 @@ export function Benefits() {
 
   return (
     <Section
-      title="Benefits"
-      subtitle={`What you can do with ${siteConfig.name}`}
+      title={`Pourquoi choisir ${siteConfig.name} ?`}
+      subtitle={`parce qu'ici, le goût et la satisfaction sont toujours au menu.`}
       className="bg-muted relative max-w-screen"
     >
       <div
@@ -37,7 +55,7 @@ export function Benefits() {
           className="hidden md:block flex-shrink-0 w-[calc(90%-1rem)] md:w-1/3 lg:w-1/3 xl:w-1/4 snap-start select-none px-4"
           aria-hidden="true"
         />
-        {siteConfig.benefits.map((benefit, index) => (
+        {items.map((benefit, index) => (
           <div
             key={benefit.id}
             className="flex-shrink-0 w-[calc(90%-1rem)] md:w-1/3 lg:w-1/3 xl:w-1/4 snap-center md:snap-start select-none px-4"
@@ -72,7 +90,7 @@ export function Benefits() {
             size="icon"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span className="sr-only">Previous slide</span>
+            <span className="sr-only">Précédent</span>
           </Button>
           <Button
             onClick={scrollNext}
@@ -81,7 +99,7 @@ export function Benefits() {
             size="icon"
           >
             <ArrowRight className="h-4 w-4" />
-            <span className="sr-only">Next slide</span>
+            <span className="sr-only">Suivant</span>
           </Button>
         </div>
       </div>

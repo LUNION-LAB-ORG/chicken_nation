@@ -38,8 +38,8 @@ export function FeatureScroll() {
   return (
     <Section
       id="feature-scroll"
-      title="Experience"
-      subtitle="An app unlike any other"
+      title="Une expérience de commande unique"
+      subtitle="une application pensée pour les amoureux du bon poulet."
       className="container px-4 sm:px-10 mx-auto max-w-[var(--max-container-width)]"
     >
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mx-auto select-none">
@@ -47,21 +47,21 @@ export function FeatureScroll() {
           ref={phone1Ref}
           src="/assets/images/devices/Device-6.png"
           alt="iPhone 1"
-          className="w-full h-auto -z-10 max-w-[250px] sm:max-w-[300px] mx-auto"
+          className="w-full h-auto max-w-[250px] sm:max-w-[300px] mx-auto"
           style={{ y: y1 }}
         />
         <motion.img
           ref={phone2Ref}
           src="/assets/images/devices/Device-7.png"
           alt="iPhone 2"
-          className="w-full h-auto -z-10 max-w-[250px] sm:max-w-[300px] mx-auto"
+          className="w-full h-auto max-w-[250px] sm:max-w-[300px] mx-auto"
           style={{ y: y2 }}
         />
         <motion.img
           ref={phone3Ref}
           src="/assets/images/devices/Device-8.png"
           alt="iPhone 3"
-          className="w-full h-auto -z-10 max-w-[250px] sm:max-w-[300px] mx-auto"
+          className="w-full h-auto max-w-[250px] sm:max-w-[300px] mx-auto"
           style={{ y: y3 }}
         />
       </div>

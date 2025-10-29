@@ -1,3 +1,4 @@
+import Download from "@/components/(public)/common/download";
 import { Benefits } from "@/components/(public)/mobile/benefits";
 import { BentoGrid } from "@/components/(public)/mobile/bento";
 import { FeatureHighlight } from "@/components/(public)/mobile/feature-highlight";
@@ -15,6 +16,7 @@ export default function AppMobile() {
       <BentoGrid />
       <Benefits />
       <Features />
+      <Download />
       <Testimonials />
     </>
   );

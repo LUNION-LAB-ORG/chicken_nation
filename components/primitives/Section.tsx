@@ -119,7 +119,7 @@ const Section = forwardRef<HTMLElement, SectionProps>(
               {subtitle && (
                 <motion.h3
                   className={cn(
-                    "mx-0 mt-4 max-w-lg text-5xl text-balance font-bold sm:max-w-none sm:text-4xl md:text-5xl lg:text-6xl leading-[1.2] tracking-tighter text-foreground lowercase",
+                    "mx-0 mt-4 max-w-lg text-3xl text-balance font-bold sm:max-w-none sm:text-4xl md:text-5xl lg:text-6xl leading-[1.2] tracking-tighter text-foreground",
                     align === "center"
                       ? "mx-auto"
                       : align === "right"

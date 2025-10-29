@@ -1,11 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { Apple, Play } from "lucide-react";
-import { Button } from "@heroui/button";
 import Motion from "@/lib/motion";
 import Section from "@/components/primitives/Section";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function Download() {
   return (
@@ -20,30 +19,33 @@ export default function Download() {
           </Motion>
 
           <Motion variant="verticalSlideIn">
-            <div className="flex flex-wrap gap-4 justify-center md:justify-start mt-8">
-              <Button
-                startContent={<Play size={20} />}
-                radius="lg"
-                size="lg"
-                as={Link}
+            <div className="flex flex-wrap gap-4 items-center justify-center md:justify-start mt-8">
+              <Link
                 target="_blank"
                 href="https://play.google.com/store/apps/details?id=com.chickennation.app"
-                className="bg-primary text-white text-sm sm:text-base shadow-md hover:scale-105 transition-transform"
               >
-                Google Play
-              </Button>
-
-              <Button
-                startContent={<Apple size={20} />}
-                radius="lg"
-                size="lg"
-                as={Link}
+                <motion.img
+                  src="/download-playstore-fr-FR.png"
+                  alt="Download"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1, delay: 1 }}
+                  className="w-40 flex-shrink-0"
+                />
+              </Link>
+              <Link
                 target="_blank"
                 href="https://apps.apple.com/ci/app/chicken-nation/id6745905607"
-                className="bg-black text-white text-sm sm:text-base shadow-md hover:scale-105 transition-transform"
               >
-                App Store
-              </Button>
+                <motion.img
+                  src="/download-apple-fr-FR.svg"
+                  alt="Download"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1, delay: 1 }}
+                  className="w-40 flex-shrink-0"
+                />
+              </Link>
             </div>
           </Motion>
         </div>
