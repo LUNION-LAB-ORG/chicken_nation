@@ -38,11 +38,17 @@ const features = [
     direction: "ltr" as const,
   },
   {
+    title: "Envoi de message",
+    description: "Envoyez un message direct au restaurant pour toute instruction ou précision concernant votre commande.",
+    imageSrc: "/assets/images/devices/Device-6.png",
+    direction: "rtl" as const,
+  },
+  {
     title: "Promotions & fidélité",
     description:
       "Profitez d'offres exclusives et cumulez des points à chaque commande.",
-    imageSrc: "/assets/images/devices/Device-6.png",
-    direction: "rtl" as const,
+    imageSrc: "/assets/images/devices/Device-7.png",
+    direction: "ltr" as const,
   },
 ];
 
