@@ -165,7 +165,7 @@ export function FeatureHighlight() {
     <Section
       id="feature-highlight"
       title="Des fonctionnalités savoureuses"
-      subtitle="tout ce qu'il faut pour vous régaler sans effort."
+      subtitle="Tout ce qu'il faut pour vous régaler sans effort."
       className="container px-10 mx-auto max-w-[var(--max-container-width)]"
       ref={containerRef}
     >

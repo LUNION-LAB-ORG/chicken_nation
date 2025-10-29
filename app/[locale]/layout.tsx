@@ -78,9 +78,9 @@ export default async function RootLayout({
               <NuqsAdapter>
                 <AuthProvider>
                   {/* <MountedProvider> */}
-                    <DirectionProvider direction={direction}>
-                      {children}
-                    </DirectionProvider>
+                  <DirectionProvider direction={direction}>
+                    {children}
+                  </DirectionProvider>
                   {/* </MountedProvider> */}
                 </AuthProvider>
               </NuqsAdapter>

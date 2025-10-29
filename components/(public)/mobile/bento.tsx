@@ -88,7 +88,7 @@ export function BentoGrid() {
     <Section
       id="bento"
       title="Tout ce que vous pouvez faire avec Chicken Nation"
-      subtitle="un plaisir à chaque clic"
+      subtitle="Un plaisir à chaque clic"
       className="mx-auto max-w-screen-md px-10"
       ref={ref}
     >
@@ -98,7 +98,7 @@ export function BentoGrid() {
             key={index}
             style={{ opacity: opacities[index], y: yTransforms[index] }}
             className={cn(
-              "bg-muted p-4 sm:p-6 !pb-0 rounded-3xl grid grid-rows-1",
+              "bg-secondary p-4 sm:p-6 !pb-0 rounded-3xl grid grid-rows-1",
               item.fullWidth && "md:col-span-2"
             )}
           >

@@ -1,48 +1,44 @@
 import Section from "@/components/primitives/Section";
-import { siteConfig } from "@/lib/config";
-import { IconMoneybag } from "@tabler/icons-react";
-import { CardSim, ListOrdered, PanelsRightBottomIcon, TrashIcon } from "lucide-react";
-import Link from "next/link";
+import {
+  ListOrderedIcon,
+  MapPinIcon,
+  ShoppingBagIcon,
+  StarIcon,
+  StoreIcon,
+  TruckIcon,
+} from "lucide-react";
 
 const features = [
   {
-    title: "Commande rapide",
-    description:
-      "Choisissez vos plats, personnalisez votre menu et passez commande en quelques secondes.",
-    imageSrc: "/assets/images/devices/Device-2.png",
-    direction: "rtl" as const,
-    icon: <ListOrdered className="h-10 w-10" />,
+    name: "Livraison Express",
+    description: "Moins de 30 minutes de la cuisine à votre porte.",
+    icon: <TruckIcon className="h-6 w-6" />,
   },
   {
-    title: "Modes de réception flexibles",
-    description:
-      "Faites-vous livrer, mangez sur place ou commandez à emporter selon votre envie du moment.",
-    imageSrc: "/assets/images/devices/Device-3.png",
-    direction: "ltr" as const,
-    icon: <CardSim className="h-10 w-10" />,
+    name: "Qualité Garantie",
+    description: "Le goût du vrai poulet croustillant, délicieux jusqu'à l'os.",
+    icon: <StarIcon className="h-6 w-6" />,
   },
   {
-    title: "Paiement simplifié",
-    description: "Payez en ligne ou à la réception, en toute sécurité.",
-    imageSrc: "/assets/images/devices/Device-4.png",
-    direction: "rtl" as const,
-    icon: <IconMoneybag className="h-10 w-10" />,
+    name: "Commande Mobile",
+    description:
+      "Passez commande et suivez-la en temps réel via l'application.",
+    icon: <ShoppingBagIcon className="h-6 w-6" />,
   },
   {
-    title: "Suivi en temps réel",
-    description:
-      "Suivez votre commande pas à pas, de la cuisine jusqu'à votre porte.",
-    imageSrc: "/assets/images/devices/Device-5.png",
-    direction: "ltr" as const,
-    icon: <TrashIcon className="h-10 w-10" />,
+    name: "Modes de Réception",
+    description: "Livraison, à emporter ou sur place (dine-in).",
+    icon: <ListOrderedIcon className="h-6 w-6" />,
   },
   {
-    title: "Promotions & fidélité",
-    description:
-      "Profitez d'offres exclusives et cumulez des points à chaque commande.",
-    imageSrc: "/assets/images/devices/Device-6.png",
-    direction: "rtl" as const,
-    icon: <PanelsRightBottomIcon className="h-10 w-10" />,
+    name: "Nos Restaurants",
+    description: "Marcory Zone 4, Angré et Sococe. Ouvert 10h à 23h.",
+    icon: <MapPinIcon className="h-6 w-6" />,
+  },
+  {
+    name: "Promotions & Fidélité",
+    description: "Offres exclusives et cumul de points via l'application.",
+    icon: <StoreIcon className="h-6 w-6" />,
   },
 ];
 
@@ -50,12 +46,12 @@ export function Features() {
   return (
     <Section
       id="features"
-      title="Features"
-      subtitle="Powerful features"
+      title="Des fonctionnalités"
+      subtitle="Tout ce qu'il faut pour vous régaler sans effort."
       className="max-w-screen-lg mx-auto container px-10"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-center gap-6">
-        {features.map(({ title, description, icon: Icon }, index) => (
+        {features.map(({ name, description, icon: Icon }, index) => (
           <div
             key={index}
             className="rounded-lg overflow-hidden bg-card p-6 flex flex-col items-center text-center"
@@ -65,13 +61,13 @@ export function Features() {
                 {Icon}
               </div>
               <h2 className="text-xl font-semibold text-card-foreground">
-                {title}
+                {name}
               </h2>
             </div>
             <p className="text-sm text-muted-foreground mb-4">{description}</p>
-            <Link href="#" className="text-sm text-primary hover:underline">
+            {/* <Link href="#" className="text-sm text-primary hover:underline">
               Learn more &gt;
-            </Link>
+            </Link> */}
           </div>
         ))}
       </div>

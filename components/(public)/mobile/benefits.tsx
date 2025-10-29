@@ -43,7 +43,7 @@ export function Benefits() {
   return (
     <Section
       title={`Pourquoi choisir ${siteConfig.name} ?`}
-      subtitle={`parce qu'ici, le goût et la satisfaction sont toujours au menu.`}
+      subtitle={`Parce qu'ici, le goût et la satisfaction sont toujours au menu.`}
       className="bg-muted relative max-w-screen"
     >
       <div
