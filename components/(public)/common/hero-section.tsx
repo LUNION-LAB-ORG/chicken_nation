@@ -15,7 +15,7 @@ export default function HeroSection({
   const isVideo = type === "video";
 
   return (
-    <div className="relative w-full bg-primary  h-[calc(100vh-70px)] min-h-[600px] max-h-[900px] overflow-hidden">
+    <div className="relative w-full bg-primary h-[calc(100vh-70px)] min-h-[600px] max-h-[900px] overflow-hidden">
       {isVideo ? (
         <video
           className="w-full h-full object-cover"
