@@ -7,7 +7,6 @@ import { ThemeProviders } from "@/providers/theme.provider";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { fontSans, fontTitle } from "@/config/fonts";
-import { siteConfig } from "@/config/site";
 import { routing } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import AuthProvider from "@/providers/auth.provider";
@@ -18,7 +17,7 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getLangDir } from "rtl-detect";
 import { GoogleAnalytics } from "@next/third-parties/google";
-import { getMetadata, Lang } from "@/config/meta";
+import { getMetadata, Lang } from "@/app/[locale]/meta";
 
 // Define viewport metadata
 export const viewport: Viewport = {
@@ -54,7 +53,6 @@ export default async function RootLayout({
 
   return (
     <html lang="fr" dir={direction} suppressHydrationWarning>
-      <head />
       <body
         className={cn(
           "min-h-screen text-foreground bg-background font-sans antialiased",

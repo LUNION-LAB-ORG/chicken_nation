@@ -5,10 +5,10 @@ export default heroui({
             colors: {
                 primary: {
                     200: "#f57e30",
-                    500: "#f57e30",
+                    500: "#fd8127",
                     600: "#ff6000",
                     foreground: "#fff",
-                    DEFAULT: "#f57e30",
+                    DEFAULT: "#fd8127",
                 },
                 secondary: {
                     200: "#ffcc00",
@@ -25,8 +25,9 @@ export default heroui({
                 primary: {
                     200: "#f57e30",
                     600: "#ff6000",
+                    500: "#fd8127",
                     foreground: "#fff",
-                    DEFAULT: "#f57e30",
+                    DEFAULT: "#fd8127",
                 },
                 secondary: {
                     200: "#ffcc00",

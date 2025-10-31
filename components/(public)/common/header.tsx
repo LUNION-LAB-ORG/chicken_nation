@@ -10,11 +10,10 @@ import {
   NavbarMenuItem,
   NavbarMenuToggle,
 } from "@heroui/react";
-import { Search, ShoppingCart } from "lucide-react";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import ChickenNationLogo from "../../common/chicken-nation-logo";
+import { Link } from "@/i18n/navigation";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,11 +37,11 @@ export default function Header() {
     >
       {/* Logo et Menu Toggle */}
       <NavbarContent>
-        <NavbarBrand>
+        <NavbarBrand as={Link} href="/">
           <ChickenNationLogo />
-          <p className="hidden lg:block font-bold text-white text-xl ml-2">
+          <span className="hidden lg:block font-bold text-white text-xl ml-2">
             CHICKEN NATION
-          </p>
+          </span>
         </NavbarBrand>
       </NavbarContent>
 
@@ -85,7 +84,8 @@ export default function Header() {
             href="/app-mobile"
             variant="flat"
           >
-            Téléchargez <span className="hidden lg:inline">l&apos;application</span>
+            Téléchargez{" "}
+            <span className="hidden lg:inline">l&apos;application</span>
           </Button>
         </NavbarItem>
         <NavbarMenuToggle
