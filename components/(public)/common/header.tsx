@@ -38,13 +38,9 @@ export default function Header() {
     >
       {/* Logo et Menu Toggle */}
       <NavbarContent>
-        <NavbarMenuToggle
-          aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-          className="sm:hidden text-white"
-        />
         <NavbarBrand>
           <ChickenNationLogo />
-          <p className="hidden md:block font-bold text-white text-xl ml-2">
+          <p className="hidden lg:block font-bold text-white text-xl ml-2">
             CHICKEN NATION
           </p>
         </NavbarBrand>
@@ -73,15 +69,15 @@ export default function Header() {
       </NavbarContent>
 
       <NavbarContent justify="end">
-        <NavbarItem>
+        {/* <NavbarItem>
           <Search className="text-white cursor-pointer" size={24} />
         </NavbarItem>
         <NavbarItem>
           <ShoppingCart
-            className="text-white cursor-pointer hidden md:block"
+            className="text-white cursor-pointer hidden lg:block"
             size={24}
           />
-        </NavbarItem>
+        </NavbarItem> */}
         <NavbarItem>
           <Button
             as={Link}
@@ -89,9 +85,13 @@ export default function Header() {
             href="/app-mobile"
             variant="flat"
           >
-            Connexion
+            Téléchargez <span className="hidden lg:inline">l&apos;application</span>
           </Button>
         </NavbarItem>
+        <NavbarMenuToggle
+          aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          className="sm:hidden text-white"
+        />
       </NavbarContent>
 
       <NavbarMenu className="bg-primary">
@@ -104,14 +104,14 @@ export default function Header() {
         ))}
         <NavbarItem>
           <Button
-            className=" bg-secondary text-secondary-foreground font-semibold w-full"
+            className="bg-secondary text-secondary-foreground font-semibold w-full"
             variant="flat"
             onPress={() => {
               router.push("/app-mobile");
               setIsMenuOpen(false);
             }}
           >
-            Connexion
+            Téléchargez l&apos;application
           </Button>
         </NavbarItem>
       </NavbarMenu>

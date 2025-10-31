@@ -40,7 +40,7 @@ export function FeatureScroll() {
     <Section
       id="feature-scroll"
       title="Une expérience de commande unique"
-      subtitle="une application pensée pour les amoureux du bon poulet."
+      subtitle="Une application pensée pour les amoureux du bon poulet."
       className="container px-4 sm:px-10 mx-auto max-w-[var(--max-container-width)]"
     >
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mx-auto select-none">

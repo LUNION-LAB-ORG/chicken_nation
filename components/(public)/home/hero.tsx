@@ -28,7 +28,7 @@ export default function Hero() {
             {/* Central Section */}
             <div className="relative w-full flex justify-center mt-4 md:mt-8">
               {/* Left decoration */}
-              <Motion
+              {/* <Motion
                 variant="horizontalSlideIn"
                 animationParams={{ delay: 0.8, offset: 50 }}
               >
@@ -40,7 +40,7 @@ export default function Hero() {
                     className="object-contain"
                   />
                 </div>
-              </Motion>
+              </Motion> */}
 
               {/* Central Bucket */}
               <Motion variant="verticalSlideIn">
@@ -56,7 +56,7 @@ export default function Hero() {
               </Motion>
 
               {/* Right decoration */}
-              <Motion
+              {/* <Motion
                 variant="horizontalSlideIn"
                 animationParams={{ delay: 0.8, offset: -100 }}
               >
@@ -68,7 +68,7 @@ export default function Hero() {
                     className="object-contain"
                   />
                 </div>
-              </Motion>
+              </Motion> */}
             </div>
           </div>
         </div>

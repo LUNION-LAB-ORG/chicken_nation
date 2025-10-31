@@ -45,7 +45,7 @@ export default function ListPlats() {
                             <div className="text-primary text-lg font-title">
                               {item.price} FCFA
                             </div>
-                            <Link href="/soonapp">
+                            <Link href="/app-mobile">
                               <ShoppingCart
                                 className="text-primary cursor-pointer rounded-lg border-2 border-primary p-2"
                                 size={48}
