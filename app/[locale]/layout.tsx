@@ -18,23 +18,9 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getLangDir } from "rtl-detect";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { getMetadata, Lang } from "@/config/meta";
 
-export const metadata: Metadata = {
-  title: {
-    default: siteConfig.name,
-    template: `%s - ${siteConfig.name}`,
-  },
-  description: siteConfig.description,
-  icons: {
-    icon: "/favicon.ico",
-  },
-  openGraph: {
-    title: "Bienvenue chez Chicken Nation",
-    description:
-      "Née de la passion pour le poulet de qualité, Chicken Nation s'est établie comme une référence en matière de restauration rapide en Côte d'Ivoire.",
-  },
-};
-
+// Define viewport metadata
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "white" },
@@ -42,6 +28,16 @@ export const viewport: Viewport = {
   ],
 };
 
+// Generate metadata for each locale
+export async function generateMetadata({
+  params,
+}: {
+  params: { lang: Lang };
+}): Promise<Metadata> {
+  return getMetadata(params.lang);
+}
+
+// Define default layout
 export default async function RootLayout({
   children,
   params,
