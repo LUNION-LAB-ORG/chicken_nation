@@ -11,9 +11,9 @@ const Loader = () => {
     <div className=" h-screen flex items-center justify-center flex-col space-y-2">
       <div className="flex gap-2 items-center ">
         <ChickenNationLogo />
-        <h1 className="text-xl font-semibold text-default-900 ">
+        <span className="text-xl font-semibold text-default-900 ">
           {siteConfig.name}
-        </h1>
+        </span>
       </div>
       <span className=" inline-flex gap-1  items-center">
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />

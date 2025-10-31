@@ -77,9 +77,9 @@ export function UtilisateurAddModal({ isOpen, setIsOpen }: Props) {
       <ModalContent>
         <form onSubmit={handleSubmit(onSubmit)}>
           <ModalHeader className="flex flex-col gap-1">
-            <h1 className="text-lg font-medium text-primary">
+            <h2 className="text-lg font-medium text-primary">
               Ajouter un utilisateur
-            </h1>
+            </h2>
             <p className="text-sm text-gray-500">
               Formulaire pour ajouter un nouvel utilisateur.
             </p>

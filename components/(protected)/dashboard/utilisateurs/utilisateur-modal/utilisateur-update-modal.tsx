@@ -92,9 +92,9 @@ export function UtilisateurUpdateModal({
       <ModalContent>
         <form onSubmit={handleSubmit(onSubmit)}>
           <ModalHeader className="flex flex-col gap-1">
-            <h1 className="text-lg font-medium text-primary">
+            <h2 className="text-lg font-medium text-primary">
               {`Modifier ${utilisateur?.firstName} ${utilisateur?.lastName}`}
-            </h1>
+            </h2>
             <p className="text-sm text-gray-500">
               Formulaire pour modifier le rôle d&apos;un utilisateur.
             </p>

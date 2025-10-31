@@ -41,9 +41,9 @@ export function UtilisateurDeleteModal({
     <Modal isOpen={isOpen} onOpenChange={setIsOpen}>
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
-          <h1 className="text-lg font-medium text-primary">
+          <h2 className="text-lg font-medium text-primary">
             {`Supprimer ${utilisateur?.firstName} ${utilisateur?.lastName} ?`}
-          </h1>
+          </h2>
           <p className="text-sm text-gray-500">
             Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cet utilisateur
             sera banni de l&apos;application.

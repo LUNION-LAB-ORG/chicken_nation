@@ -127,7 +127,7 @@ export function Testimonials() {
   return (
     <Section
       title="Témoignages"
-      subtitle="Ce que nos clients disent"
+      subtitle="Feedback des consommateurs"
       className="container px-10 mx-auto"
     >
       <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4 py-10">

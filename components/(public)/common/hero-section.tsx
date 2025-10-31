@@ -35,7 +35,7 @@ export default function HeroSection({
       )}
 
       <div className="bg-black/60 p-8 w-full absolute bottom-0 mx-auto flex justify-center items-center">
-        <Title size="lg" color="white" className="text-center">
+        <Title level={1} size="lg" color="white" className="text-center">
           {title}
         </Title>
       </div>

@@ -106,7 +106,7 @@ const Section = forwardRef<HTMLElement, SectionProps>(
           )}
         >
           {(title || subtitle || description) && (
-            <div className={cn(alignmentClass, "space-y-4 pb-10 mx-auto")}>
+            <div className={cn(alignmentClass, "space-y-4 pb-4 lg:pb-8 mx-auto")}>
               {title && (
                 <motion.h2
                   className="text-sm text-primary text-balance font-mono font-semibold tracking-wider uppercase"
