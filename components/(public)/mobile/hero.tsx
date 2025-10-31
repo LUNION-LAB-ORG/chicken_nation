@@ -72,76 +72,108 @@ export function Hero() {
               target="_blank"
               href="https://play.google.com/store/apps/details?id=com.chickennation.app"
             >
-              <motion.img
-                src="/download-playstore-fr-FR.png"
-                alt="Download"
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 1, delay: 1 }}
-                className="w-40 flex-shrink-0"
-              />
+                className="flex-shrink-0"
+              >
+                <Image
+                  src="/download-playstore-fr-FR.png"
+                  alt="Download"
+                  width={200}
+                  height={200}
+                  className="w-40"
+                />
+              </motion.div>
             </Link>
             <Link
               target="_blank"
               href="https://apps.apple.com/ci/app/chicken-nation/id6745905607"
             >
-              <motion.img
-                src="/download-apple-fr-FR.svg"
-                alt="Download"
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 1, delay: 1 }}
-                className="w-40 flex-shrink-0"
-              />
+                className="flex-shrink-0"
+              >
+                <Image
+                  src="/download-apple-fr-FR.svg"
+                  alt="Download"
+                  width={200}
+                  height={200}
+                  className="w-40"
+                />
+              </motion.div>
             </Link>
           </div>
         </div>
         <div className="flex flex-nowrap items-center justify-center gap-4 sm:gap-8 h-auto sm:h-[500px] select-none">
-          <motion.img
-            src="/assets/images/devices/Device-1.png"
-            alt="iPhone"
+          <motion.div
             initial={{ opacity: 0, x: -200 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
             style={{ y: y1 }}
-            transition={{ duration: 1, delay: 1 }}
-            className="w-40 sm:w-64 h-[333px] sm:h-[500px] flex-shrink-0"
-          />
-          <motion.img
-            src="/assets/images/devices/Device-2.png"
-            alt="iPhone"
+            transition={{ duration: 1, delay: 0.3 }}
+            className="relative w-40 sm:w-64 h-[333px] sm:h-[500px] flex-shrink-0"
+          >
+            <Image
+              src="/assets/images/devices/device-3.png"
+              alt="iPhone"
+              fill
+            />
+          </motion.div>
+          <motion.div
             initial={{ opacity: 0, x: -100 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
             style={{ y: y2 }}
-            transition={{ duration: 1, delay: 1 }}
-            className="w-40 sm:w-64 h-[333px] sm:h-[500px] flex-shrink-0"
-          />
-          <motion.img
-            src="/assets/images/devices/Device-3.png"
-            alt="iPhone"
+            transition={{ duration: 1, delay: 0.3 }}
+            className="relative w-40 sm:w-64 h-[333px] sm:h-[500px] flex-shrink-0"
+          >
+            <Image
+              src="/assets/images/devices/device-2.png"
+              alt="iPhone"
+              fill
+            />
+          </motion.div>
+          <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            whileInView={{ opacity: 1 }}
             style={{ y: y3 }}
-            transition={{ duration: 1, delay: 1 }}
-            className="w-40 sm:w-64 h-[333px] sm:h-[500px] flex-shrink-0"
-          />
-          <motion.img
-            src="/assets/images/devices/Device-4.png"
-            alt="iPhone"
+            transition={{ duration: 1, delay: 0.3 }}
+            className="relative w-40 sm:w-64 h-[333px] sm:h-[500px] flex-shrink-0"
+          >
+            <Image
+              src="/assets/images/devices/device-1.png"
+              alt="iPhone"
+              fill
+            />
+          </motion.div>
+          <motion.div
             initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
             style={{ y: y4 }}
-            transition={{ duration: 1, delay: 1 }}
-            className="w-40 sm:w-64 h-[333px] sm:h-[500px] flex-shrink-0"
-          />
-          <motion.img
-            src="/assets/images/devices/Device-5.png"
-            alt="iPhone"
+            transition={{ duration: 1, delay: 0.3 }}
+            className="relative w-40 sm:w-64 h-[333px] sm:h-[500px] flex-shrink-0"
+          >
+            <Image
+              src="/assets/images/devices/device-13.png"
+              alt="iPhone"
+              fill
+            />
+          </motion.div>
+          <motion.div
             initial={{ opacity: 0, x: 200 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
             style={{ y: y5 }}
-            transition={{ duration: 1, delay: 1 }}
-            className="w-40 sm:w-64 h-[333px] sm:h-[500px] flex-shrink-0"
-          />
+            transition={{ duration: 1, delay: 0.3 }}
+            className="relative w-40 sm:w-64 h-[333px] sm:h-[500px] flex-shrink-0"
+          >
+            <Image
+              src="/assets/images/devices/device-7.png"
+              alt="iPhone"
+              fill
+            />
+          </motion.div>
         </div>
       </main>
     </Section>

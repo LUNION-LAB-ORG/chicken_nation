@@ -24,27 +24,39 @@ export default function Download() {
                 target="_blank"
                 href="https://play.google.com/store/apps/details?id=com.chickennation.app"
               >
-                <motion.img
-                  src="/download-playstore-fr-FR.png"
-                  alt="Download"
+                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 1, delay: 1 }}
-                  className="w-40 flex-shrink-0"
-                />
+                  className="flex-shrink-0"
+                >
+                  <Image
+                    src="/download-playstore-fr-FR.png"
+                    alt="Download"
+                    width={200}
+                    height={200}
+                    className="w-40"
+                  />
+                </motion.div>
               </Link>
               <Link
                 target="_blank"
                 href="https://apps.apple.com/ci/app/chicken-nation/id6745905607"
               >
-                <motion.img
-                  src="/download-apple-fr-FR.svg"
-                  alt="Download"
+                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 1, delay: 1 }}
-                  className="w-40 flex-shrink-0"
-                />
+                  className="flex-shrink-0"
+                >
+                  <Image
+                    src="/download-apple-fr-FR.svg"
+                    alt="Download"
+                    width={200}
+                    height={200}
+                    className="w-40"
+                  />
+                </motion.div>
               </Link>
             </div>
           </Motion>

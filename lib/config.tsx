@@ -68,21 +68,21 @@ export const siteConfig = {
       title: "AI-Powered Scheduling",
       description:
         "Intelligent scheduling that learns your preferences and optimizes your time.",
-      imageSrc: "/assets/images/devices/Device-2.png",
+      imageSrc: "/assets/images/devices/device-2.png",
       direction: "rtl" as const,
     },
     {
       title: "Smart Time Blocking",
       description:
         "Automatically block time for focused work and personal activities.",
-      imageSrc: "/assets/images/devices/Device-3.png",
+      imageSrc: "/assets/images/devices/device-3.png",
       direction: "ltr" as const,
     },
     {
       title: "Predictive Event Planning",
       description:
         "AI suggests optimal times for meetings and events based on your habits.",
-      imageSrc: "/assets/images/devices/Device-4.png",
+      imageSrc: "/assets/images/devices/device-4.png",
       direction: "rtl" as const,
     },
   ],
@@ -91,7 +91,7 @@ export const siteConfig = {
       title: "AI-Powered Scheduling",
       content:
         "Our app uses advanced AI to optimize your calendar, suggesting the best times for meetings and tasks based on your preferences and habits.",
-      imageSrc: "/assets/images/devices/Device-1.png",
+      imageSrc: "/assets/images/devices/device-1.png",
       imageAlt: "AI scheduling illustration",
       fullWidth: true,
     },
@@ -99,7 +99,7 @@ export const siteConfig = {
       title: "Smart Time Blocking",
       content:
         "Automatically block out time for focused work, breaks, and personal activities to maintain a balanced and productive schedule.",
-      imageSrc: "/assets/images/devices/Device-2.png",
+      imageSrc: "/assets/images/devices/device-2.png",
       imageAlt: "Time blocking illustration",
       fullWidth: false,
     },
@@ -107,7 +107,7 @@ export const siteConfig = {
       title: "Intelligent Reminders",
       content:
         "Receive context-aware notifications that adapt to your schedule, ensuring you never miss important events or deadlines.",
-      imageSrc: "/assets/images/devices/Device-3.png",
+      imageSrc: "/assets/images/devices/device-3.png",
       imageAlt: "Smart reminders illustration",
       fullWidth: false,
     },
@@ -115,7 +115,7 @@ export const siteConfig = {
       title: "Team Collaboration",
       content:
         "Effortlessly coordinate schedules with team members and clients, finding optimal meeting times across different time zones.",
-      imageSrc: "/assets/images/devices/Device-4.png",
+      imageSrc: "/assets/images/devices/device-4.png",
       imageAlt: "Team collaboration illustration",
       fullWidth: true,
     },
@@ -124,22 +124,22 @@ export const siteConfig = {
     {
       id: 1,
       text: "Save hours each week with AI-optimized scheduling.",
-      image: "/assets/images/devices/Device-6.png",
+      image: "/assets/images/devices/device-6.png",
     },
     {
       id: 2,
       text: "Reduce scheduling conflicts and double-bookings.",
-      image: "/assets/images/devices/Device-7.png",
+      image: "/assets/images/devices/device-7.png",
     },
     {
       id: 3,
       text: "Improve work-life balance with smart time allocation.",
-      image: "/assets/images/devices/Device-8.png",
+      image: "/assets/images/devices/device-8.png",
     },
     {
       id: 4,
       text: "Increase productivity with AI-driven time management insights.",
-      image: "/assets/images/devices/Device-1.png",
+      image: "/assets/images/devices/device-1.png",
     },
   ],
   pricing: [

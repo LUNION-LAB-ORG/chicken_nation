@@ -6,6 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { easeOutCubic } from "@/lib/animation";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -14,40 +15,41 @@ const features = [
     title: "Commande rapide",
     description:
       "Choisissez vos plats, personnalisez votre menu et passez commande en quelques secondes.",
-    imageSrc: "/assets/images/devices/Device-2.png",
+    imageSrc: "/assets/images/devices/device-15.png",
     direction: "rtl" as const,
   },
   {
     title: "Modes de réception flexibles",
     description:
       "Faites-vous livrer, mangez sur place ou commandez à emporter selon votre envie du moment.",
-    imageSrc: "/assets/images/devices/Device-3.png",
+    imageSrc: "/assets/images/devices/device-14.png",
     direction: "ltr" as const,
   },
   {
     title: "Paiement simplifié",
     description: "Payez en ligne ou à la réception, en toute sécurité.",
-    imageSrc: "/assets/images/devices/Device-4.png",
+    imageSrc: "/assets/images/devices/device-7.png",
     direction: "rtl" as const,
   },
   {
     title: "Suivi en temps réel",
     description:
       "Suivez votre commande pas à pas, de la cuisine jusqu'à votre porte.",
-    imageSrc: "/assets/images/devices/Device-5.png",
+    imageSrc: "/assets/images/devices/device-8.png",
     direction: "ltr" as const,
   },
   {
     title: "Envoi de message",
-    description: "Envoyez un message direct au restaurant pour toute instruction ou précision concernant votre commande.",
-    imageSrc: "/assets/images/devices/Device-6.png",
+    description:
+      "Envoyez un message direct au restaurant pour toute instruction ou précision concernant votre commande.",
+    imageSrc: "/assets/images/devices/device-16.png",
     direction: "rtl" as const,
   },
   {
     title: "Promotions & fidélité",
     description:
       "Profitez d'offres exclusives et cumulez des points à chaque commande.",
-    imageSrc: "/assets/images/devices/Device-7.png",
+    imageSrc: "/assets/images/devices/device-6.png",
     direction: "ltr" as const,
   },
 ];
@@ -134,9 +136,11 @@ function Feature({
         </div>
       </motion.div>
       <div className="w-full lg:w-1/2">
-        <img
+        <Image
           src={imageSrc}
           alt={title}
+          width={563}
+          height={1000}
           className="w-full max-w-[300px] mx-auto"
         />
       </div>

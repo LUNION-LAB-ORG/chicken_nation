@@ -5,23 +5,24 @@ import Section from "@/components/primitives/Section";
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/lib/config";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import Image from "next/image";
 import { useRef } from "react";
 
 const items = [
   {
     id: 1,
     text: "Qualité garantie",
-    image: "/assets/images/devices/Device-6.png",
+    image: "/assets/images/devices/device-13.png",
   },
   {
     id: 2,
     text: "Service rapide",
-    image: "/assets/images/devices/Device-7.png",
+    image: "/assets/images/devices/device-12.png",
   },
   {
     id: 3,
     text: "Expérience fluide",
-    image: "/assets/images/devices/Device-8.png",
+    image: "/assets/images/devices/device-8.png",
   },
 ];
 
@@ -61,9 +62,11 @@ export function Benefits() {
             className="flex-shrink-0 w-[calc(90%-1rem)] md:w-1/3 lg:w-1/3 xl:w-1/4 snap-center md:snap-start select-none px-4"
           >
             <div className="h-[500px] relative rounded-xl overflow-hidden">
-              <img
+              <Image
                 src={benefit.image}
                 alt={benefit.text}
+                width={563}
+                height={1000}
                 className="absolute inset-0 w-full h-full object-cover transition-all duration-500 ease-out object-[0px_10px] hover:object-top"
               />
               <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-muted to-transparent pointer-events-none" />

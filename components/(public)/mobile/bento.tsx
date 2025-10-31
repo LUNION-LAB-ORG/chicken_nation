@@ -3,18 +3,27 @@
 
 import Section from "@/components/primitives/Section";
 import { easeInOutCubic } from "@/lib/animation";
-import { siteConfig } from "@/lib/config";
 import { cn } from "@/lib/utils";
 import { motion, useScroll, useTransform } from "framer-motion";
+import Image from "next/image";
 import { useRef } from "react";
 
-const items = [
+const items: {
+  name: string;
+  description: string;
+  icon: string;
+  imageSrc: string;
+  imageAlt: string;
+  position: "top" | "center" | "bottom";
+  fullWidth: boolean;
+}[] = [
   {
     name: "Commander vos plats préférés",
     description: "Un seul réflexe pour toutes vos envies : Chicken Nation.",
     icon: "Utensils",
-    imageSrc: "/assets/images/devices/Device-1.png",
+    imageSrc: "/assets/images/devices/device-4.png",
     imageAlt: "AI scheduling illustration",
+    position: "center",
     fullWidth: true,
   },
   {
@@ -22,8 +31,9 @@ const items = [
     description:
       "Explorez nos plats du moment et laissez-vous tenter par nos recettes exclusives.",
     icon: "Search",
-    imageSrc: "/assets/images/devices/Device-2.png",
+    imageSrc: "/assets/images/devices/device-3.png",
     imageAlt: "Time blocking illustration",
+    position: "top",
     fullWidth: false,
   },
   {
@@ -31,8 +41,9 @@ const items = [
     description:
       "Chaque commande vous rapproche de nouvelles réductions et surprises.",
     icon: "Star",
-    imageSrc: "/assets/images/devices/Device-3.png",
+    imageSrc: "/assets/images/devices/device-6.png",
     imageAlt: "Smart reminders illustration",
+    position: "top",
     fullWidth: false,
   },
   {
@@ -40,8 +51,9 @@ const items = [
     description:
       "Invitez vos amis à rejoindre la Nation et partagez vos moments gourmands.",
     icon: "Share2",
-    imageSrc: "/assets/images/devices/Device-4.png",
+    imageSrc: "/assets/images/devices/device-5.png",
     imageAlt: "Team collaboration illustration",
+    position: "center",
     fullWidth: true,
   },
 ];
@@ -83,7 +95,11 @@ export function BentoGrid() {
       ease: easeInOutCubic,
     }),
   ];
-
+  const position = {
+    top: "object-top",
+    center: "object-center",
+    bottom: "object-bottom",
+  };
   return (
     <Section
       id="bento"
@@ -116,10 +132,15 @@ export function BentoGrid() {
                 item.fullWidth && "sm:space-x-4"
               )}
             >
-              <img
+              <Image
                 src={item.imageSrc}
                 alt={item.imageAlt}
-                className="w-full h-64 sm:h-96 rounded-xl object-cover object-top"
+                width={563}
+                height={1000}
+                className={cn(
+                  "w-full h-64 sm:h-96 rounded-xl object-cover object-top",
+                  position[item.position]
+                )}
               />
             </div>
           </motion.div>

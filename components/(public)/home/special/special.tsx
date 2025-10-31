@@ -201,7 +201,6 @@ const deals = [
 export default function Special() {
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Mobile: 1 item, Tablet: 4 items (2x2), Desktop: 6 items (2x3)
   const itemsPerPage =
     typeof window !== "undefined" && window.innerWidth < 768
       ? 2
