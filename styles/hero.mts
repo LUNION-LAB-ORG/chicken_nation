@@ -21,11 +21,10 @@ export default heroui({
         },
         dark: {
             colors: {
-                background: "#0C0C0C",
                 primary: {
                     200: "#f57e30",
-                    600: "#ff6000",
                     500: "#fd8127",
+                    600: "#ff6000",
                     foreground: "#fff",
                     DEFAULT: "#fd8127",
                 },
@@ -35,7 +34,7 @@ export default heroui({
                     600: "#fdbf17",
                     foreground: "#000",
                     DEFAULT: "#ffcc00",
-                }
+                },
             }
         }
     },

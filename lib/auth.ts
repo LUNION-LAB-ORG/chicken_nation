@@ -70,8 +70,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token.accessTokenExpires && Date.now() < token.accessTokenExpires) {
         return token;
       }
-
-      return refreshAccessToken(token);
+      return token
+      // return refreshAccessToken(token);
     },
     async session({ session, token }) {
       if (token.id) {

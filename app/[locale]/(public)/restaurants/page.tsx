@@ -1,4 +1,4 @@
-import Special from "@/components/(public)/home/special/special";
+import Special from "@/components/(public)/home/special";
 import List from "@/components/(public)/restaurant/list";
 import HeroSection from "@/components/(public)/common/hero-section";
 

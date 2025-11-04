@@ -5,7 +5,7 @@ import { FeatureHighlight } from "@/components/(public)/mobile/feature-highlight
 import { FeatureScroll } from "@/components/(public)/mobile/feature-scroll";
 import { Features } from "@/components/(public)/mobile/features";
 import { Hero } from "@/components/(public)/mobile/hero";
-import { Testimonials } from "@/components/(public)/mobile/testimonials";
+import Testimonials from "@/components/(public)/home/testimonials";
 
 export default function AppMobile() {
   return (

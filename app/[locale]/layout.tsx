@@ -1,31 +1,21 @@
 import "@/styles/globals.css";
 import { ToastProvider } from "@heroui/toast";
-import { Metadata, Viewport } from "next";
-
-import { ThemeProviders } from "@/providers/theme.provider";
+import { Metadata } from "next";
 
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
+import { getMetadata, Lang } from "@/app/[locale]/meta";
 import { fontSans, fontTitle } from "@/config/fonts";
 import { routing } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import AuthProvider from "@/providers/auth.provider";
 import DirectionProvider from "@/providers/direction-provider";
 import QueryProvider from "@/providers/query-provider";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getLangDir } from "rtl-detect";
-import { GoogleAnalytics } from "@next/third-parties/google";
-import { getMetadata, Lang } from "@/app/[locale]/meta";
-
-// Define viewport metadata
-export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    // { media: "(prefers-color-scheme: dark)", color: "black" },
-  ],
-};
 
 // Generate metadata for each locale
 export async function generateMetadata({
@@ -65,23 +55,23 @@ export default async function RootLayout({
 
         <NextIntlClientProvider messages={messages} locale={locale}>
           <QueryProvider>
-            <ThemeProviders
+            {/* <ThemeProviders
               themeProps={{ attribute: "class", defaultTheme: "light" }}
-            >
-              <ToastProvider
-                placement="top-center"
-                toastProps={{ shouldShowTimeoutProgress: true }}
-              />
-              <NuqsAdapter>
-                <AuthProvider>
-                  {/* <MountedProvider> */}
-                  <DirectionProvider direction={direction}>
-                    {children}
-                  </DirectionProvider>
-                  {/* </MountedProvider> */}
-                </AuthProvider>
-              </NuqsAdapter>
-            </ThemeProviders>
+            > */}
+            <ToastProvider
+              placement="top-center"
+              toastProps={{ shouldShowTimeoutProgress: true }}
+            />
+            <NuqsAdapter>
+              <AuthProvider>
+                {/* <MountedProvider> */}
+                <DirectionProvider direction={direction}>
+                  {children}
+                </DirectionProvider>
+                {/* </MountedProvider> */}
+              </AuthProvider>
+            </NuqsAdapter>
+            {/* </ThemeProviders> */}
           </QueryProvider>
         </NextIntlClientProvider>
       </body>

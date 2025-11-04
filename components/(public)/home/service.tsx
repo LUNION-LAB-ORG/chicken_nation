@@ -8,19 +8,20 @@ const serviceItems = [
     id: 1,
     name: "Passez une commande",
     picture: "assets/images/illustrations/page-accueil/service1.png",
-    url: "https://app.eatself.com/3787/carte/0",
+    // url: "https://app.eatself.com/3787/carte/0",
+    url: "/app-mobile",
   },
   {
     id: 2,
     name: "Réservez une table",
     picture: "assets/images/illustrations/page-accueil/service2.png",
-    url: "https://app.eatself.com/3787/carte/0",
+    url: "/app-mobile",
   },
   {
     id: 3,
     name: "Trouver un restaurant",
     picture: "assets/images/illustrations/page-accueil/service3.png",
-    url: "https://app.eatself.com/3787/carte/0",
+    url: "/app-mobile",
   },
 ];
 export default function Service() {
@@ -38,9 +39,9 @@ export default function Service() {
           >
             <Link
               href={item.url}
-              className="bg-white flex flex-col p-8 justify-between w-[280px] md:w-[230px] lg:w-[300px] items-center gap-4 rounded-2xl hover:shadow-lg transition-shadow"
+              className="bg-white flex flex-col p-8 justify-between w-[280px] md:w-[230px] lg:w-[300px] md:min-h-[260px] items-center gap-4 rounded-2xl hover:shadow-lg transition-shadow"
             >
-              <div className="relative w-24 h-24 md:w-32 md:h-32">
+              <div className="relative w-24 h-24 md:w-28 md:h-28">
                 <Image
                   src={`/${item.picture}`}
                   alt={item.name}
@@ -56,7 +57,7 @@ export default function Service() {
         ))}
       </div>
 
-      <div className="hidden lg:block absolute -bottom-30 left-0">
+      <div className="hidden lg:block absolute z-2 -bottom-30 left-0">
         <Motion variant="verticalSlideIn">
           <Image
             src="/assets/images/illustrations/page-accueil/paq-chick.png"
