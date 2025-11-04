@@ -1,14 +1,15 @@
 import Image from "next/image";
 import Motion from "@/lib/motion";
 import Section from "@/components/primitives/Section";
-
+import bgNew from "@/public/assets/images/backgrounds/BgNew.png";
 export default function Hero() {
   return (
     <Section className="relative w-full h-[calc(100vh-70px)] min-h-[600px] max-h-[900px] overflow-hidden">
       <Image
-        src="/assets/images/backgrounds/BgNew.png"
+        src={bgNew}
         alt="Background"
         fill
+        placeholder="blur"
         priority
         className="object-cover"
       />
