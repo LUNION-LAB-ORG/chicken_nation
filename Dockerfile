@@ -1,6 +1,13 @@
-# syntax=docker.io/docker/dockerfile:1
-
 FROM node:24-alpine AS base
+
+ARG NEXT_PUBLIC_URL
+ARG NEXT_PUBLIC_API_BACKEND_URL
+ARG NEXT_PUBLIC_API_FILE_URL
+
+ENV NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL}
+ENV NEXT_PUBLIC_API_BACKEND_URL=${NEXT_PUBLIC_API_BACKEND_URL}
+ENV NEXT_PUBLIC_API_FILE_URL=${NEXT_PUBLIC_API_FILE_URL}
+ENV NODE_ENV="production"
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -58,7 +65,6 @@ USER nextjs
 
 EXPOSE 3000
 
-ENV PORT=3000
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
