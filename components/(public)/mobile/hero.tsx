@@ -114,12 +114,13 @@ export function Hero() {
             whileInView={{ opacity: 1, x: 0 }}
             style={{ y: y1 }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="relative w-40 sm:w-64 h-[333px] sm:h-[500px] flex-shrink-0"
+            className="relative flex-shrink-0"
           >
             <Image
               src="/assets/images/devices/device-3.png"
               alt="iPhone"
-              fill
+              width={563 / 2}
+              height={1000 / 2}
             />
           </motion.div>
           <motion.div
@@ -127,12 +128,13 @@ export function Hero() {
             whileInView={{ opacity: 1, x: 0 }}
             style={{ y: y2 }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="relative w-40 sm:w-64 h-[333px] sm:h-[500px] flex-shrink-0"
+            className="relative flex-shrink-0"
           >
             <Image
               src="/assets/images/devices/device-2.png"
               alt="iPhone"
-              fill
+              width={563 / 2}
+              height={1000 / 2}
             />
           </motion.div>
           <motion.div
@@ -140,12 +142,13 @@ export function Hero() {
             whileInView={{ opacity: 1 }}
             style={{ y: y3 }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="relative w-40 sm:w-64 h-[333px] sm:h-[500px] flex-shrink-0"
+            className="relative flex-shrink-0"
           >
             <Image
               src="/assets/images/devices/device-1.png"
               alt="iPhone"
-              fill
+              width={563 / 2}
+              height={1000 / 2}
             />
           </motion.div>
           <motion.div
@@ -153,12 +156,13 @@ export function Hero() {
             whileInView={{ opacity: 1, x: 0 }}
             style={{ y: y4 }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="relative w-40 sm:w-64 h-[333px] sm:h-[500px] flex-shrink-0"
+            className="relative flex-shrink-0"
           >
             <Image
               src="/assets/images/devices/device-13.png"
               alt="iPhone"
-              fill
+              width={563 / 2}
+              height={1000 / 2}
             />
           </motion.div>
           <motion.div
@@ -166,12 +170,13 @@ export function Hero() {
             whileInView={{ opacity: 1, x: 0 }}
             style={{ y: y5 }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="relative w-40 sm:w-64 h-[333px] sm:h-[500px] flex-shrink-0"
+            className="relative flex-shrink-0"
           >
             <Image
               src="/assets/images/devices/device-7.png"
               alt="iPhone"
-              fill
+              width={563 / 2}
+              height={1000 / 2}
             />
           </motion.div>
         </div>

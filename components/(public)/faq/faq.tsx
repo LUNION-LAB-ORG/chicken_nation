@@ -18,9 +18,7 @@ export default function Quiz() {
           <ul className="list-none space-y-1">
             <li>- Sur place dans notre restaurant</li>
             <li>- Par téléphone au +225 0747000034</li>
-            <li>- Via notre application mobile Turbo</li>
-            <li>- Sur notre site web</li>
-            <li>- Via les plateformes de livraison partenaires (Turbo Delivery)</li>
+            <li>- Via notre application mobile Chicken-Nation</li>
           </ul>
         </div>
       </AccordionItem>

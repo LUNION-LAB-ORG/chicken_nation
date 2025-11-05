@@ -54,7 +54,7 @@ export function FeatureScroll() {
             className="relative w-full h-auto max-w-[250px] sm:max-w-[300px] mx-auto"
           />
         </motion.div>
-        <motion.div style={{ y: y2 }}>
+        <motion.div style={{ y: y2 }} className="hidden sm:block">
           <Image
             ref={phone2Ref}
             src="/assets/images/devices/device-13.png"
@@ -65,7 +65,7 @@ export function FeatureScroll() {
           />
         </motion.div>
 
-        <motion.div style={{ y: y3 }}>
+        <motion.div style={{ y: y3 }} className="hidden sm:block">
           <Image
             ref={phone3Ref}
             src="/assets/images/devices/device-14.png"
