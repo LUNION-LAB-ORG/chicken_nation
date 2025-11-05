@@ -8,10 +8,6 @@ export const metadata: Metadata = {
         absolute: "CHICKEN NATION - Le Meilleur du Poulet à Abidjan, Côte d'Ivoire",
     },
     description: "CHICKEN NATION, la référence du fast-food à Abidjan. Poulet 100% local élevé dans nos fermes. Croustillant, grillé ou épicé. Livraison rapide en moins de 30min. Restaurants à Zone 4, Angré-Djibi et Sococé.",
-    icons: {
-        icon: "/favicon.ico",
-        apple: "/apple-icon.png",
-    },
     referrer: "origin-when-cross-origin",
     keywords: [
         "Chicken Nation Abidjan",
@@ -93,7 +89,6 @@ export const organizationSchema = {
     "@id": "https://www.chicken-nation.com/#organization",
     "name": "CHICKEN NATION",
     "url": "https://www.chicken-nation.com",
-    "logo": "https://www.chicken-nation.com/logo.png",
     "slogan": "Délicieux jusqu'à l'os",
     "description": "Fast-food spécialisé dans le poulet 100% local élevé dans nos propres fermes en Côte d'Ivoire.",
     "email": "info@chicken-nation.com",
