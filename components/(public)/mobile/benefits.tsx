@@ -3,7 +3,7 @@
 
 import Section from "@/components/primitives/Section";
 import { Button } from "@/components/ui/button";
-import { siteConfig } from "@/lib/config";
+import { siteConfig } from "@/config/site";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useRef } from "react";
