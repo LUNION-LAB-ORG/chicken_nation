@@ -3,8 +3,6 @@ import { ToastProvider } from "@heroui/toast";
 import { Metadata } from "next";
 
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-
-import { getMetadata, Lang } from "@/app/[locale]/meta";
 import { fontSans, fontTitle } from "@/config/fonts";
 import { routing } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
@@ -16,15 +14,6 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getLangDir } from "rtl-detect";
-
-// Generate metadata for each locale
-export async function generateMetadata({
-  params,
-}: {
-  params: { lang: Lang };
-}): Promise<Metadata> {
-  return getMetadata(params.lang);
-}
 
 // Define default layout
 export default async function RootLayout({

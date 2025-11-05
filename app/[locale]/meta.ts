@@ -1,147 +1,145 @@
 import type { Metadata } from "next";
 
-export type Lang = "fr" | "en";
-
-export const getMetadata = (lang: Lang): Metadata => {
-    const isFrench = lang === "fr";
-
-    return {
-        metadataBase: new URL("https://www.chicken-nation.com"),
-        title: {
-            default: isFrench
-                ? "CHICKEN NATION | Fast-Food 100% Poulet en Côte d'Ivoire"
-                : "CHICKEN NATION | 100% Chicken Fast-Food in Côte d'Ivoire",
-            template: isFrench
-                ? "%s | CHICKEN NATION - Délicieux jusqu'à l'os"
-                : "%s | CHICKEN NATION - Delicious to the Bone",
-            absolute: isFrench
-                ? "CHICKEN NATION - Le Meilleur du Poulet à Abidjan, Côte d'Ivoire"
-                : "CHICKEN NATION - The Best Chicken Restaurant in Abidjan, Côte d'Ivoire",
+export const metadata: Metadata = {
+    metadataBase: new URL("https://www.chicken-nation.com"),
+    title: {
+        default: "CHICKEN NATION | Fast-Food 100% Poulet en Côte d'Ivoire",
+        template: "%s | CHICKEN NATION - Délicieux jusqu'à l'os",
+        absolute: "CHICKEN NATION - Le Meilleur du Poulet à Abidjan, Côte d'Ivoire",
+    },
+    description: "CHICKEN NATION, la référence du fast-food à Abidjan. Poulet 100% local élevé dans nos fermes. Croustillant, grillé ou épicé. Livraison rapide en moins de 30min. Restaurants à Zone 4, Angré-Djibi et Sococé.",
+    icons: {
+        icon: "/favicon.ico",
+        apple: "/apple-icon.png",
+    },
+    referrer: "origin-when-cross-origin",
+    keywords: [
+        "Chicken Nation Abidjan",
+        "Fast food Côte d'Ivoire",
+        "Poulet croustillant Abidjan",
+        "Burger poulet Abidjan",
+        "Restaurant Zone 4 Abidjan",
+        "Restaurant Angré Abidjan",
+        "Restaurant Sococé Abidjan",
+        "Menu Chicken Nation",
+        "Poulet grillé Abidjan",
+        "Livraison repas Abidjan",
+        "Fast food halal Abidjan",
+        "Combo repas Abidjan",
+        "Restauration rapide Côte d'Ivoire",
+        "Chicken Nation CI",
+        "Poulet local Abidjan",
+        "Turbo Glovo Yango delivery",
+    ],
+    authors: [{ name: "CHICKEN NATION", url: "https://www.chicken-nation.com" }],
+    creator: "CHICKEN NATION",
+    publisher: "CHICKEN NATION",
+    alternates: {
+        canonical: "https://www.chicken-nation.com",
+        languages: {
+            "fr-CI": "https://www.chicken-nation.com",
         },
-        description: isFrench
-            ? "CHICKEN NATION, la référence du fast-food à Abidjan. Spécialisé dans le poulet croustillant, grillé ou épicé. Dégustez nos burgers, wings, wraps et menus combo dans nos restaurants à Zone 4 et Angré."
-            : "CHICKEN NATION, the leading chicken fast-food restaurant in Abidjan. Enjoy crispy, grilled, or spicy chicken — burgers, wings, wraps, and combo meals at our Zone 4 and Angré locations.",
-        icons: {
-            icon: "/favicon.ico",
-            apple: "/apple-icon.png",
-        },
-        referrer: "origin-when-cross-origin",
-        keywords: isFrench
-            ? [
-                "Chicken Nation Abidjan",
-                "Fast food Côte d'Ivoire",
-                "Poulet croustillant Abidjan",
-                "Burger poulet Abidjan",
-                "Restaurant Zone 4 Abidjan",
-                "Restaurant Angré Abidjan",
-                "Menu Chicken Nation",
-                "Poulet grillé Abidjan",
-                "Livraison repas Abidjan",
-                "Fast food halal Abidjan",
-                "Combo repas Abidjan",
-                "Restauration rapide Côte d'Ivoire",
-                "Chicken Nation CI",
-            ]
-            : [
-                "Chicken Nation Abidjan",
-                "Fast food Ivory Coast",
-                "Crispy chicken Abidjan",
-                "Grilled chicken Abidjan",
-                "Chicken burger Abidjan",
-                "Chicken wrap Abidjan",
-                "Food delivery Abidjan",
-                "Halal fast food Abidjan",
-                "Combo meals Abidjan",
-                "Chicken Nation Ivory Coast",
-            ],
-        authors: [{ name: "CHICKEN NATION", url: "https://www.chicken-nation.com" }],
-        creator: "CHICKEN NATION",
-        publisher: "CHICKEN NATION",
-        alternates: {
-            canonical: isFrench
-                ? "https://www.chicken-nation.com"
-                : "https://www.chicken-nation.com/en",
-            languages: {
-                "fr-CI": "https://www.chicken-nation.com",
-                "en-US": "https://www.chicken-nation.com/en",
-            },
-        },
-        openGraph: {
-            type: "website",
-            locale: isFrench ? "fr_CI" : "en_US",
-            url: isFrench
-                ? "https://www.chicken-nation.com"
-                : "https://www.chicken-nation.com/en",
-            siteName: "CHICKEN NATION",
-            title: isFrench
-                ? "CHICKEN NATION - Le Meilleur du Poulet à Abidjan, Côte d'Ivoire"
-                : "CHICKEN NATION - The Best Chicken in Abidjan, Côte d'Ivoire",
-            description: isFrench
-                ? "Découvrez CHICKEN NATION, fast-food 100% poulet à Abidjan. Burgers, wings, wraps, tenders et menus gourmands servis dans une ambiance conviviale."
-                : "Discover CHICKEN NATION, the 100% chicken fast-food restaurant in Abidjan. Burgers, wings, wraps, tenders, and delicious combo meals served in a friendly atmosphere.",
-            images: [
-                {
-                    url: isFrench
-                        ? "https://www.chicken-nation.com/og-image.jpg"
-                        : "https://www.chicken-nation.com/og-image-en.jpg",
-                    width: 630,
-                    height: 630,
-                    alt: isFrench
-                        ? "CHICKEN NATION - Fast food 100% poulet en Côte d'Ivoire"
-                        : "CHICKEN NATION - 100% Chicken Fast Food in Côte d'Ivoire",
-                },
-            ],
-        },
-        twitter: {
-            card: "summary_large_image",
-            site: "@ChickenNationCI",
-            creator: "@ChickenNationCI",
-            title: isFrench
-                ? "CHICKEN NATION - Fast-Food 100% Poulet à Abidjan"
-                : "CHICKEN NATION - 100% Chicken Fast-Food in Abidjan",
-            description: isFrench
-                ? "Savourez nos burgers, wings et wraps faits avec amour. Chicken Nation, délicieux jusqu'à l'os !"
-                : "Enjoy our burgers, wings, and wraps made with love. Chicken Nation — delicious to the bone!",
-            images: [
-                isFrench
-                    ? "https://www.chicken-nation.com/twitter-image.jpg"
-                    : "https://www.chicken-nation.com/twitter-image-en.jpg",
-            ],
-        },
-        viewport: {
-            width: "device-width",
-            initialScale: 1,
-            maximumScale: 1,
-        },
-        robots: {
+    },
+    openGraph: {
+        type: "website",
+        locale: "fr_CI",
+        url: "https://www.chicken-nation.com",
+        siteName: "CHICKEN NATION",
+        title: "CHICKEN NATION - Le Meilleur du Poulet à Abidjan, Côte d'Ivoire",
+        description: "Découvrez CHICKEN NATION, fast-food 100% poulet local élevé dans nos fermes. Burgers, wings, wraps, tenders et menus gourmands. Livraison rapide à Abidjan.",
+    },
+    twitter: {
+        card: "summary_large_image",
+        site: "@ChickenNationCI",
+        creator: "@ChickenNationCI",
+    },
+    viewport: {
+        width: "device-width",
+        initialScale: 1,
+        maximumScale: 1,
+    },
+    robots: {
+        index: true,
+        follow: true,
+        googleBot: {
             index: true,
             follow: true,
-            googleBot: {
-                index: true,
-                follow: true,
-                "max-video-preview": -1,
-                "max-image-preview": "large",
-                "max-snippet": -1,
+            "max-video-preview": -1,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+        },
+    },
+    category: "Restauration rapide",
+    verification: {
+        google: "google-site-verification=-B0Ir9iTmPZHT-_7eQtFlG-b5v_AN1561-Q7zf-9PWQ",
+        yandex: "1b5037f79415fff0",
+    },
+    other: {
+        "og:phone_number": "+225 07 20 35 35 35, +225 07 47 00 00 34",
+        "og:email": "info@chicken-nation.com",
+        "og:latitude": "5.2860635",
+        "og:longitude": "-3.9736923",
+        "og:street-address": "Marcory Zone 4, Abidjan, Côte d'Ivoire",
+        "og:locality": "Abidjan",
+        "og:region": "Côte d'Ivoire",
+        "og:country-name": "Côte d'Ivoire",
+    },
+};
+
+
+export const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://www.chicken-nation.com/#organization",
+    "name": "CHICKEN NATION",
+    "url": "https://www.chicken-nation.com",
+    "logo": "https://www.chicken-nation.com/logo.png",
+    "slogan": "Délicieux jusqu'à l'os",
+    "description": "Fast-food spécialisé dans le poulet 100% local élevé dans nos propres fermes en Côte d'Ivoire.",
+    "email": "info@chicken-nation.com",
+    "telephone": ["+225 07 20 35 35 35", "+225 07 47 00 00 34"],
+    "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Marcory Zone 4",
+        "addressLocality": "Abidjan",
+        "addressCountry": "CI"
+    },
+    "sameAs": [
+        "https://twitter.com/ChickenNationCI",
+        "https://www.instagram.com/chickennationci"
+    ],
+    "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Menu Chicken Nation",
+        "itemListElement": [
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "MenuItem",
+                    "name": "Poulets grillés"
+                }
             },
-        },
-        category: isFrench ? "Restauration rapide" : "Fast Food Restaurant",
-        verification: {
-            google: "google-site-verification=XXXXXXXXXXXXXXX",
-            yandex: "XXXXXXXXXXXXXXX",
-            other: { bing: "XXXXXXXXXXXXXXX" },
-        },
-        other: {
-            "fb:app_id": "1075289994232342",
-            "og:phone_number": "+225 07 77 777 777",
-            "og:email": "contact@chicken-nation.com",
-            "og:latitude": "5.309660",
-            "og:longitude": "-3.996790",
-            "og:street-address":
-                "Marcory Zone 4, Rue du 7 Décembre | Abidjan, Côte d'Ivoire",
-            "og:locality": "Abidjan",
-            "og:region": "Côte d'Ivoire",
-            "og:postal-code": "01 BP 1234 Abidjan 01",
-            "og:country-name": "Côte d'Ivoire",
-        },
-    };
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "MenuItem",
+                    "name": "Burgers"
+                }
+            },
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "MenuItem",
+                    "name": "Wings"
+                }
+            },
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "MenuItem",
+                    "name": "Wraps"
+                }
+            }
+        ]
+    }
 };
