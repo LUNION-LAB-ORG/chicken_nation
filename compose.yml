@@ -1,7 +1,7 @@
 services:
-  LuxuryHomeAbidjan-Production:
+  chicken-nation-web-prod:
     env_file:
-      - .env.local
+      - .env
     build:
       context: .
       args:
