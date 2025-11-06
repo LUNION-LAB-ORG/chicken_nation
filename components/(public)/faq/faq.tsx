@@ -1,180 +1,294 @@
 "use client";
-// import Motion from "@/lib/motion";
+
 import { Accordion, AccordionItem } from "@heroui/accordion";
 
-export default function Quiz() {
+const faqs = [
+  {
+    key: "1",
+    question: "Comment puis-je commander ?",
+    answer: (
+      <div className="space-y-3">
+        <p className="font-medium text-gray-700">
+          Plusieurs options s&apos;offrent à vous :
+        </p>
+        <ul className="list-none space-y-2">
+          <li className="flex items-center gap-2">
+            <span className="text-primary-600">🏪</span>
+            <span>
+              Sur place dans nos restaurants (Zone 4, Angré-Djibi, Sococé)
+            </span>
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="text-primary-600">📞</span>
+            <span>
+              Par téléphone :{" "}
+              <a
+                href="tel:+2250720353535"
+                className="font-semibold text-primary-600 hover:text-primary-500"
+              >
+                07 20 35 35 35
+              </a>{" "}
+              /{" "}
+              <a
+                href="tel:+2250747000034"
+                className="font-semibold text-primary-600 hover:text-primary-500"
+              >
+                07 47 00 00 34
+              </a>
+            </span>
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="text-primary-600">📱</span>
+            <span>
+              Via notre application mobile <strong>Chicken Nation</strong>
+            </span>
+          </li>
+        </ul>
+      </div>
+    ),
+  },
+  {
+    key: "2",
+    question: "Quelles sont les zones de livraison ?",
+    answer:
+      "Nous livrons partout dans Abidjan, même Bingerville et Grand-Bassam.",
+  },
+  {
+    key: "3",
+    question: "Quel est le délai de livraison moyen ?",
+    answer: "Le délai moyen est de 20 à 35 minutes, selon votre emplacement.",
+  },
+  {
+    key: "4",
+    question: "Puis-je personnaliser mon burger ?",
+    answer:
+      "Oui, vous pouvez personnaliser votre burger selon vos préférences.",
+  },
+  {
+    key: "5",
+    question: "Quels moyens de paiement acceptez-vous ?",
+    answer: (
+      <div className="space-y-2">
+        <p>Nous acceptons plusieurs moyens de paiement :</p>
+        <ul className="list-none space-y-1 ml-2">
+          <li>
+            💵 <strong>Espèces</strong>
+          </li>
+          <li>
+            📱 <strong>Mobile Money</strong> (Orange Money, MTN Money, Wave,
+            Moov Money)
+          </li>
+          <li>
+            💳 <strong>Carte bancaire</strong> (Visa, Mastercard)
+          </li>
+        </ul>
+      </div>
+    ),
+  },
+  {
+    key: "6",
+    question: "Avez-vous une carte de fidélité ?",
+    answer: (
+      <div className="space-y-2">
+        <p>
+          Oui ! Notre <strong className="text-primary-600">Carte Nation</strong>{" "}
+          sera bientôt disponible sur l&apos;application Chicken Nation.
+        </p>
+        <p className="text-sm bg-secondary-200/30 p-2 rounded border-l-4 border-secondary-600">
+          <strong>Avantages :</strong> -20% sur tous les menus étudiants +
+          offres exclusives !
+        </p>
+      </div>
+    ),
+  },
+  {
+    key: "6",
+    question: "Comment utiliser mes points fidélité ?",
+    answer:
+      "Les conditions d'éligibilité et d'utilisation de la carte de fidélité vous sont communiquées très prochainement via l'application.",
+  },
+  {
+    key: "7",
+    question: "Quels sont vos horaires d'ouverture ?",
+    answer: (
+      <div className="space-y-2">
+        <p className="font-semibold text-primary-600">
+          Tous nos restaurants sont ouverts 7 jours sur 7 :
+        </p>
+        <p className="ml-2">
+          🕐 <strong>Lundi au Dimanche :</strong> 10h00 - 23h00
+        </p>
+      </div>
+    ),
+  },
+  {
+    key: "8",
+    question: "Peut-on réserver une table ?",
+    answer: (
+      <div className="space-y-2">
+        <p>Oui, contactez-nous par téléphone pour réserver :</p>
+        <ul className="list-none space-y-1 ml-2">
+          <li>
+            📞 <strong className="text-primary-600">Zone 4 (Marcory) :</strong>{" "}
+            <a href="tel:+2250720353535" className="hover:underline">
+              07 20 35 35 35
+            </a>
+          </li>
+          <li>
+            📞{" "}
+            <strong className="text-primary-600">Angré-Djibi & Sococé :</strong>{" "}
+            <a href="tel:+2250747000034" className="hover:underline">
+              07 47 00 00 34
+            </a>
+          </li>
+        </ul>
+        <p>
+          Vous pouvez également réservé une table en ligne sur notre application
+          mobile Chicken Nation.
+        </p>
+      </div>
+    ),
+  },
+  {
+    key: "9",
+    question: "Proposez-vous des services pour les entreprises ?",
+    answer:
+      "Nous travaillons sur une offre dédiée aux entreprises. Ce service sera bientôt disponible.",
+  },
+  {
+    key: "10",
+    question: "Quelles mesures d'hygiène appliquez-vous ?",
+    answer: (
+      <div className="space-y-2">
+        <p>Votre santé est notre priorité :</p>
+        <ul className="list-none space-y-1 ml-2">
+          <li>✅ Respect strict des normes sanitaires internationales</li>
+          <li>✅ Poulet 100% local élevé dans nos propres fermes</li>
+          <li>✅ Contrôles qualité réguliers</li>
+          <li>✅ Ingrédients frais sélectionnés avec soin</li>
+        </ul>
+      </div>
+    ),
+  },
+  {
+    key: "11",
+    question: "Comment sont préparés les plats ?",
+    answer:
+      "Tous nos plats sont préparés à la commande avec des ingrédients frais et de qualité. Notre poulet est mariné avec amour et frit à la perfection.",
+  },
+  {
+    key: "12",
+    question: "Comment puis-je vous contacter ?",
+    answer: (
+      <div className="space-y-2">
+        <p className="font-medium">Plusieurs moyens de nous joindre :</p>
+        <ul className="list-none space-y-1 ml-2">
+          <li>
+            📞 <strong>Zone 4 :</strong>{" "}
+            <a
+              href="tel:+2250720353535"
+              className="text-primary-600 hover:underline"
+            >
+              07 20 35 35 35
+            </a>
+          </li>
+          <li>
+            📞 <strong>Angré-Djibi & Sococé :</strong>{" "}
+            <a
+              href="tel:+2250747000034"
+              className="text-primary-600 hover:underline"
+            >
+              07 47 00 00 34
+            </a>
+          </li>
+          <li>
+            ✉️ <strong>Email :</strong>{" "}
+            <a
+              href="mailto:info@chicken-nation.com"
+              className="text-primary-600 hover:underline"
+            >
+              info@chicken-nation.com
+            </a>
+          </li>
+          <li>
+            📱 <strong>Réseaux sociaux :</strong> @ChickenNationCI
+          </li>
+        </ul>
+      </div>
+    ),
+  },
+  {
+    key: "13",
+    question: "Que faire en cas de problème avec ma commande ?",
+    answer: (
+      <div className="space-y-2">
+        <p>
+          Contactez immédiatement notre service client au{" "}
+          <a
+            href="tel:+2250720353535"
+            className="font-semibold text-primary-600 hover:underline"
+          >
+            07 20 35 35 35
+          </a>{" "}
+          ou au{" "}
+          <a
+            href="tel:+2250747000034"
+            className="font-semibold text-primary-600 hover:underline"
+          >
+            07 47 00 00 34
+          </a>
+          .
+        </p>
+        <p>
+          Nous résoudrons rapidement votre réclamation. Votre satisfaction est
+          notre priorité !
+        </p>
+      </div>
+    ),
+  },
+];
+
+export default function FAQ() {
   return (
-    <div>
-    <Accordion variant="splitted" className="text-primary-800">
-
-      <AccordionItem
-        key="1"
-        aria-label="Comment puis-je commander"
-        title="Comment puis-je commander ?"
-        className="bg-gray-100 text-black text-sm p-2"
+    <div className="w-full max-w-screen-md mx-auto">
+      <Accordion
+        variant="splitted"
+        selectionMode="multiple"
+        className="gap-3"
+        itemClasses={{
+          base: "px-4 py-2 bg-white shadow-md rounded-xl border border-gray-200 hover:border-primary-300 transition-all",
+          title:
+            "font-semibold text-gray-800 text-base group-data-[open=true]:text-primary-600",
+          trigger: "py-4 rounded-xl data-[hover=true]:bg-primary-100/50",
+          indicator: "text-primary-600 data-[open=true]:rotate-180",
+          content: "pt-2 pb-4 px-2 text-gray-700 text-sm leading-relaxed",
+        }}
       >
-        <div className="space-y-2">
-          <p>Plusieurs options s&apos;offrent à vous :</p>
-          <ul className="list-none space-y-1">
-            <li>- Sur place dans notre restaurant</li>
-            <li>- Par téléphone au +225 0747000034</li>
-            <li>- Via notre application mobile Chicken-Nation</li>
-          </ul>
-        </div>
-      </AccordionItem>
-
-      <AccordionItem
-        key="2"
-        aria-label="Zones de livraison"
-        title="Quelles sont les zones de livraison ?"
-        className="bg-gray-100 text-black text-sm p-2"
-      >
-        <p>Nous livrons partout dans Abidjan, même Bingerville et Bassam</p>
-      </AccordionItem>
-
-      <AccordionItem
-        key="3"
-        aria-label="Délai de livraison"
-        title="Quel est le délai de livraison moyen ?"
-        className="bg-gray-100 text-black text-sm p-2"
-      >
-        <p>Le délai moyen est de 20 à 35 minutes, selon votre emplacement.</p>
-      </AccordionItem>
-
-      <AccordionItem
-        key="4"
-        aria-label="Minimum de commande"
-        title="Y a-t-il un minimum de commande pour la livraison ?"
-        className="bg-gray-100 text-black text-sm p-2"
-      >
-        <p>Oui, un minimum de 5000 FCFA est requis pour la livraison.</p>
-      </AccordionItem>
-
-      <AccordionItem
-        key="5"
-        aria-label="Options végétariennes"
-        title="Proposez-vous des options végétariennes ?"
-        className="bg-gray-100 text-black text-sm p-2"
-      >
-        <p>Nous avons une option végétarienne : notre salade de choux , qui est disponible en supplément</p>
-      </AccordionItem>
-
-      <AccordionItem
-        key="7"
-        aria-label="Personnalisation burger"
-        title="Puis-je personnaliser mon burger ?"
-        className="bg-gray-100 text-black text-sm p-2"
-      >
-        <p>Oui, cela est bien possible</p>
-      </AccordionItem>
-
-      <AccordionItem
-        key="8"
-        aria-label="Prix et taxes"
-        title="Les prix affichés incluent-ils les taxes ?"
-        className="bg-gray-100 text-black text-sm p-2"
-      >
-        <p>Oui, nos prix incluent toutes les taxes.</p>
-      </AccordionItem>
-
-      <AccordionItem
-        key="9"
-        aria-label="Moyens de paiement"
-        title="Quels moyens de paiement acceptez-vous ?"
-        className="bg-gray-100 text-black text-sm p-2"
-      >
-        <p>Nous acceptons les paiements en espèces, mobile money et carte bancaire.</p>
-      </AccordionItem>
-
-      <AccordionItem
-        key="10"
-        aria-label="Carte fidélité"
-        title="Avez-vous une carte de fidélité ?"
-        className="bg-gray-100 text-black text-sm p-2"
-      >
-        <p>Bientôt disponible sur l&apos;application de Chicken Nation uniquement</p>
-      </AccordionItem>
-
-      <AccordionItem
-        key="11"
-        aria-label="Points fidélité"
-        title="Comment utiliser mes points fidélité ?"
-        className="bg-gray-100 text-black text-sm p-2"
-      >
-        <p>
-          Les conditions d&apos;éligibilité et les conditions générales d&apos;utilisations de la carte de fidélité vous seront
-          communiquées très prochainement via l&apos;application.
-        </p>
-      </AccordionItem>
-
-      <AccordionItem
-        key="12"
-        aria-label="Horaires"
-        title="Quels sont vos horaires d'ouverture ?"
-        className="bg-gray-100 text-black text-sm p-2"
-      >
-        <p>Nous sommes ouverts du lundi au vendredi de 10h30 à 23h et les week-ends de 10h30 à minuit</p>
-      </AccordionItem>
-
-      <AccordionItem
-        key="13"
-        aria-label="Réservation"
-        title="Peut-on réserver une table ?"
-        className="bg-gray-100 text-black text-sm p-2"
-      >
-        <p>
-          Pour effectuer une réservation, nous vous invitons à nous contacter par téléphone aux numéros : 07 47 00 00 34 - Chicken
-          Nation Angré, 07 20 35 35 35 - Chicken Nation Marcory Zone 4
-        </p>
-      </AccordionItem>
-
-      <AccordionItem
-        key="14"
-        aria-label="Services entreprises"
-        title="Proposez-vous des services pour les entreprises ?"
-        className="bg-gray-100 text-black text-sm p-2"
-      >
-        <p>Bientôt disponible</p>
-      </AccordionItem>
-
-      <AccordionItem
-        key="15"
-        aria-label="Mesures hygiène"
-        title="Quelles mesures d'hygiène appliquez-vous ?"
-        className="bg-gray-100 text-black text-sm p-2"
-      >
-        <p>Nous suivons strictement les normes sanitaires en vigueur.</p>
-      </AccordionItem>
-
-      <AccordionItem
-        key="16"
-        aria-label="Préparation plats"
-        title="Comment sont préparés les plats ?"
-        className="bg-gray-100 text-black text-sm p-2"
-      >
-        <p>Nos plats sont préparés avec des ingrédients frais et de qualité.</p>
-      </AccordionItem>
-
-      <AccordionItem
-        key="17"
-        aria-label="Contact"
-        title="Comment puis-je vous contacter ?"
-        className="bg-gray-100 text-black text-sm p-2"
-      >
-        <p>
-          Contactez-nous via téléphone : 07 47 00 00 34 - Chicken Nation Angré; 07 20 35 35 35 - Chicken Nation Marcory Zone 4
-        </p>
-      </AccordionItem>
-
-      <AccordionItem
-        key="18"
-        aria-label="Problème commande"
-        title="Que faire en cas de problème avec ma commande ?"
-        className="bg-gray-100 text-black text-sm p-2"
-      >
-        <p>Appelez notre service client pour toute réclamation.</p>
-      </AccordionItem>
-    </Accordion>
+        {faqs.map((faq) => (
+          <AccordionItem
+            key={faq.key}
+            aria-label={faq.question}
+            title={faq.question}
+            indicator={({ isOpen }) => (
+              <svg
+                className={`w-5 h-5 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            )}
+          >
+            {typeof faq.answer === "string" ? <p>{faq.answer}</p> : faq.answer}
+          </AccordionItem>
+        ))}
+      </Accordion>
     </div>
   );
 }

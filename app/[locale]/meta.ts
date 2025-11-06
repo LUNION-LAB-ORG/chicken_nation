@@ -86,7 +86,7 @@ export const metadata: Metadata = {
 export const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "@id": "https://www.chicken-nation.com/#organization",
+    "@id": "https://www.chicken-nation.com",
     "name": "CHICKEN NATION",
     "url": "https://www.chicken-nation.com",
     "slogan": "Délicieux jusqu'à l'os",
