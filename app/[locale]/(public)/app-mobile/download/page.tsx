@@ -11,12 +11,13 @@ export default function AppMobileDownload() {
       const isIOS = /iphone|ipad|ipod/.test(userAgent);
 
       // 🧠 Étape 1 — Enregistrer le clic
-      await fetch(baseURL + "/analytics/app/app-click", {
+      fetch(baseURL + "/analytics/app/app-click", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           platform: isAndroid ? "android" : isIOS ? "ios" : "web",
           userAgent,
+          // ajouter l'ip de l'utilisateur
         }),
       }).catch(console.error);
 
