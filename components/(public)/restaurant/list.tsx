@@ -6,16 +6,11 @@ import Image from "next/image";
 import Link from "next/link";
 import Motion from "@/lib/motion";
 import Section from "@/components/primitives/Section";
-import Title from "@/components/primitives/Title";
 import { listRestaurants } from "@/features/restaurants/data/list-restaurants";
 
 export default function List() {
   return (
     <Section className="flex flex-col gap-8 md:gap-12">
-      {/* <Motion variant="verticalSlideIn">
-        <Title size="md">NOS ADRESSES</Title>
-      </Motion> */}
-      {/* Restaurants grid */}
       <div className="grid md:grid-cols-2 gap-10">
         {listRestaurants.map((r) => (
           <Motion
@@ -87,10 +82,8 @@ export default function List() {
             De nouvelles saveurs arrivent bientôt !
           </h2>
           <p className="text-gray-700">
-            2 nouveaux restaurants ouvriront leurs portes à Abidjan en 2025 🍗
-            <br />
-            L'un à <span className="font-semibold">Sococé II Plateaux</span> et
-            l'autre à <span className="font-semibold">Faya</span>.
+            Un nouveau restaurant ouvriront leurs portes à Abidjan en 2025 🍗
+            <br />à <span className="font-semibold">Faya</span>.
           </p>
         </div>
       </div>

@@ -71,7 +71,7 @@ export const metadata: Metadata = {
         yandex: "1b5037f79415fff0",
     },
     other: {
-        "og:phone_number": "+225 07 20 35 35 35, +225 07 47 00 00 34",
+        "og:phone_number": "+225 0720353535, +225 0747000034, +225 0700005556",
         "og:email": "info@chicken-nation.com",
         "og:latitude": "5.2860635",
         "og:longitude": "-3.9736923",
@@ -92,7 +92,7 @@ export const organizationSchema = {
     "slogan": "Délicieux jusqu'à l'os",
     "description": "Fast-food spécialisé dans le poulet 100% local élevé dans nos propres fermes en Côte d'Ivoire.",
     "email": "info@chicken-nation.com",
-    "telephone": ["+225 07 20 35 35 35", "+225 07 47 00 00 34"],
+    "telephone": ["+225 07 20 35 35 35", "+225 07 47 00 00 34", "+225 07 00 00 55 56"],
     "address": {
         "@type": "PostalAddress",
         "streetAddress": "Marcory Zone 4",

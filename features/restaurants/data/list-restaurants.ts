@@ -1,23 +1,30 @@
 export const listRestaurants: IRestaurant[] = [
     {
         id: 1,
-        name: "Marcory Zone 4",
-        hours: "10h30 - 23h30 & week-end 10h30 - 01h30",
+        name: "MARCORY ZONE 4",
+        hours: "08h00 - 22h00 7j/7",
         description:
-            "Chicken Nation Zone 4 est un restaurant de type Fast-food spécialisé dans des recettes de poulet.",
-        email: "chicken.marcory@gmail.com",
+            "Chicken Nation est un fast-food ivoirien spécialisé dans le poulet pané halal, offrant des recettes savoureuses dans une ambiance conviviale. Présent à Marcory Zone 4, Angré Djibi 8ᵉ Tranche et Sococe 2 Plateaux.",
+        email: "info@chicken-nation.com",
         image: "/assets/images/illustrations/restaurant/marcory-1.png",
-        link: "/restaurants/marcory",
     },
     {
         id: 2,
-        name: "Angré 8è Tranche",
-        hours: "10h30 - 23h30 & week-end 10h30 - 01h30",
+        name: "ANGRE DJIBI 8ᵉ TRANCHE",
+        hours: "10h00 - 22h00 & week-end 08h00 - 22h00",
         description:
-            "Chicken Nation Angré est un restaurant de type Fast-food spécialisé dans des recettes de poulet.",
-        email: "chicken.djibi@gmail.com",
+            "Chicken Nation est un fast-food ivoirien spécialisé dans le poulet pané halal, offrant des recettes savoureuses dans une ambiance conviviale. Présent à Marcory Zone 4, Angré Djibi 8ᵉ Tranche et Sococe 2 Plateaux.",
+        email: "info@chicken-nation.com",
         image: "/assets/images/illustrations/restaurant/angre.png",
-        link: "/restaurants/angre",
+    },
+    {
+        id: 3,
+        name: "SOCOCE 2 PLATEAUX",
+        hours: "08h00 - 22h00 7j/7",
+        description:
+            "Chicken Nation est un fast-food ivoirien spécialisé dans le poulet pané halal, offrant des recettes savoureuses dans une ambiance conviviale. Présent à Marcory Zone 4, Angré Djibi 8ᵉ Tranche et Sococe 2 Plateaux.",
+        email: "info@chicken-nation.com",
+        image: "/assets/images/illustrations/restaurant/sococe.jpg",
     },
 ];
 
@@ -29,5 +36,4 @@ export interface IRestaurant {
     description: string;
     email: string;
     image: string;
-    link: string;
 };

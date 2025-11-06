@@ -10,6 +10,11 @@ export default function AppMobileDownload() {
       const isAndroid = userAgent.includes("android");
       const isIOS = /iphone|ipad|ipod/.test(userAgent);
 
+      const ip = await fetch("https://api.ipify.org?format=json")
+        .then((res) => res.json())
+        .then((data) => data.ip)
+        .catch((err) => console.error(err));
+
       // 🧠 Étape 1 — Enregistrer le clic
       fetch(baseURL + "/analytics/app/app-click", {
         method: "POST",
@@ -17,7 +22,7 @@ export default function AppMobileDownload() {
         body: JSON.stringify({
           platform: isAndroid ? "android" : isIOS ? "ios" : "web",
           userAgent,
-          // ajouter l'ip de l'utilisateur
+          ip,
         }),
       }).catch(console.error);
 

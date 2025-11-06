@@ -34,6 +34,12 @@ const faqs = [
                 className="font-semibold text-primary-600 hover:text-primary-500"
               >
                 07 47 00 00 34
+              </a> /
+              <a
+                href="tel:+2250700005556"
+                className="font-semibold text-primary-600 hover:text-primary-500"
+              >
+                07 00 00 55 56
               </a>
             </span>
           </li>
@@ -136,9 +142,16 @@ const faqs = [
           </li>
           <li>
             📞{" "}
-            <strong className="text-primary-600">Angré-Djibi & Sococé :</strong>{" "}
+            <strong className="text-primary-600">Angré-Djibi :</strong>{" "}
             <a href="tel:+2250747000034" className="hover:underline">
               07 47 00 00 34
+            </a>
+          </li>
+          <li>
+            📞{" "}
+            <strong className="text-primary-600">Sococé :</strong>{" "}
+            <a href="tel:+2250700005556" className="hover:underline">
+              07 00 00 55 56
             </a>
           </li>
         </ul>
@@ -193,12 +206,21 @@ const faqs = [
             </a>
           </li>
           <li>
-            📞 <strong>Angré-Djibi & Sococé :</strong>{" "}
+            📞 <strong>Angré-Djibi :</strong>{" "}
             <a
               href="tel:+2250747000034"
               className="text-primary-600 hover:underline"
             >
               07 47 00 00 34
+            </a>
+          </li>
+          <li>
+            📞 <strong>Sococé :</strong>{" "}
+            <a
+              href="tel:+2250700005556"
+              className="text-primary-600 hover:underline"
+            >
+              07 00 00 55 56
             </a>
           </li>
           <li>
@@ -230,12 +252,19 @@ const faqs = [
           >
             07 20 35 35 35
           </a>{" "}
-          ou au{" "}
+          / {" "}
           <a
             href="tel:+2250747000034"
             className="font-semibold text-primary-600 hover:underline"
           >
             07 47 00 00 34
+          </a>
+          ou au{" "}
+          <a
+            href="tel:+2250700005556"
+            className="font-semibold text-primary-600 hover:underline"
+          >
+            07 00 00 55 56
           </a>
           .
         </p>

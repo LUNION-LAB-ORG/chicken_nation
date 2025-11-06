@@ -19,7 +19,7 @@ export const faqSchema = {
       "name": "Comment puis-je commander chez Chicken Nation ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Vous pouvez commander de plusieurs façons : sur place dans nos restaurants à Zone 4, Angré-Djibi ou Sococé, par téléphone au 07 20 35 35 35 ou 07 47 00 00 34, via notre application mobile disponible sur l'App Store et Google Play Store, ou via nos partenaires de livraison (Turbo, Glovo, Yango)."
+        "text": "Vous pouvez commander de plusieurs façons : sur place dans nos restaurants à Zone 4, Angré-Djibi ou Sococé, par téléphone au +225 0747000034, via notre application mobile disponible sur l'App Store et Google Play Store, ou via nos partenaires de livraison (Turbo, Glovo, Yango)."
       }
     },
     {
@@ -67,7 +67,7 @@ export const faqSchema = {
       "name": "Comment réserver une table ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Pour réserver une table, contactez-nous par téléphone : 07 47 00 00 34 pour Chicken Nation Angré-Djibi et Sococé, ou 07 20 35 35 35 pour Chicken Nation Zone 4."
+        "text": "Pour réserver une table, contactez-nous par téléphone : +225 07 47 00 00 34 pour Chicken Nation Zone 4, Angré-Djibi et Sococé."
       }
     }
   ]
