@@ -4,7 +4,7 @@ import HeroSection from "@/components/(public)/common/hero-section";
 export default function Politic() {
   return (
     <div>
-      <HeroSection title="TERMES ET CONDITIONS" src="/assets/images/backgrounds/background-terme-et-condition.png" />
+      <HeroSection title="TERMES ET CONDITIONS" src="/assets/images/backgrounds/terme.jpeg" />
       <Policy />
     </div>
   );

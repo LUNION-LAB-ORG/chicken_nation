@@ -11,7 +11,7 @@ export default function Faq() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <HeroSection title="FAQ" src="/assets/images/backgrounds/faq.png" />
+      <HeroSection title="FAQ" src="/assets/images/backgrounds/faq.jpeg" />
       <div className="p-2 md:p-20">
         <Quiz />
       </div>

@@ -15,7 +15,7 @@ export default function Asset() {
           animationParams={{ delay: 0.4, offset: 50 }}
         >
           <Image
-            src="/assets/images/illustrations/histoire/histoire-5.png"
+            src="/assets/images/illustrations/histoire/histoire.png"
             alt="histoire-3"
             width={1280 / 2.5}
             height={990 / 2.5}
