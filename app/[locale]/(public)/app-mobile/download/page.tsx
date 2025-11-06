@@ -37,10 +37,7 @@ export default function AppMobileDownload() {
             "https://apps.apple.com/ci/app/chicken-nation/id6745905607";
         } else {
           // Desktop (tu peux afficher une page d’explication)
-          // window.location.href = getFullUrlFile(
-          //   "/app-mobile",
-          //   process.env.NEXT_PUBLIC_URL
-          // );
+          window.location.href = "https://chicken-nation.com/app-mobile";
         }
       }, 2000);
 
