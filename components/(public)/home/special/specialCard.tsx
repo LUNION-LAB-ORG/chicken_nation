@@ -90,7 +90,7 @@ export const SpecialCard = ({
         <div>
           {/* Réduction */}
           <div
-            className="text-4xl font-black mb-2 tracking-tight"
+            className="text-4xl md:text-6xl font-black mb-2 tracking-tight"
             style={{ color: promo.text_color || "#FFFFFF" }}
           >
             {getDiscountDisplay()}
@@ -99,7 +99,7 @@ export const SpecialCard = ({
           {/* Titre */}
           {promo.title && (
             <h3
-              className="text-lg font-bold mb-2 line-clamp-1"
+              className="text-lg md:text-3xl font-bold mb-2 line-clamp-1"
               style={{ color: promo.text_color || "#FFFFFF" }}
             >
               {promo.title}
@@ -109,7 +109,7 @@ export const SpecialCard = ({
           {/* Description */}
           {promo.description && (
             <p
-              className="text-sm opacity-90 line-clamp-2"
+              className="text-base md:text-lg opacity-90 line-clamp-2"
               style={{ color: promo.text_color || "#FFFFFF" }}
             >
               {promo.description}
