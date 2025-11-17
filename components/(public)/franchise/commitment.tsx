@@ -63,7 +63,7 @@ export default function Commitment() {
                 />
               </div>
 
-              <h2 className="text-xl font-bold text-orange-500 mb-4">
+              <h2 className="text-xl font-bold text-primary-500 mb-4">
                 {commitment.title}
               </h2>
 

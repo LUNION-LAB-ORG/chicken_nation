@@ -63,7 +63,7 @@ export default function CarteNationBannerFlottant() {
                   {/* Right side - CTA Button and Close */}
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <Link
-                      href="https://forms.gle/781fkESdVT7Zd7TN9"
+                      href="https://forms.gle/97oafAEgxRdzAX3r9"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 px-4 py-2 md:px-6 md:py-2.5 bg-white hover:bg-secondary text-primary hover:text-black font-bold text-xs md:text-sm rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 whitespace-nowrap"
