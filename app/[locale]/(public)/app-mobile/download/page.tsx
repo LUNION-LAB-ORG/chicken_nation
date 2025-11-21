@@ -11,7 +11,7 @@ export default function AppMobileDownload() {
       const isIOS = /iphone|ipad|ipod/.test(userAgent);
 
       // 🧠 Étape 1 — Enregistrer le clic
-      fetch(baseURL + "/analytics/app/app-click", {
+      fetch(baseURL + "/marketing/app-mobile/app-click", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -30,11 +30,9 @@ export default function AppMobileDownload() {
       const timeout = setTimeout(() => {
         // Redirection
         if (isAndroid) {
-          window.location.href =
-            "https://play.google.com/store/apps/details?id=com.chickennation.app";
+          window.location.href = process.env.NEXT_PUBLIC_PLAY_STORE_LINK!;
         } else if (isIOS) {
-          window.location.href =
-            "https://apps.apple.com/ci/app/chicken-nation/id6745905607";
+          window.location.href = process.env.NEXT_PUBLIC_APP_STORE_LINK!;
         } else {
           // Desktop (tu peux afficher une page d’explication)
           window.location.href = "https://chicken-nation.com/app-mobile";
