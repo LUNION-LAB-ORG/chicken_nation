@@ -20,7 +20,7 @@ export default function PrivacyPolicyPage() {
         </h1>
 
         <p className="text-sm text-gray-500 text-center">
-          Dernière mise à jour : 24 Mars 2025
+          Dernière mise à jour : {new Date().toLocaleDateString()}
         </p>
 
         <h2 className="text-xl font-semibold mt-6">1. Introduction</h2>
