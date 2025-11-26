@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@heroui/button";
-import { Mail } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import Motion from "@/lib/motion";
@@ -58,9 +58,15 @@ export default function List() {
                   Horaire : {r.hours}
                 </p>
                 <p className="text-gray-700 mb-4">{r.description}</p>
-                <div className="flex items-center gap-2 text-gray-700 text-sm">
-                  <Mail className="w-4 h-4" />
-                  <span>{r.email}</span>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-gray-700 text-sm">
+                  <div className="flex items-center gap-2 text-gray-700 text-sm">
+                    <Mail className="w-4 h-4 text-primary" />
+                    <span className="font-semibold">{r.email}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-700 text-sm">
+                    <Phone className="w-4 h-4 text-primary" />
+                    <span className="font-semibold">{r.contact}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -82,8 +88,8 @@ export default function List() {
             De nouvelles saveurs arrivent bientôt !
           </h2>
           <p className="text-gray-700">
-            Un nouveau restaurant ouvriront leurs portes à Abidjan en 2025 🍗
-            <br />à <span className="font-semibold">Faya</span>.
+            Un nouveau restaurant ouvriront leurs portes à Abidjan en 2026 🍗
+            <br />à <span className="font-semibold">Abobo</span>.
           </p>
         </div>
       </div>

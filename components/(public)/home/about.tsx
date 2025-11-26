@@ -15,7 +15,7 @@ export default function About() {
         <Title>A PROPOS</Title>
         <p className="text-base md:text-lg mb-8 max-w-xl text-center">
           Née de la passion pour le poulet de qualité,{" "}
-          <span className="text-red-500 font-bold">Chicken Nation</span>{" "}
+          <span className="text-primary-500 font-bold">Chicken Nation</span>{" "}
           s&apos;est établie comme une référence en matière de restauration
           rapide en Côte d&apos;Ivoire.
         </p>
@@ -29,8 +29,8 @@ export default function About() {
             <Image
               src="/assets/images/illustrations/page-accueil/seauR.png"
               alt="Boîte de poulet frit"
-              width={2054 / 5}
-              height={1404 / 5}
+              width={342}
+              height={234}
               className="object-contain w-full"
             />
           </div>
@@ -67,8 +67,8 @@ export default function About() {
             <Image
               src="/assets/images/illustrations/page-accueil/burger.png"
               alt="Burger au poulet"
-              width={1502 / 5}
-              height={1902 / 5}
+              width={300}
+              height={380}
               className="object-contain w-full"
             />
           </div>
