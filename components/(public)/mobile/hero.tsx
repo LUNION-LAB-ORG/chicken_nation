@@ -1,6 +1,7 @@
 "use client";
 
 import ChickenNationLogo from "@/components/common/chicken-nation-logo";
+import { QRCode } from "@/components/kibo-ui/qr-code";
 import Section from "@/components/primitives/Section";
 import { siteConfig } from "@/config/site";
 import { easeInOutCubic } from "@/lib/animation";
@@ -67,6 +68,9 @@ export function Hero() {
           >
             Téléchargez l&apos;application et savourez la différence.
           </motion.p>
+          <div className="flex justify-center items-center mb-4">
+            <QRCode className="size-28" data="https://chicken-nation.com/fr/app-mobile/download" />
+          </div>
           <div className="flex justify-center items-center gap-4 mb-16">
             <Link
               target="_blank"
