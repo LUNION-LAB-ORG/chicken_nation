@@ -15,7 +15,7 @@ export const publicRoutes = [
   "/sign-up",
   "/confidentiality-none-disclosure-agreement",
   "/privacy-rules",
-  "/request",
+  "/deletion-of-account",
 ];
 
 // Middleware d'internationalisation
