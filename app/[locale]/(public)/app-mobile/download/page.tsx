@@ -27,19 +27,17 @@ export default function AppMobileDownload() {
       // window.location.href = deepLink;
 
       // 🧠 Étape 3 — Si rien ne se passe, après 2 secondes, on envoie vers le store
-      const timeout = setTimeout(() => {
+      setTimeout(() => {
         // Redirection
         if (isAndroid) {
-          window.location.href = process.env.NEXT_PUBLIC_PLAY_STORE_LINK!;
+          window.location.href = process.env.NEXT_PUBLIC_PLAY_STORE_LINK || "https://play.google.com/store/apps/details?id=com.chickennation.app";
         } else if (isIOS) {
-          window.location.href = process.env.NEXT_PUBLIC_APP_STORE_LINK!;
+          window.location.href = process.env.NEXT_PUBLIC_APP_STORE_LINK || "https://apps.apple.com/ci/app/chicken-nation/id6745905607";
         } else {
           // Desktop (tu peux afficher une page d’explication)
           window.location.href = "https://chicken-nation.com/app-mobile";
         }
       }, 2000);
-
-      return () => clearTimeout(timeout);
     }
     handleClick();
   }, []);
