@@ -24,7 +24,7 @@ export default function AppMobileDownload() {
       const deepLink = "chickennation://home";
 
       // Si app installée → elle s’ouvrira
-      window.location.href = deepLink;
+      // window.location.href = deepLink;
 
       // 🧠 Étape 3 — Si rien ne se passe, après 2 secondes, on envoie vers le store
       const timeout = setTimeout(() => {
