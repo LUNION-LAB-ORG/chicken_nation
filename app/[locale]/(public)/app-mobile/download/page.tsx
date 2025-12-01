@@ -31,8 +31,8 @@ export default function AppMobileDownload() {
       }
 
       // --- 🧠 Étape 2 : Essayer d'ouvrir l'app directement ---
-      const deepLink = "chickennation://home";
-      window.location.href = deepLink; // Tentative d'ouverture de l'application
+      // const deepLink = "chickennation://home";
+      // window.location.href = deepLink; // Tentative d'ouverture de l'application
 
       // --- 🧠 Étape 3 : Si l'app ne s'ouvre pas, lancer le Store après 2 secondes ---
       timeoutId = setTimeout(() => {
