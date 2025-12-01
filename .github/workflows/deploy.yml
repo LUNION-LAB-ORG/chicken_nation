@@ -53,3 +53,7 @@ jobs:
             ${{ env.IMAGE_NAME }}:latest
           cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:latest
           cache-to: type=inline
+          build-args: |
+                NEXT_PUBLIC_URL=${{ secrets.NEXT_PUBLIC_URL }}
+                NEXT_PUBLIC_API_BACKEND_URL=${{ secrets.NEXT_PUBLIC_API_BACKEND_URL }}
+                NEXT_PUBLIC_API_FILE_URL=${{ secrets.NEXT_PUBLIC_API_FILE_URL }}
