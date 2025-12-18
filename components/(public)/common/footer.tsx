@@ -10,10 +10,10 @@ const Footer = () => {
     <footer className="w-full text-sm">
       <div className="bg-secondary border-secondary text-secondary-foreground py-3 px-4 flex flex-col md:flex-row justify-between items-center gap-3">
         <span className="flex items-center text-center md:text-left">
-          📍 Chicken Nation Marcory Zone 4 / Angré / Sococe
+          📍 Chicken Nation Marcory Zone 4 / Angré / Sococe / Faya
         </span>
 
-        <span className="flex items-center">🕒 Tous les jours — 10h à 23h</span>
+        <span className="flex items-center">🕒 Tous les jours — 10h à 00h</span>
 
         <div className="flex justify-center items-center space-x-4">
           <a

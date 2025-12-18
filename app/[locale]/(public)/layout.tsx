@@ -1,3 +1,4 @@
+import Download from "@/components/(public)/common/download";
 import Footer from "@/components/(public)/common/footer";
 import Header from "@/components/(public)/common/header";
 import Main from "@/components/primitives/Main";
@@ -20,6 +21,7 @@ export default async function PublicLayout({
       <Main className="max-w-screen-2xl mx-auto">
         <Header />
         {children}
+        <Download />
         <Footer />
       </Main>
     </>

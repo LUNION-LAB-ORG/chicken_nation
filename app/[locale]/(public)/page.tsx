@@ -1,6 +1,5 @@
 import CarteNationBannerFlottant from "@/components/(public)/common/carte-nation/CarteNationBannerFlottant";
 import CarteNationCTA from "@/components/(public)/common/carte-nation/CarteNationCTA";
-import Download from "@/components/(public)/common/download";
 import About from "@/components/(public)/home/about";
 import Hero from "@/components/(public)/home/hero";
 import OderFood from "@/components/(public)/home/oder-food";
@@ -19,7 +18,6 @@ export default function Home() {
       <CarteNationCTA />
       <OderFood />
       <Testimonials />
-      <Download />
       {/* <Faq/> */}
     </>
   );

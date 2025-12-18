@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@heroui/button";
-import { Mail, Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import Motion from "@/lib/motion";
@@ -58,7 +57,7 @@ export default function List() {
                   Horaire : {r.hours}
                 </p>
                 <p className="text-gray-700 mb-4">{r.description}</p>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-gray-700 text-sm">
+                {/* <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-gray-700 text-sm">
                   <div className="flex items-center gap-2 text-gray-700 text-sm">
                     <Mail className="w-4 h-4 text-primary" />
                     <span className="font-semibold">{r.email}</span>
@@ -67,7 +66,7 @@ export default function List() {
                     <Phone className="w-4 h-4 text-primary" />
                     <span className="font-semibold">{r.contact}</span>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </Motion>

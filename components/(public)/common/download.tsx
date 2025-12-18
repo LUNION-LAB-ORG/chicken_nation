@@ -15,7 +15,7 @@ export default function Download() {
           <Motion variant="verticalSlideIn">
             <h2 className="font-title text-2xl sm:text-4xl lg:text-5xl text-center lg:text-left font-semibold leading-tight">
               Pour commander appelez-nous au <br />
-              <span className="text-primary">0747000034 / 0720353535 / 0700005556 / 0741919171</span>
+              <span className="text-primary">07 07 58 14 10 / 07 07 58 14 11</span>
             </h2>
           </Motion>
           <div className="flex justify-center mt-8 gap-4">
