@@ -1,4 +1,4 @@
-import { getFullUrlFile } from "@/utils/getFullUrlFile";
+import { formatImageUrl } from "@/utils/formatImageUrl";
 import Image from "next/image";
 
 export const SpecialCard = ({
@@ -68,7 +68,7 @@ export const SpecialCard = ({
       {promo.coupon_image_url && (
         <div className="absolute bottom-0 right-0">
           <Image
-            src={getFullUrlFile(promo.coupon_image_url)}
+            src={formatImageUrl(promo.coupon_image_url)}
             alt={promo.title}
             width={100}
             height={100}

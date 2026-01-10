@@ -14,6 +14,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "chicken.turbodeliveryapp.com",
       },
+      {
+        protocol: "https",
+        hostname: "dvsxt5681pvqm.cloudfront.net",
+      },
     ],
   },
 };

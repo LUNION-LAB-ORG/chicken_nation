@@ -2,7 +2,7 @@
 
 import { Rating, RatingButton } from "@/components/kibo-ui/rating";
 import Section from "@/components/primitives/Section";
-import { getFullUrlFile } from "@/utils/getFullUrlFile";
+import { formatImageUrl } from "@/utils/formatImageUrl";
 import { Pagination } from "@heroui/pagination";
 import Image from "next/image";
 import { useState } from "react";
@@ -77,7 +77,7 @@ function TestimonialCard({ testimonial }: { testimonial: ICommentaire }) {
             height={40}
             src={
               testimonial.customer.image
-                ? getFullUrlFile(
+                ? formatImageUrl(
                     testimonial.customer.image
                   )
                 : "/assets/images/icons/avatar.png"
