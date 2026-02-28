@@ -3,10 +3,13 @@ FROM node:24-alpine AS base
 ARG NEXT_PUBLIC_URL
 ARG NEXT_PUBLIC_API_BACKEND_URL
 ARG NEXT_PUBLIC_API_FILE_URL
+ARG NEXT_PUBLIC_CLOUDFRONT_URL
 
 ENV NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL}
 ENV NEXT_PUBLIC_API_BACKEND_URL=${NEXT_PUBLIC_API_BACKEND_URL}
 ENV NEXT_PUBLIC_API_FILE_URL=${NEXT_PUBLIC_API_FILE_URL}
+ENV NEXT_PUBLIC_CLOUDFRONT_URL=${NEXT_PUBLIC_CLOUDFRONT_URL}
+
 ENV NODE_ENV="production"
 
 # Install dependencies only when needed
@@ -16,11 +19,13 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
+# Ajout de bun.lockb* et bun.lock* pour supporter Bun
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* bun.lockb* bun.lock* .npmrc* ./
 RUN \
     if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
     elif [ -f package-lock.json ]; then npm ci; \
     elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
+    elif [ -f bun.lockb ] || [ -f bun.lock ]; then npm install -g bun && bun install --frozen-lockfile; \
     else echo "Lockfile not found." && exit 1; \
     fi
 
@@ -35,10 +40,12 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED=1
 
+# 💡 CORRECTION ICI : Remplacement des commandes d'installation par les commandes "run build" pour npm et yarn
 RUN \
-    if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-    elif [ -f package-lock.json ]; then npm ci; \
+    if [ -f yarn.lock ]; then yarn run build; \
+    elif [ -f package-lock.json ]; then npm run build; \
     elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
+    elif [ -f bun.lockb ] || [ -f bun.lock ]; then npm install -g bun && bun run build; \
     else echo "Lockfile not found." && exit 1; \
     fi
 
@@ -63,7 +70,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 
 EXPOSE 3000
-
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
