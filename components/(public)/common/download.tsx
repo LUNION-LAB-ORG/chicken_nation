@@ -20,7 +20,7 @@ export default function Download() {
           </Motion>
           <div className="flex justify-center mt-8 gap-4">
             <Motion variant="verticalSlideIn">
-              <QRCode className="size-32" data="https://chicken-nation.com/fr/app-mobile/download" />
+              <QRCode className="size-32" data="https://chicken-nation.com/fr/app-mobile/deep-link" />
             </Motion>
             <Motion variant="verticalSlideIn">
               <div className="flex flex-col gap-4 items-center justify-center lg:justify-start">

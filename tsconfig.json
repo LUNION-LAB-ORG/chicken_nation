@@ -37,7 +37,8 @@
     "next.config.mjs",
     "styles/hero.mts",
     ".next\\dev/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    ".next/dev/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

@@ -69,7 +69,7 @@ export function Hero() {
             Téléchargez l&apos;application et savourez la différence.
           </motion.p>
           <div className="flex justify-center items-center mb-4">
-            <QRCode className="size-28" data="https://chicken-nation.com/fr/app-mobile/download" />
+            <QRCode className="size-28" data="https://chicken-nation.com/fr/app-mobile/deep-link" />
           </div>
           <div className="flex justify-center items-center gap-4 mb-16">
             <Link
