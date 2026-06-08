@@ -16,6 +16,10 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "api-private.chicken-nation.com",
+      },
+      {
+        protocol: "https",
         hostname: "dvsxt5681pvqm.cloudfront.net",
       },
     ],
