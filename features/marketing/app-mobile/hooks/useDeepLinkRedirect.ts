@@ -25,13 +25,7 @@ export const useDeepLinkRedirect = () => {
             const isAndroid = userAgent.includes("android");
             const isIOS = /iphone|ipad|ipod/.test(userAgent);
 
-            // 1. Tracking Analytique (Fire-and-forget)
-            mutateAppClick({
-                platform: isAndroid ? "android" : isIOS ? "ios" : "web",
-                userAgent,
-            });
-
-            // 2. Construction de la route mobile
+            // 1. Construction de la route mobile
             let appPath = "home"; // Route par défaut
             const category = searchParams.get("category");
             const product = searchParams.get("product");
@@ -40,6 +34,11 @@ export const useDeepLinkRedirect = () => {
             const loyalty = searchParams.get("loyalty");
             const nationCard = searchParams.get("nation-card");
 
+            // Métadonnées de tracking (résolues en même temps que appPath/itemName)
+            let clickType = "home";
+            let clickTargetId: string | undefined = undefined;
+            let clickTargetLabel = "Accueil";
+
             try {
                 // 💡 Utilisation de await avec mutateAsync
                 if (category) {
@@ -47,31 +46,55 @@ export const useDeepLinkRedirect = () => {
                     const categoryData = await getCategoryAsync(category);
                     setItemName(categoryData.name);
                     appPath = `category/${categoryData.id}`;
+                    clickType = "category";
+                    clickTargetId = category;
+                    clickTargetLabel = categoryData.name;
 
                 } else if (product) {
                     setStatus("Recherche du plat...");
                     const productData = await getDishAsync(product);
                     setItemName(productData.name);
                     appPath = `menu/${productData.id}`;
+                    clickType = "dish";
+                    clickTargetId = product;
+                    clickTargetLabel = productData.name;
 
                 } else if (order) {
                     setItemName(`Commande ${order}`);
                     appPath = `order/${order}`;
+                    clickType = "order";
+                    clickTargetId = order;
+                    clickTargetLabel = `Commande ${order}`;
                 } else if (voucher) {
                     setItemName("Bons et Codes Promo");
                     appPath = `vouchers`;
+                    clickType = "voucher";
+                    clickTargetLabel = "Bons et Codes Promo";
                 } else if (loyalty) {
                     setItemName("Club de Fidélité");
                     appPath = `loyalty`;
+                    clickType = "loyalty";
+                    clickTargetLabel = "Club de Fidélité";
                 } else if (nationCard) {
                     setItemName("Carte de la Nation");
                     appPath = `nation-card`;
+                    clickType = "nation_card";
+                    clickTargetLabel = "Carte de la Nation";
                 }
             } catch (error) {
                 console.error("Élément introuvable en base de données :", error);
                 // Si l'API échoue (ex: produit supprimé), appPath restera "home"
                 // L'utilisateur sera redirigé vers l'accueil de l'app plutôt qu'une page d'erreur
             }
+
+            // 2. Tracking Analytique (Fire-and-forget, APRÈS résolution du nom/route)
+            mutateAppClick({
+                platform: isAndroid ? "android" : isIOS ? "ios" : "web",
+                userAgent,
+                type: clickType,
+                targetId: clickTargetId,
+                targetLabel: clickTargetLabel,
+            });
 
             // 3. Lancement de la redirection vers l'application
             const deepLink = `${appSchema}://${appPath}`;
