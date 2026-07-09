@@ -9,5 +9,11 @@ import { AppClickBody } from "../app-mobile.types";
 export const useAppClickMutation = () => {
     return useMutation({
         mutationFn: (data: AppClickBody) => appMobileAPI.appClick(data),
+        // Le clic est déclenché en fire-and-forget : on logge au moins l'échec
+        // (réseau/CORS) pour ne plus avoir de panne silencieuse comme lors de la
+        // migration API (le site tapait l'ancien hôte mort sans aucune trace).
+        onError: (error) => {
+            console.error("[deeplink] échec de l'enregistrement du clic:", error);
+        },
     });
 };
