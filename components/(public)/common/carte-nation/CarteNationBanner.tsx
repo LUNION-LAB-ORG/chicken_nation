@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 export default function CarteNationBanner() {
 
@@ -85,9 +85,7 @@ export default function CarteNationBanner() {
                 {/* CTA */}
                 <div className="flex-shrink-0">
                   <Link
-                    href="https://forms.gle/97oafAEgxRdzAX3r9"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href="/carte-nation/adhesion"
                     className="inline-flex items-center gap-3 px-8 py-4 bg-white hover:bg-secondary text-primary hover:text-black font-bold text-lg rounded-full transition-all duration-300 shadow-2xl hover:shadow-[0_0_30px_rgba(255,204,0,0.5)] hover:scale-110"
                   >
                     <span>Demander ma carte</span>

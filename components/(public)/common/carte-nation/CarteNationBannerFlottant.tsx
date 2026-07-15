@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { Button } from "@heroui/button";
@@ -63,9 +63,7 @@ export default function CarteNationBannerFlottant() {
                   {/* Right side - CTA Button and Close */}
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <Link
-                      href="https://forms.gle/97oafAEgxRdzAX3r9"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href="/carte-nation/adhesion"
                       className="inline-flex items-center gap-1.5 px-4 py-2 md:px-6 md:py-2.5 bg-white hover:bg-secondary text-primary hover:text-black font-bold text-xs md:text-sm rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 whitespace-nowrap"
                     >
                       <span>Obtenir ma carte</span>

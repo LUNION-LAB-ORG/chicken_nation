@@ -1,0 +1,228 @@
+"use client";
+
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Checkbox,
+  Input,
+  Radio,
+  RadioGroup,
+} from "@heroui/react";
+import { addToast } from "@heroui/toast";
+import { CheckCircle2, GraduationCap, Briefcase, X } from "lucide-react";
+
+import {
+  adhesionSchema,
+  AdhesionDTO,
+} from "@/features/marketing/adhesion/adhesion.schema";
+import { useAdhesionMutation } from "@/features/marketing/adhesion/queries/adhesion.mutation";
+import { NATION_CARD_DEEPLINK } from "@/features/marketing/adhesion/adhesion.constants";
+
+/**
+ * Formulaire d'adhésion à la Carte de la Nation (pré-inscription silencieuse).
+ * Champs : nom, téléphone (CI), profil déclaratif (Étudiant/Professionnel),
+ * consentement WhatsApp obligatoire. AUCUN justificatif.
+ */
+export default function AdhesionForm() {
+  const t = useTranslations("carte-nation.adhesion");
+  const [submitted, setSubmitted] = useState(false);
+
+  const { mutateAsync, isPending } = useAdhesionMutation();
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<AdhesionDTO>({
+    resolver: zodResolver(adhesionSchema),
+    mode: "onBlur",
+    defaultValues: {
+      name: "",
+      phone: "",
+      profile_type: undefined,
+      whatsapp_opt_in: false,
+    },
+  });
+
+  const onSubmit = async (data: AdhesionDTO) => {
+    try {
+      await mutateAsync({ data });
+      setSubmitted(true);
+    } catch (error) {
+      addToast({
+        title: t("error_title"),
+        description:
+          error instanceof Error ? error.message : t("error_generic"),
+        icon: <X />,
+        color: "danger",
+      });
+    }
+  };
+
+  if (submitted) {
+    return (
+      <Card className="max-w-xl w-full mx-auto border border-primary-100 shadow-lg">
+        <CardBody className="p-8 md:p-10 text-center">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+            <CheckCircle2 className="h-11 w-11 text-primary" />
+          </div>
+          <h2 className="mb-3 text-2xl md:text-3xl font-bold text-foreground">
+            {t("success_title")}
+          </h2>
+          <p className="mb-8 text-base text-default-500">
+            {t("success_subtitle")}
+          </p>
+
+          <ol className="mb-8 space-y-3 text-left">
+            <li className="flex items-start gap-3">
+              <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
+                1
+              </span>
+              <span className="text-sm text-default-600">
+                {t("success_step_1")}
+              </span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
+                2
+              </span>
+              <span className="text-sm text-default-600">
+                {t("success_step_2")}
+              </span>
+            </li>
+          </ol>
+
+          <Button
+            as="a"
+            href={NATION_CARD_DEEPLINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            color="primary"
+            size="lg"
+            fullWidth
+            className="font-semibold"
+          >
+            {t("success_cta")}
+          </Button>
+        </CardBody>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="max-w-xl w-full mx-auto border border-primary-100 shadow-lg">
+      <CardHeader className="flex-col items-start gap-1 px-6 pt-6">
+        <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+          {t("title")}
+        </h2>
+        <p className="text-sm text-default-500">{t("subtitle")}</p>
+      </CardHeader>
+      <CardBody className="px-6 pb-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+          <Input
+            {...register("name")}
+            label={t("name_label")}
+            placeholder={t("name_placeholder")}
+            isDisabled={isPending}
+            isInvalid={!!errors.name}
+            errorMessage={errors.name?.message}
+            variant="bordered"
+            autoComplete="name"
+          />
+
+          <Input
+            {...register("phone")}
+            type="tel"
+            inputMode="tel"
+            label={t("phone_label")}
+            placeholder={t("phone_placeholder")}
+            description={t("phone_hint")}
+            isDisabled={isPending}
+            isInvalid={!!errors.phone}
+            errorMessage={errors.phone?.message}
+            variant="bordered"
+            autoComplete="tel"
+          />
+
+          <Controller
+            control={control}
+            name="profile_type"
+            render={({ field }) => (
+              <RadioGroup
+                label={t("profile_label")}
+                orientation="horizontal"
+                value={field.value ?? ""}
+                onValueChange={field.onChange}
+                isDisabled={isPending}
+                isInvalid={!!errors.profile_type}
+                errorMessage={errors.profile_type?.message}
+                classNames={{ wrapper: "gap-3" }}
+              >
+                <Radio value="ETUDIANT">
+                  <span className="inline-flex items-center gap-1.5">
+                    <GraduationCap className="h-4 w-4" />
+                    {t("profile_student")}
+                  </span>
+                </Radio>
+                <Radio value="PROFESSIONNEL">
+                  <span className="inline-flex items-center gap-1.5">
+                    <Briefcase className="h-4 w-4" />
+                    {t("profile_professional")}
+                  </span>
+                </Radio>
+              </RadioGroup>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="whatsapp_opt_in"
+            render={({ field }) => (
+              <div>
+                <Checkbox
+                  isSelected={field.value}
+                  onValueChange={field.onChange}
+                  isDisabled={isPending}
+                  isInvalid={!!errors.whatsapp_opt_in}
+                  size="sm"
+                >
+                  <span className="text-sm text-default-600">
+                    {t("optin_label")}
+                  </span>
+                </Checkbox>
+                {errors.whatsapp_opt_in && (
+                  <p className="mt-1 text-tiny text-danger">
+                    {errors.whatsapp_opt_in.message}
+                  </p>
+                )}
+              </div>
+            )}
+          />
+
+          <Button
+            type="submit"
+            color="primary"
+            size="lg"
+            fullWidth
+            isLoading={isPending}
+            isDisabled={isPending}
+            className="font-semibold"
+          >
+            {isPending ? t("submitting") : t("submit")}
+          </Button>
+
+          <p className="text-center text-tiny text-default-400">
+            {t("legal_note")}
+          </p>
+        </form>
+      </CardBody>
+    </Card>
+  );
+}

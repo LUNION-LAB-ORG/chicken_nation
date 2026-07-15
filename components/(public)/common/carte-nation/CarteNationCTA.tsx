@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 export default function CarteNationCTA() {
   return (
@@ -57,9 +57,7 @@ export default function CarteNationCTA() {
               </ul>
 
               <Link
-                href="https://forms.gle/97oafAEgxRdzAX3r9"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/carte-nation/adhesion"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary-500 text-white font-semibold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
               >
                 Demander ma carte
