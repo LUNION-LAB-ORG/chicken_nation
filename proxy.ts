@@ -6,6 +6,8 @@ import { auth } from "@/lib/auth";
 export const publicRoutes = [
   "/",
   "/app-mobile",
+  "/auth",
+  "/carte-nation",
   "/contact",
   "/faq",
   "/franchise",
@@ -51,8 +53,10 @@ export default async function proxy(req: NextRequest) {
       // Encodage de la callbackUrl
       const encodedCallbackUrl = encodeURIComponent(callbackUrl);
 
-      // Création de l'URL de connexion
-      const loginUrl = new URL(`${locale}/auth/login?callbackUrl=${encodedCallbackUrl}`, req.url);
+      // Création de l'URL de connexion (chemin ABSOLU : le `/` initial est
+      // indispensable, sinon `new URL` résout relativement au chemin courant
+      // et empile /fr/<page>/fr/auth/login... à chaque redirection).
+      const loginUrl = new URL(`/${locale}/auth/login?callbackUrl=${encodedCallbackUrl}`, req.url);
 
       // Redirection vers la page de connexion
       return NextResponse.redirect(loginUrl);
