@@ -16,8 +16,8 @@ import { AdhesionResponse } from "../adhesion.types";
  * s'appliquent avant la validation Zod (le schéma accepte les deux formats).
  */
 export const useAdhesionMutation = () => {
-  return useMutation<AdhesionResponse, Error, { data: AdhesionDTO }>({
-    mutationFn: async ({ data }) => {
+  return useMutation<AdhesionResponse, Error, { data: AdhesionDTO; photo: File }>({
+    mutationFn: async ({ data, photo }) => {
       const validation = processAndValidateFormData(adhesionSchema, data, {
         outputFormat: "object",
         transformations: {
@@ -40,7 +40,7 @@ export const useAdhesionMutation = () => {
         );
       }
 
-      return adhesionAPI.adherer(validation.data as AdhesionDTO);
+      return adhesionAPI.adherer(validation.data as AdhesionDTO, photo);
     },
   });
 };

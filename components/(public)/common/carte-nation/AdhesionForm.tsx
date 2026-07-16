@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -15,7 +15,7 @@ import {
   RadioGroup,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
-import { CheckCircle2, GraduationCap, X } from "lucide-react";
+import { Camera, CheckCircle2, GraduationCap, X } from "lucide-react";
 
 import {
   adhesionSchema,
@@ -62,9 +62,32 @@ export default function AdhesionForm() {
   // Source de vérité pour l'affichage du champ Établissement.
   const isStudent = watch("profile_type") === "ETUDIANT";
 
+  // Photo du titulaire — OBLIGATOIRE (contrôle backoffice). Gérée hors react-hook-form
+  // (un File ne se valide pas proprement via zod ici) : état local + envoi multipart.
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setPhotoError(t("photo_invalid"));
+      return;
+    }
+    setPhoto(file);
+    setPhotoPreview(URL.createObjectURL(file));
+    setPhotoError(null);
+  };
+
   const onSubmit = async (data: AdhesionDTO) => {
+    if (!photo) {
+      setPhotoError(t("photo_required"));
+      return;
+    }
     try {
-      await mutateAsync({ data });
+      await mutateAsync({ data, photo });
       setSubmitted(true);
     } catch (error) {
       addToast({
@@ -161,6 +184,52 @@ export default function AdhesionForm() {
             variant="bordered"
             autoComplete="tel"
           />
+
+          {/* Photo du titulaire — OBLIGATOIRE (contrôle backoffice) */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-foreground">
+              {t("photo_label")} <span className="text-danger">*</span>
+            </label>
+            <div className="flex items-center gap-4">
+              {photoPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={photoPreview}
+                  alt=""
+                  className="h-20 w-20 rounded-xl border border-default-200 object-cover"
+                />
+              ) : (
+                <div className="flex h-20 w-20 items-center justify-center rounded-xl border border-dashed border-default-300 bg-default-50 text-default-400">
+                  <Camera className="h-6 w-6" />
+                </div>
+              )}
+              <div className="flex-1">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                  disabled={isPending}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="bordered"
+                  size="sm"
+                  isDisabled={isPending}
+                  onPress={() => fileInputRef.current?.click()}
+                >
+                  {photo ? t("photo_change") : t("photo_choose")}
+                </Button>
+                <p className="mt-1 text-tiny text-default-400">
+                  {t("photo_hint")}
+                </p>
+              </div>
+            </div>
+            {photoError && (
+              <p className="text-tiny text-danger">{photoError}</p>
+            )}
+          </div>
 
           <div className="space-y-4">
             <RadioGroup
