@@ -24,6 +24,12 @@ export const useAdhesionMutation = () => {
           name: (value: string) => value.trim(),
           // Normalise 0700000000 / +2250700000000 → +2250700000000
           phone: (value: string) => normalizePhoneCI(value) ?? value,
+          // Trim ; un établissement vide (« Non » à la question étudiant) n'est
+          // PAS envoyé au backend (undefined → droppé par la sérialisation JSON).
+          establishment: (value: string | undefined) => {
+            const trimmed = (value ?? "").trim();
+            return trimmed.length > 0 ? trimmed : undefined;
+          },
         },
       });
 

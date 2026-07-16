@@ -15,7 +15,7 @@ import {
   RadioGroup,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
-import { CheckCircle2, GraduationCap, Briefcase, X } from "lucide-react";
+import { CheckCircle2, GraduationCap, X } from "lucide-react";
 
 import {
   adhesionSchema,
@@ -26,8 +26,9 @@ import { NATION_CARD_DEEPLINK } from "@/features/marketing/adhesion/adhesion.con
 
 /**
  * Formulaire d'adhésion à la Carte de la Nation (pré-inscription silencieuse).
- * Champs : nom, téléphone (CI), profil déclaratif (Étudiant/Professionnel),
- * consentement WhatsApp obligatoire. AUCUN justificatif.
+ * Champs : nom, téléphone (CI), « Êtes-vous étudiant/élève ? » (Oui/Non — si Oui,
+ * établissement requis + profile_type="ETUDIANT"), consentement WhatsApp
+ * obligatoire. AUCUN justificatif.
  */
 export default function AdhesionForm() {
   const t = useTranslations("carte-nation.adhesion");
@@ -39,6 +40,9 @@ export default function AdhesionForm() {
     register,
     handleSubmit,
     control,
+    watch,
+    setValue,
+    clearErrors,
     formState: { errors },
   } = useForm<AdhesionDTO>({
     resolver: zodResolver(adhesionSchema),
@@ -47,9 +51,16 @@ export default function AdhesionForm() {
       name: "",
       phone: "",
       profile_type: undefined,
+      establishment: "",
       whatsapp_opt_in: false,
     },
   });
+
+  // Réponse à « Êtes-vous étudiant/élève ? » — tri-état pour le rendu du radio
+  // (distingue « non répondu » de « Non », que profile_type=undefined ne permet pas).
+  const [studentChoice, setStudentChoice] = useState<"yes" | "no" | "">("");
+  // Source de vérité pour l'affichage du champ Établissement.
+  const isStudent = watch("profile_type") === "ETUDIANT";
 
   const onSubmit = async (data: AdhesionDTO) => {
     try {
@@ -151,35 +162,48 @@ export default function AdhesionForm() {
             autoComplete="tel"
           />
 
-          <Controller
-            control={control}
-            name="profile_type"
-            render={({ field }) => (
-              <RadioGroup
-                label={t("profile_label")}
-                orientation="horizontal"
-                value={field.value ?? ""}
-                onValueChange={field.onChange}
+          <div className="space-y-4">
+            <RadioGroup
+              label={t("student_label")}
+              orientation="horizontal"
+              value={studentChoice}
+              onValueChange={(value) => {
+                setStudentChoice(value as "yes" | "no");
+                if (value === "yes") {
+                  setValue("profile_type", "ETUDIANT", {
+                    shouldValidate: false,
+                  });
+                } else {
+                  // « Non » : aucun profile_type ni établissement envoyés.
+                  setValue("profile_type", undefined, { shouldValidate: false });
+                  setValue("establishment", "", { shouldValidate: false });
+                  clearErrors("establishment");
+                }
+              }}
+              isDisabled={isPending}
+              classNames={{ wrapper: "gap-3" }}
+            >
+              <Radio value="yes">
+                <span className="inline-flex items-center gap-1.5">
+                  <GraduationCap className="h-4 w-4" />
+                  {t("student_yes")}
+                </span>
+              </Radio>
+              <Radio value="no">{t("student_no")}</Radio>
+            </RadioGroup>
+
+            {isStudent && (
+              <Input
+                {...register("establishment")}
+                label={t("establishment_label")}
+                placeholder={t("establishment_placeholder")}
                 isDisabled={isPending}
-                isInvalid={!!errors.profile_type}
-                errorMessage={errors.profile_type?.message}
-                classNames={{ wrapper: "gap-3" }}
-              >
-                <Radio value="ETUDIANT">
-                  <span className="inline-flex items-center gap-1.5">
-                    <GraduationCap className="h-4 w-4" />
-                    {t("profile_student")}
-                  </span>
-                </Radio>
-                <Radio value="PROFESSIONNEL">
-                  <span className="inline-flex items-center gap-1.5">
-                    <Briefcase className="h-4 w-4" />
-                    {t("profile_professional")}
-                  </span>
-                </Radio>
-              </RadioGroup>
+                isInvalid={!!errors.establishment}
+                errorMessage={errors.establishment?.message}
+                variant="bordered"
+              />
             )}
-          />
+          </div>
 
           <Controller
             control={control}
