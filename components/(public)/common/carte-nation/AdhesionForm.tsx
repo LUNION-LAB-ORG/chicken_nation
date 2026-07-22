@@ -82,10 +82,8 @@ export default function AdhesionForm() {
   };
 
   const onSubmit = async (data: AdhesionDTO) => {
-    if (!photo) {
-      setPhotoError(t("photo_required"));
-      return;
-    }
+    // Photo FACULTATIVE sur le site (décision 22/07) : elle sert à la
+    // vérification backoffice et peut être fournie plus tard dans l'app.
     try {
       await mutateAsync({ data, photo });
       setSubmitted(true);
@@ -185,10 +183,11 @@ export default function AdhesionForm() {
             autoComplete="tel"
           />
 
-          {/* Photo du titulaire — OBLIGATOIRE (contrôle backoffice) */}
+          {/* Photo du titulaire — FACULTATIVE sur le site (vérification backoffice) */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-foreground">
-              {t("photo_label")} <span className="text-danger">*</span>
+              {t("photo_label")}{" "}
+              <span className="text-default-400 font-normal">{t("photo_optional")}</span>
             </label>
             <div className="flex items-center gap-4">
               {photoPreview ? (
