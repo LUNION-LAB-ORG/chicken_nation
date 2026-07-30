@@ -33,5 +33,12 @@
   "success_subtitle": "Your request is in. Once approved, your Nation Card arrives on WhatsApp. Download the app to start using it.",
   "success_step_1": "Once your request is approved, you'll receive your card and the app link on WhatsApp.",
   "success_step_2": "Download the Chicken Nation app and sign in with this same number.",
-  "success_cta": "Download the Chicken Nation app"
+  "success_cta": "Download the Chicken Nation app",
+  "pitch_title": "-20% on every menu",
+  "pitch_sub": "All year long, in every Chicken Nation restaurant.",
+  "benefit_free": "100% free, no documents required",
+  "benefit_whatsapp": "Your card arrives directly on WhatsApp",
+  "benefit_app": "Use it in the app on every order",
+  "card_label": "Nation Card",
+  "card_member": "Nation Member"
 }
