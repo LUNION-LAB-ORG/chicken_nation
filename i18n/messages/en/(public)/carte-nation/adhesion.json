@@ -10,7 +10,7 @@
   "name_placeholder": "e.g. Awa Koné",
   "phone_label": "Phone number",
   "phone_placeholder": "07 07 00 00 00",
-  "phone_hint": "Ivorian number (WhatsApp) — this is where you'll receive your card.",
+  "phone_hint": "WhatsApp number — that's where your card will arrive. Outside Côte d'Ivoire: include your country code (e.g. +221…).",
   "photo_label": "Your photo",
   "photo_optional": "(optional)",
   "photo_hint": "A recent, clearly visible photo — used only for verification. You can also add it later in the app.",

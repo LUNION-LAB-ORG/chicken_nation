@@ -26,11 +26,11 @@ export const adhesionSchema = z
       .min(2, "Votre nom doit contenir au moins 2 caractères")
       .max(100, "Votre nom ne doit pas dépasser 100 caractères"),
 
-    // Accepte 0700000000 / +2250700000000 / 2250700000000 (raw ou normalisé).
+    // International, défaut CI : 0700000000 → +225 ; sinon indicatif pays requis.
     phone: z
       .string({ message: "Votre numéro de téléphone est requis" })
       .trim()
-      .refine(isValidPhoneCI, "Numéro ivoirien invalide (ex : 07 07 00 00 00)"),
+      .refine(isValidPhoneCI, "Numéro invalide (ex : 07 07 00 00 00, ou +221 77 123 45 67 avec l'indicatif pays)"),
 
     // "ETUDIANT" si « Oui », sinon absent : aucun profile_type n'est envoyé.
     profile_type: z.literal("ETUDIANT").optional(),

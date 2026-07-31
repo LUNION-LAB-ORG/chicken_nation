@@ -10,7 +10,7 @@
   "name_placeholder": "Ex : Awa Koné",
   "phone_label": "Numéro de téléphone",
   "phone_placeholder": "07 07 00 00 00",
-  "phone_hint": "Numéro ivoirien (WhatsApp) — c'est là que tu recevras ta carte.",
+  "phone_hint": "Numéro WhatsApp — c'est là que tu recevras ta carte. Hors Côte d'Ivoire : ajoute l'indicatif pays (ex : +221…).",
   "photo_label": "Votre photo",
   "photo_optional": "(facultatif)",
   "photo_hint": "Une photo récente et bien visible — elle sert uniquement à la vérification. Tu pourras aussi l'ajouter plus tard dans l'app.",
