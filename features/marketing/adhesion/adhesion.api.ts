@@ -18,7 +18,10 @@ export const adhesionAPI: IAdhesionAPI = {
     // pas l'upload de fichier. Le navigateur pose lui-même le boundary (on NE fixe
     // donc PAS le Content-Type). Endpoint PUBLIC → aucun header d'auth.
     const formData = new FormData();
-    formData.append("name", data.name);
+    // Champs EXPLICITES prénom/nom (le backend les prend en priorité — un
+    // prénom composé n'est plus coupé par la découpe legacy de `name`).
+    formData.append("first_name", data.first_name);
+    formData.append("last_name", data.last_name);
     formData.append("phone", data.phone);
     if (data.profile_type) formData.append("profile_type", data.profile_type);
     if (data.establishment) formData.append("establishment", data.establishment);

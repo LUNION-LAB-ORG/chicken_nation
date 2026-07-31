@@ -40,5 +40,9 @@
   "benefit_whatsapp": "Ta carte arrive directement sur WhatsApp",
   "benefit_app": "Utilisable dans l'app à chaque commande",
   "card_label": "Carte de la Nation",
-  "card_member": "Membre de la Nation"
+  "card_member": "Membre de la Nation",
+  "last_name_label": "Nom",
+  "last_name_placeholder": "Ex : Koné",
+  "first_name_label": "Prénom(s)",
+  "first_name_placeholder": "Ex : Awa"
 }

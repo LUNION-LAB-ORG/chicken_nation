@@ -40,5 +40,9 @@
   "benefit_whatsapp": "Your card arrives directly on WhatsApp",
   "benefit_app": "Use it in the app on every order",
   "card_label": "Nation Card",
-  "card_member": "Nation Member"
+  "card_member": "Nation Member",
+  "last_name_label": "Last name",
+  "last_name_placeholder": "E.g. Koné",
+  "first_name_label": "First name(s)",
+  "first_name_placeholder": "E.g. Awa"
 }

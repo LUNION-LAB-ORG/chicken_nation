@@ -44,7 +44,8 @@ export default function AdhesionForm() {
     resolver: zodResolver(adhesionSchema),
     mode: "onBlur",
     defaultValues: {
-      name: "",
+      first_name: "",
+      last_name: "",
       phone: "",
       profile_type: undefined,
       establishment: "",
@@ -177,17 +178,32 @@ export default function AdhesionForm() {
           className="mt-6 space-y-5"
           noValidate
         >
-          <Input
-            {...register("name")}
-            label={t("name_label")}
-            placeholder={t("name_placeholder")}
-            isDisabled={isPending}
-            isInvalid={!!errors.name}
-            errorMessage={errors.name?.message}
-            variant="bordered"
-            radius="lg"
-            autoComplete="name"
-          />
+          {/* Nom + prénom(s) — deux champs EXPLICITES (plus de découpe du nom
+              complet : un prénom composé « Jean Marc » reste entier). */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-3">
+            <Input
+              {...register("last_name")}
+              label={t("last_name_label")}
+              placeholder={t("last_name_placeholder")}
+              isDisabled={isPending}
+              isInvalid={!!errors.last_name}
+              errorMessage={errors.last_name?.message}
+              variant="bordered"
+              radius="lg"
+              autoComplete="family-name"
+            />
+            <Input
+              {...register("first_name")}
+              label={t("first_name_label")}
+              placeholder={t("first_name_placeholder")}
+              isDisabled={isPending}
+              isInvalid={!!errors.first_name}
+              errorMessage={errors.first_name?.message}
+              variant="bordered"
+              radius="lg"
+              autoComplete="given-name"
+            />
+          </div>
 
           <Input
             {...register("phone")}

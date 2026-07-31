@@ -20,11 +20,17 @@ export type ProfileType = "ETUDIANT";
  */
 export const adhesionSchema = z
   .object({
-    name: z
+    last_name: z
       .string({ message: "Votre nom est requis" })
       .trim()
       .min(2, "Votre nom doit contenir au moins 2 caractères")
       .max(100, "Votre nom ne doit pas dépasser 100 caractères"),
+
+    first_name: z
+      .string({ message: "Votre prénom est requis" })
+      .trim()
+      .min(2, "Votre prénom doit contenir au moins 2 caractères")
+      .max(100, "Votre prénom ne doit pas dépasser 100 caractères"),
 
     // International, défaut CI : 0700000000 → +225 ; sinon indicatif pays requis.
     phone: z

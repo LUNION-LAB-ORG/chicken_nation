@@ -40,5 +40,9 @@
   "benefit_whatsapp": "تصلك بطاقتك مباشرة على واتساب",
   "benefit_app": "استخدمها في التطبيق مع كل طلب",
   "card_label": "بطاقة الأمّة",
-  "card_member": "عضو الأمّة"
+  "card_member": "عضو الأمّة",
+  "last_name_label": "اسم العائلة",
+  "last_name_placeholder": "مثال: كوني",
+  "first_name_label": "الاسم الشخصي",
+  "first_name_placeholder": "مثال: آوا"
 }

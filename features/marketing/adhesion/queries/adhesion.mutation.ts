@@ -21,7 +21,8 @@ export const useAdhesionMutation = () => {
       const validation = processAndValidateFormData(adhesionSchema, data, {
         outputFormat: "object",
         transformations: {
-          name: (value: string) => value.trim(),
+          first_name: (value: string) => value.trim(),
+          last_name: (value: string) => value.trim(),
           // Normalise 0700000000 / +2250700000000 → +2250700000000
           phone: (value: string) => normalizePhoneCI(value) ?? value,
           // Trim ; un établissement vide (« Non » à la question étudiant) n'est
