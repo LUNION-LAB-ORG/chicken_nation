@@ -135,7 +135,7 @@ export default function AdhesionForm() {
             {[t("success_step_1"), t("success_step_2")].map((step, i) => (
               <li
                 key={step}
-                className="flex items-start gap-3 rounded-2xl bg-[#FFF8F0] p-4"
+                className="flex items-start gap-3 rounded-2xl bg-neutral-50 p-4"
               >
                 <span className="flex h-8 w-8 flex-shrink-0 -rotate-3 items-center justify-center rounded-lg bg-secondary font-title text-base font-bold text-black shadow-[2px_2px_0_0_#ff6200]">
                   {i + 1}
@@ -221,7 +221,7 @@ export default function AdhesionForm() {
           />
 
           {/* Photo du titulaire — FACULTATIVE (vérification backoffice) */}
-          <div className="rounded-2xl border border-dashed border-neutral-300 bg-[#FFF8F0]/60 p-4">
+          <div className="rounded-2xl border border-dashed border-neutral-200 bg-neutral-50 p-4">
             <label className="block text-sm font-semibold text-neutral-800">
               {t("photo_label")}{" "}
               <span className="font-normal text-neutral-400">
@@ -323,7 +323,7 @@ export default function AdhesionForm() {
             control={control}
             name="whatsapp_opt_in"
             render={({ field }) => (
-              <div className="rounded-2xl bg-[#FFF8F0] p-3.5">
+              <div className="rounded-2xl bg-neutral-50 p-3.5">
                 <Checkbox
                   isSelected={field.value}
                   onValueChange={field.onChange}

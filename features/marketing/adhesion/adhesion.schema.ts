@@ -36,7 +36,7 @@ export const adhesionSchema = z
     phone: z
       .string({ message: "Votre numéro de téléphone est requis" })
       .trim()
-      .refine(isValidPhoneCI, "Numéro invalide (ex : 07 07 00 00 00, ou +221 77 123 45 67 avec l'indicatif pays)"),
+      .refine(isValidPhoneCI, "Numéro invalide"),
 
     // "ETUDIANT" si « Oui », sinon absent : aucun profile_type n'est envoyé.
     profile_type: z.literal("ETUDIANT").optional(),
