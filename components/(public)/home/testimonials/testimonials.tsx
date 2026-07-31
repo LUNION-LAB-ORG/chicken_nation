@@ -21,7 +21,7 @@ export function TestimonialsContent({
   return (
     <Section
       title="Témoignages"
-      subtitle="Ce qu'en dit la Nation"
+      subtitle="L'avis de la Nation"
       className="container px-6 sm:px-10 mx-auto"
     >
       {/* Mobile : carrousel snap. md+ : grille (le snap disparaît). */}
