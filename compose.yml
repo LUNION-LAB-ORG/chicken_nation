@@ -13,5 +13,6 @@ services:
         NEXT_PUBLIC_APP_STORE_LINK: ${NEXT_PUBLIC_APP_STORE_LINK}
         NEXT_PUBLIC_APP_SCHEMA: ${NEXT_PUBLIC_APP_SCHEMA}
     image: chicken-nation-web-prod
+    restart: unless-stopped
     ports:
       - "127.0.0.1:${DOCKER_PORT}:3000"
