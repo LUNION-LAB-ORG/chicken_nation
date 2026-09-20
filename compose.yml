@@ -14,4 +14,4 @@ services:
         NEXT_PUBLIC_APP_SCHEMA: ${NEXT_PUBLIC_APP_SCHEMA}
     image: chicken-nation-web-prod
     ports:
-      - "${DOCKER_PORT}:3000"
+      - "127.0.0.1:${DOCKER_PORT}:3000"
