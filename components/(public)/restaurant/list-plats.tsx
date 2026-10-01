@@ -1,62 +1,75 @@
 "use client";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { Tabs, Tab } from "@heroui/react";
 import { Card, CardBody } from "@heroui/card";
+import { Link } from "@/i18n/navigation";
 import Section from "@/components/primitives/Section";
-import { listPlats } from "@/features/restaurants/data/list-plats";
+import type { ICategorieCarte } from "@/features/menus/apis/menu-public.api";
 
-export default function ListPlats() {
-  const categories = Array.from(
-    new Set(listPlats.map((item) => item.category))
-  );
+const fcfa = (montant: number) => `${montant.toLocaleString("fr-FR").replace(/ | /g, " ")} FCFA`;
+
+export default function ListPlats({ categories }: { categories: ICategorieCarte[] }) {
+  if (categories.length === 0) {
+    return (
+      <Section className="text-center text-gray-700">
+        La carte est momentanément indisponible. Retrouvez tous nos plats dans{" "}
+        <Link href="/app-mobile" className="font-semibold text-primary">
+          l&apos;application CHICKEN NATION
+        </Link>
+        .
+      </Section>
+    );
+  }
+
   return (
     <Section className="flex w-full flex-col">
-      <Tabs aria-label="Menu" size="lg" color="primary" variant="light">
-        {categories.map((category) => (
-          <Tab key={category} title={category}>
+      <Tabs aria-label="Catégories du menu" size="lg" color="primary" variant="light">
+        {categories.map((categorie) => (
+          <Tab key={categorie.nom} title={categorie.nom}>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {listPlats
-                .filter((item) => item.category === category)
-                .map((item, index) => (
-                  <Card key={index}>
-                    <CardBody>
-                      {/* Image du produit */}
-                      <div className="flex flex-col gap-4 rounded-3xl p-2 items-center ">
+              {categorie.plats.map((plat) => (
+                <Card key={plat.id}>
+                  <CardBody>
+                    <div className="flex h-full flex-col gap-4 rounded-3xl p-2 items-center">
+                      <div className="relative h-40 w-full">
                         <Image
-                          src={item.picture}
-                          alt={item.title}
-                          width={150}
-                          height={150}
+                          src={plat.image}
+                          alt={plat.nom}
+                          fill
+                          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
                           className="object-contain rounded-3xl"
                         />
-                        {/* Contenu de la carte */}
-                        <div className="flex flex-col justify-between w-full text-center ">
-                          <div>
-                            <div className="text-xl font-title font-semibold">
-                              {item.title}
-                            </div>
-                            <div className="text-gray-600">{item.substile}</div>
-                          </div>
+                      </div>
+                      <div className="flex flex-1 flex-col justify-between w-full text-center">
+                        <div>
+                          <h3 className="text-lg font-bold uppercase">{plat.nom}</h3>
+                          {plat.description && (
+                            <p className="text-sm text-gray-600">{plat.description}</p>
+                          )}
+                        </div>
 
-                          {/* Prix et icône panier */}
-                          <div className="flex justify-between items-center mt-4">
-                            <div className="text-primary text-lg font-title">
-                              {item.price} FCFA
-                            </div>
-                            <Link href="/app-mobile">
-                              <ShoppingCart
-                                className="text-primary cursor-pointer rounded-lg border-2 border-primary p-2"
-                                size={48}
-                              />
-                            </Link>
+                        <div className="flex justify-between items-center mt-4">
+                          <div className="text-left">
+                            {plat.prixAvantPromo && (
+                              <div className="text-sm text-gray-500 line-through">
+                                {fcfa(plat.prixAvantPromo)}
+                              </div>
+                            )}
+                            <div className="text-primary text-lg font-bold">{fcfa(plat.prix)}</div>
                           </div>
+                          <Link href="/app-mobile" aria-label={`Commander ${plat.nom} sur l'application`}>
+                            <ShoppingCart
+                              className="text-primary cursor-pointer rounded-lg border-2 border-primary p-2"
+                              size={48}
+                            />
+                          </Link>
                         </div>
                       </div>
-                    </CardBody>
-                  </Card>
-                ))}
+                    </div>
+                  </CardBody>
+                </Card>
+              ))}
             </div>
           </Tab>
         ))}
