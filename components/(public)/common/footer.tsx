@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { Facebook, Instagram } from "lucide-react";
 import Title from "@/components/primitives/Title";
@@ -10,10 +10,10 @@ const Footer = () => {
     <footer className="w-full text-sm">
       <div className="bg-secondary border-secondary text-secondary-foreground py-3 px-4 flex flex-col md:flex-row justify-between items-center gap-3">
         <span className="flex items-center text-center md:text-left">
-          📍 Chicken Nation Marcory Zone 4 / Angré / Sococe / Faya
+          📍 Chicken Nation Marcory Zone 4 / Angré / Sococé / Faya / Yopougon
         </span>
 
-        <span className="flex items-center">🕒 Tous les jours — 10h à 00h</span>
+        <span className="flex items-center">🕒 Tous les jours, de 10h à minuit</span>
 
         <div className="flex justify-center items-center space-x-4">
           <a
@@ -129,47 +129,31 @@ const Footer = () => {
           {/* Nos plats */}
           <div className="flex flex-col gap-2">
             <Title size="xs" color="white" className="mb-4 text-left">
-              NOS PLATS
+              COMMANDER
             </Title>
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/restaurants/marcory/poulets"
+                  href="/restaurants/nos-menus"
                   className="hover:text-primary-300 transition-colors"
                 >
-                  Poulets grillés
+                  Notre menu
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/restaurants/marcory/lunchs"
+                  href="/app-mobile"
                   className="hover:text-primary-300 transition-colors"
                 >
-                  Lunchs
+                  Commander sur l&apos;application
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/restaurants/marcory/combos"
+                  href="/carte-nation/adhesion"
                   className="hover:text-primary-300 transition-colors"
                 >
-                  Combos
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/restaurants/marcory/plats"
-                  className="hover:text-primary-300 transition-colors"
-                >
-                  Plats
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/restaurants/marcory/plus"
-                  className="hover:text-primary-300 transition-colors"
-                >
-                  Plus
+                  Carte de la Nation
                 </Link>
               </li>
             </ul>

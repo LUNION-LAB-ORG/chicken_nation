@@ -15,7 +15,7 @@ const faqs = [
           <li className="flex items-center gap-2">
             <span className="text-primary-600">🏪</span>
             <span>
-              Sur place dans nos restaurants (Zone 4, Angré-Djibi, Sococé)
+              Sur place dans nos restaurants (Zone 4, Angré, Sococé, Faya, Yopougon)
             </span>
           </li>
           <li className="flex items-center gap-2">
@@ -154,9 +154,23 @@ const faqs = [
               07 00 00 55 56
             </a>
           </li>
+          <li>
+            📞{" "}
+            <strong className="text-primary-600">Riviera Faya :</strong>{" "}
+            <a href="tel:+2250720208352" className="hover:underline">
+              07 20 20 83 52
+            </a>
+          </li>
+          <li>
+            📞{" "}
+            <strong className="text-primary-600">Yopougon :</strong>{" "}
+            <a href="tel:+2250712853211" className="hover:underline">
+              07 12 85 32 11
+            </a>
+          </li>
         </ul>
         <p>
-          Vous pouvez également réservé une table en ligne sur notre application
+          Vous pouvez également réserver une table en ligne sur notre application
           mobile Chicken Nation.
         </p>
       </div>
@@ -221,6 +235,24 @@ const faqs = [
               className="text-primary-600 hover:underline"
             >
               07 00 00 55 56
+            </a>
+          </li>
+          <li>
+            📞 <strong>Riviera Faya :</strong>{" "}
+            <a
+              href="tel:+2250720208352"
+              className="text-primary-600 hover:underline"
+            >
+              07 20 20 83 52
+            </a>
+          </li>
+          <li>
+            📞 <strong>Yopougon :</strong>{" "}
+            <a
+              href="tel:+2250712853211"
+              className="text-primary-600 hover:underline"
+            >
+              07 12 85 32 11
             </a>
           </li>
           <li>

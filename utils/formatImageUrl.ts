@@ -1,7 +1,8 @@
 
 export const formatImageUrl = (imageUrl?: string, placeholder?: string): string => {
   const API_URL = process.env.NEXT_PUBLIC_API_FILE_URL;
-  const CLOUDFRONT_URL = process.env.NEXT_PUBLIC_CLOUDFRONT_URL;
+  // Accepte la variable avec ou sans https:// (le .env local l'a, pas forcément la prod).
+  const CLOUDFRONT_URL = process.env.NEXT_PUBLIC_CLOUDFRONT_URL?.replace(/^https?:\/\//, '');
   if (!imageUrl) return formatImageUrl(placeholder || '/icons/image.png');
 
   try {

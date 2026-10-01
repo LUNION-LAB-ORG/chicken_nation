@@ -2,7 +2,7 @@ import Section from "@/components/primitives/Section";
 import Title from "@/components/primitives/Title";
 import Motion from "@/lib/motion";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 export default function About() {
   return (

@@ -7,7 +7,7 @@ export const metadata = pageMetadata({
   chemin: "/restaurants",
   titre: "Nos restaurants à Abidjan",
   description:
-    "Trouvez le restaurant CHICKEN NATION le plus proche : Marcory Zone 4, Angré, Sococé et Faya. Ouverts tous les jours de 10h à minuit, sur place, à emporter ou en livraison.",
+    "Trouvez le restaurant CHICKEN NATION le plus proche : Marcory Zone 4, Angré, Sococé, Riviera Faya et Yopougon. Ouverts tous les jours dès 10h, sur place, à emporter ou en livraison.",
 });
 
 export default function Restaurants() {

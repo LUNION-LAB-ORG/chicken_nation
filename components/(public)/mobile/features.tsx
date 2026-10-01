@@ -32,7 +32,7 @@ const features = [
   },
   {
     name: "Nos Restaurants",
-    description: "Marcory Zone 4, Angré et Sococe. Ouvert 10h à 23h.",
+    description: "Marcory Zone 4, Angré, Sococé, Faya et Yopougon. Ouverts tous les jours dès 10h.",
     icon: <MapPinIcon className="h-6 w-6" />,
   },
   {

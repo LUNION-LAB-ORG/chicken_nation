@@ -10,7 +10,7 @@ const IMAGE_PARTAGE = {
 };
 
 const TITRE_ACCUEIL = "CHICKEN NATION - Le Meilleur du Poulet à Abidjan, Côte d'Ivoire";
-const DESCRIPTION_ACCUEIL = "CHICKEN NATION, la référence du fast-food à Abidjan. Poulet 100% local élevé dans nos fermes. Croustillant, grillé ou épicé. Livraison en 20 à 35 min. Restaurants à Zone 4, Angré, Sococé et Faya.";
+const DESCRIPTION_ACCUEIL = "CHICKEN NATION, la référence du fast-food à Abidjan. Poulet 100% local élevé dans nos fermes. Croustillant, grillé ou épicé. Livraison en 20 à 35 min. Restaurants à Zone 4, Angré, Sococé, Faya et Yopougon.";
 
 export const metadata: Metadata = {
     metadataBase: new URL(SITE_URL),
@@ -28,6 +28,8 @@ export const metadata: Metadata = {
         "Restaurant Zone 4 Abidjan",
         "Restaurant Angré Abidjan",
         "Restaurant Sococé Abidjan",
+        "Restaurant Riviera Faya Abidjan",
+        "Restaurant Yopougon Abidjan",
         "Menu Chicken Nation",
         "Poulet grillé Abidjan",
         "Livraison repas Abidjan",

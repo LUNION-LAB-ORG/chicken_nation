@@ -11,7 +11,7 @@ import { pageMetadata } from "../meta";
 export const metadata = pageMetadata({
   chemin: "/",
   description:
-    "CHICKEN NATION, la référence du fast-food à Abidjan. Poulet 100% local élevé dans nos fermes. Croustillant, grillé ou épicé. Livraison en 20 à 35 min. Restaurants à Zone 4, Angré, Sococé et Faya.",
+    "CHICKEN NATION, la référence du fast-food à Abidjan. Poulet 100% local élevé dans nos fermes. Croustillant, grillé ou épicé. Livraison en 20 à 35 min. Restaurants à Zone 4, Angré, Sococé, Faya et Yopougon.",
 });
 
 export default function Home() {
