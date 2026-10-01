@@ -1,13 +1,10 @@
-import { Metadata } from "next";
+import { pageMetadata } from "../../meta";
 
-export const faqMetadata: Metadata = {
-  title: "FAQ - Questions Fréquentes",
-  description: "Trouvez les réponses à vos questions sur Chicken Nation : commandes, livraison, menu, horaires, paiements et plus encore.",
-  openGraph: {
-    title: "FAQ - Chicken Nation",
-    description: "Questions fréquentes sur nos restaurants, livraisons et services.",
-  },
-};
+export const faqMetadata = pageMetadata({
+  chemin: "/faq",
+  titre: "Questions fréquentes",
+  description: "Trouvez les réponses à vos questions sur CHICKEN NATION : commandes, livraison, menu, horaires, paiements et plus encore.",
+});
 
 // Schema.org FAQ pour le SEO
 export const faqSchema = {

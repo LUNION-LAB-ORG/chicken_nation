@@ -1,4 +1,12 @@
 import Image from "next/image";
+import { pageMetadata } from "../../meta";
+
+export const metadata = pageMetadata({
+  chemin: "/confidentiality-none-disclosure-agreement",
+  titre: "Engagement de confidentialité",
+  description:
+    "Engagement de confidentialité et de non-divulgation de CHICKEN NATION.",
+});
 
 export default function ConfidentialityDocumentPage() {
   return (

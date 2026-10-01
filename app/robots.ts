@@ -5,6 +5,7 @@ export default function robots(): MetadataRoute.Robots {
         rules: {
             userAgent: "*",
             allow: "/",
+            disallow: ["/api/", "/*/dashboard", "/*/auth/", "/*/app-mobile/deep-link", "/*/app-mobile/download"],
         },
         sitemap: "https://www.chicken-nation.com/sitemap.xml",
     };

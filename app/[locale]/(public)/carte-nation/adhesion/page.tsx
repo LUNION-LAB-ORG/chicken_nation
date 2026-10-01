@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Check } from "lucide-react";
+import { pageMetadata } from "../../../meta";
 
 import AdhesionForm from "@/components/(public)/common/carte-nation/AdhesionForm";
 import NationCardVisual from "@/components/(public)/common/carte-nation/NationCardVisual";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("carte-nation.adhesion");
-  return {
-    title: t("meta_title"),
+  return pageMetadata({
+    chemin: "/carte-nation/adhesion",
+    titre: t("meta_title"),
     description: t("meta_description"),
-  };
+  });
 }
 
 /**

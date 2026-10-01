@@ -3,9 +3,9 @@ import Footer from "@/components/(public)/common/footer";
 import Header from "@/components/(public)/common/header";
 import Main from "@/components/primitives/Main";
 import "@/styles/globals.css";
-import { metadata, organizationSchema } from "../meta";
+import { metadata, organizationSchema, viewport } from "../meta";
 
-export { metadata };
+export { metadata, viewport };
 
 export default async function PublicLayout({
   children,

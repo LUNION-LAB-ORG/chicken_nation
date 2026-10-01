@@ -2,7 +2,7 @@ import Quiz from "@/components/(public)/faq/faq";
 import HeroSection from "@/components/(public)/common/hero-section";
 import { faqMetadata, faqSchema } from "./meta";
 
-export { faqMetadata };
+export { faqMetadata as metadata };
 
 export default function Faq() {
   return (

@@ -1,13 +1,24 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+
+const SITE_URL = "https://www.chicken-nation.com";
+
+const IMAGE_PARTAGE = {
+    url: "/assets/images/partage/chicken-nation.jpg",
+    width: 1200,
+    height: 630,
+    alt: "CHICKEN NATION, délicieux jusqu'à l'os",
+};
+
+const TITRE_ACCUEIL = "CHICKEN NATION - Le Meilleur du Poulet à Abidjan, Côte d'Ivoire";
+const DESCRIPTION_ACCUEIL = "CHICKEN NATION, la référence du fast-food à Abidjan. Poulet 100% local élevé dans nos fermes. Croustillant, grillé ou épicé. Livraison en 20 à 35 min. Restaurants à Zone 4, Angré, Sococé et Faya.";
 
 export const metadata: Metadata = {
-    metadataBase: new URL("https://www.chicken-nation.com"),
+    metadataBase: new URL(SITE_URL),
     title: {
-        default: "CHICKEN NATION | Fast-Food 100% Poulet en Côte d'Ivoire",
-        template: "%s | CHICKEN NATION - Délicieux jusqu'à l'os",
-        absolute: "CHICKEN NATION - Le Meilleur du Poulet à Abidjan, Côte d'Ivoire",
+        default: TITRE_ACCUEIL,
+        template: "%s | CHICKEN NATION",
     },
-    description: "CHICKEN NATION, la référence du fast-food à Abidjan. Poulet 100% local élevé dans nos fermes. Croustillant, grillé ou épicé. Livraison rapide en moins de 30min. Restaurants à Zone 4, Angré-Djibi et Sococé.",
+    description: DESCRIPTION_ACCUEIL,
     referrer: "origin-when-cross-origin",
     keywords: [
         "Chicken Nation Abidjan",
@@ -30,29 +41,20 @@ export const metadata: Metadata = {
     authors: [{ name: "CHICKEN NATION", url: "https://www.chicken-nation.com" }],
     creator: "CHICKEN NATION",
     publisher: "CHICKEN NATION",
-    alternates: {
-        canonical: "https://www.chicken-nation.com",
-        languages: {
-            "fr-CI": "https://www.chicken-nation.com",
-        },
-    },
     openGraph: {
         type: "website",
         locale: "fr_CI",
-        url: "https://www.chicken-nation.com",
+        url: SITE_URL,
         siteName: "CHICKEN NATION",
-        title: "CHICKEN NATION - Le Meilleur du Poulet à Abidjan, Côte d'Ivoire",
+        title: TITRE_ACCUEIL,
         description: "Découvrez CHICKEN NATION, fast-food 100% poulet local élevé dans nos fermes. Burgers, wings, wraps, tenders et menus gourmands. Livraison rapide à Abidjan.",
+        images: [IMAGE_PARTAGE],
     },
     twitter: {
         card: "summary_large_image",
         site: "@ChickenNationCI",
         creator: "@ChickenNationCI",
-    },
-    viewport: {
-        width: "device-width",
-        initialScale: 1,
-        maximumScale: 1,
+        images: [IMAGE_PARTAGE.url],
     },
     robots: {
         index: true,
@@ -67,7 +69,7 @@ export const metadata: Metadata = {
     },
     category: "Restauration rapide",
     verification: {
-        google: "google-site-verification=-B0Ir9iTmPZHT-_7eQtFlG-b5v_AN1561-Q7zf-9PWQ",
+        google: "-B0Ir9iTmPZHT-_7eQtFlG-b5v_AN1561-Q7zf-9PWQ",
         yandex: "1b5037f79415fff0",
     },
     other: {
@@ -82,6 +84,44 @@ export const metadata: Metadata = {
     },
 };
 
+
+// Le zoom reste permis : le bloquer gêne les personnes qui voient mal.
+export const viewport: Viewport = {
+    width: "device-width",
+    initialScale: 1,
+};
+
+/**
+ * Métadonnées propres à une page. Le contenu est en français sur toutes les
+ * langues : l'adresse de référence est donc toujours la version /fr, pour que
+ * Google ne compte pas /en et /ar comme des doublons.
+ * Next remplace l'objet openGraph du parent au lieu de le fusionner : il faut
+ * redonner ici l'image et le nom du site.
+ */
+export function pageMetadata({ chemin, titre, description }: { chemin: string; titre?: string; description: string }): Metadata {
+    const url = `${SITE_URL}/fr${chemin === "/" ? "" : chemin}`;
+    const titrePartage = titre ? `${titre} | CHICKEN NATION` : TITRE_ACCUEIL;
+    return {
+        ...(titre ? { title: titre } : { title: { absolute: TITRE_ACCUEIL } }),
+        description,
+        alternates: { canonical: url },
+        openGraph: {
+            type: "website",
+            locale: "fr_CI",
+            siteName: "CHICKEN NATION",
+            url,
+            title: titrePartage,
+            description,
+            images: [IMAGE_PARTAGE],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: titrePartage,
+            description,
+            images: [IMAGE_PARTAGE.url],
+        },
+    };
+}
 
 export const organizationSchema = {
     "@context": "https://schema.org",

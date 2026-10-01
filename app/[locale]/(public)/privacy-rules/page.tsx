@@ -1,4 +1,12 @@
 import Image from "next/image";
+import { pageMetadata } from "../../meta";
+
+export const metadata = pageMetadata({
+  chemin: "/privacy-rules",
+  titre: "Politique de confidentialité",
+  description:
+    "Quelles données l'application CHICKEN NATION collecte, pourquoi, et comment exercer vos droits sur vos données personnelles.",
+});
 
 export default function PrivacyPolicyPage() {
   return (

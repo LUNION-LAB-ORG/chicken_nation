@@ -6,6 +6,14 @@ import Skill from "@/components/(public)/history/skill";
 import Team from "@/components/(public)/history/team";
 import OderFood from "@/components/(public)/home/oder-food";
 import HeroSection from "@/components/(public)/common/hero-section";
+import { pageMetadata } from "../../meta";
+
+export const metadata = pageMetadata({
+  chemin: "/histoire",
+  titre: "Notre histoire",
+  description:
+    "L'histoire de CHICKEN NATION : un poulet 100% local, élevé dans nos propres fermes en Côte d'Ivoire et servi croustillant ou grillé à Abidjan.",
+});
 
 export default function History() {
   return (
