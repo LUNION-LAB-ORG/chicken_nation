@@ -20,7 +20,7 @@ export default function Hero() {
             {/* Title */}
             <Motion variant="verticalSlideIn">
               <h1 className="text-[#ff6200] font-title text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-center tracking-wider leading-tight">
-                DELICICEUX
+                DELICIEUX
                 <br />
                 JUSQU&apos;A L&apos;OS
               </h1>

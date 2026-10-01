@@ -180,7 +180,7 @@ const Footer = () => {
       {/* === Bottom Bar === */}
       <div className="bg-white py-3 px-4 text-center text-primary text-xs sm:text-sm">
         <p>
-          © 2024 <span className="font-semibold">Chicken Nation</span> — Tous
+          © {new Date().getFullYear()} <span className="font-semibold">Chicken Nation</span> — Tous
           droits réservés |{" "}
           <a
             href="https://lunion-lab.com"

@@ -12,6 +12,7 @@ export default function AddContact() {
     email: "",
     telephone: "",
     message: "",
+    site_web: "",
   });
 
   const [sending, setSending] = useState(false);
@@ -34,10 +35,12 @@ export default function AddContact() {
       body: JSON.stringify(formData),
     });
 
-    const result = await res.json();
+    const result = await res.json().catch(() => ({ success: false }));
     setSending(false);
 
-    if (result.success) {
+    if (res.status === 429) {
+      setFeedback("❌ Trop de messages envoyés. Réessaie dans quelques minutes.");
+    } else if (result.success) {
       setFeedback("✅ Message envoyé avec succès !");
       setFormData({
         nom: "",
@@ -45,6 +48,7 @@ export default function AddContact() {
         email: "",
         telephone: "",
         message: "",
+        site_web: "",
       });
     } else {
       setFeedback("❌ Une erreur est survenue. Réessaie plus tard.");
@@ -60,6 +64,17 @@ export default function AddContact() {
       </Motion>
       <div className="p-0 md:p-24 w-full">
         <form className="space-y-6" onSubmit={handleSubmit}>
+          {/* Champ piège pour les robots, invisible pour les visiteurs */}
+          <input
+            type="text"
+            name="site_web"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            className="hidden"
+            value={formData.site_web}
+            onChange={handleChange}
+          />
           <div className="grid md:grid-cols-2 gap-6">
             <Motion variant="verticalSlideIn">
               <input
