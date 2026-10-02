@@ -49,6 +49,10 @@ export function etapesSuivi(type: string) {
       ];
 }
 
+/** Livrée, récupérée ou annulée : plus rien ne bougera, le suivi s'arrête. */
+export const estTerminee = (c: Pick<ICommande, "status">) =>
+  c.status === "COMPLETED" || c.status === "COLLECTED" || c.status === "CANCELLED";
+
 /** Commande en ligne pas encore payée, qu'on peut encore régler. */
 export const aPayer = (c: Pick<ICommande, "status" | "paied" | "payment_method">) =>
   c.payment_method === "ONLINE" && !c.paied && c.status === "PENDING";

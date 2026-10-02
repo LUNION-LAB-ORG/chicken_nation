@@ -10,6 +10,7 @@ import {
   rechercherAdressesAction,
 } from "../actions/commande.action";
 import type { IAdresseLivraison, ISuggestionAdresse } from "../types/commande.types";
+import { messageErreurAction } from "../utils/erreur-action.utils";
 
 const nouvelleSession = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Date.now());
@@ -34,38 +35,77 @@ export default function AdresseLivraison({
   // Un jeton par recherche : Google facture la session entière comme un seul appel.
   const session = useRef(nouvelleSession());
 
+  /**
+   * Numéro du dernier geste du client (choix d'une adresse, position, « Modifier »).
+   * Un résultat arrivé après un geste plus récent est ignoré : la position GPS,
+   * lente à venir, remplaçait sinon en silence l'adresse choisie entre-temps
+   * et son indication. Le démontage (passage à « À emporter ») compte aussi.
+   */
+  const geste = useRef(0);
+  useEffect(
+    () => () => {
+      geste.current++;
+    },
+    [],
+  );
+
   useEffect(() => {
     setRechercheVide(false);
     if (adresse || saisie.trim().length < 3) return setSuggestions([]);
+    let actif = true;
     const t = setTimeout(async () => {
-      const resultats = await rechercherAdressesAction(saisie, session.current);
-      setSuggestions(resultats);
-      setRechercheVide(resultats.length === 0);
+      try {
+        const resultats = await rechercherAdressesAction(saisie, session.current);
+        if (!actif) return;
+        setSuggestions(resultats);
+        setRechercheVide(resultats.length === 0);
+      } catch (e) {
+        if (actif) setErreur(messageErreurAction(e));
+      }
     }, 350);
-    return () => clearTimeout(t);
+    return () => {
+      actif = false;
+      clearTimeout(t);
+    };
   }, [saisie, adresse]);
 
   const choisir = async (s: ISuggestionAdresse) => {
+    const n = ++geste.current;
     setErreur(null);
-    const res = await detailsAdresseAction(s.placeId, session.current);
-    session.current = nouvelleSession();
-    if (!res.ok) return setErreur(res.message);
-    setSuggestions([]);
-    onChange({ ...res.data, repere: "" });
+    setLocalisation(false);
+    try {
+      const res = await detailsAdresseAction(s.placeId, session.current);
+      session.current = nouvelleSession();
+      if (n !== geste.current) return;
+      if (!res.ok) return setErreur(res.message);
+      setSuggestions([]);
+      onChange({ ...res.data, repere: "" });
+    } catch (e) {
+      if (n === geste.current) setErreur(messageErreurAction(e));
+    }
   };
 
   const maPosition = () => {
+    const n = ++geste.current;
     setErreur(null);
     if (!navigator.geolocation) return setErreur("Votre navigateur ne donne pas votre position. Cherchez votre adresse.");
     setLocalisation(true);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        const res = await adresseDepuisPositionAction(pos.coords.latitude, pos.coords.longitude);
-        setLocalisation(false);
-        if (!res.ok) return setErreur(res.message);
-        onChange({ ...res.data, repere: "" });
+        if (n !== geste.current) return;
+        try {
+          const res = await adresseDepuisPositionAction(pos.coords.latitude, pos.coords.longitude);
+          if (n !== geste.current) return;
+          if (!res.ok) return setErreur(res.message);
+          onChange({ ...res.data, repere: "" });
+        } catch (e) {
+          if (n === geste.current) setErreur(messageErreurAction(e));
+        } finally {
+          if (n === geste.current) setLocalisation(false);
+        }
       },
       () => {
+        if (n !== geste.current) return;
         setLocalisation(false);
         setErreur("Position refusée ou introuvable. Cherchez votre adresse à la place.");
       },
@@ -85,7 +125,9 @@ export default function AdresseLivraison({
             type="button"
             className="shrink-0 text-sm font-semibold text-primary underline"
             onClick={() => {
+              geste.current++;
               setSaisie("");
+              setLocalisation(false);
               onChange(null);
             }}
           >
@@ -93,7 +135,7 @@ export default function AdresseLivraison({
           </button>
         </div>
         <Input
-          label="Point de repère pour le livreur"
+          label="Indication pour la livraison (facultatif)"
           placeholder="Ex. : portail bleu en face de la pharmacie"
           value={adresse.repere}
           onValueChange={(repere) => onChange({ ...adresse, repere })}

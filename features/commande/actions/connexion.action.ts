@@ -16,18 +16,27 @@ function versClient(brut: Record<string, unknown>): IClient {
 
 /** Envoie le code de connexion sur WhatsApp (SMS si WhatsApp échoue). */
 export async function demanderCodeAction(saisie: string): Promise<Resultat<{ telephone: string }>> {
-  const telephone = normaliserMobileCI(saisie);
+  const telephone = normaliserMobileCI(String(saisie));
   if (!telephone) return { ok: false, message: "Saisissez un numéro mobile ivoirien à 10 chiffres (07, 05 ou 01)." };
   const res = await appelApi("/auth/customer/login", { methode: "POST", corps: { phone: telephone }, public: true });
   return res.ok ? { ok: true, data: { telephone } } : res;
 }
 
-/** Vérifie le code ; en cas de succès, la session est posée dans le cookie. */
-export async function verifierCodeAction(telephone: string, code: string): Promise<Resultat<IClient>> {
-  if (!/^\d{4}$/.test(code)) return { ok: false, message: "Le code compte 4 chiffres." };
+/**
+ * Vérifie le code ; en cas de succès, la session est posée dans le cookie.
+ *
+ * Une action serveur s'appelle avec n'importe quels arguments : le numéro est
+ * donc remis ici sous sa forme unique (+225…). Le serveur compte les essais
+ * ratés par numéro ; transmis tel quel, chaque graphie (« 2250700… »,
+ * « +225 0700… ») ouvrait un nouveau lot de cinq essais sur le même code.
+ */
+export async function verifierCodeAction(saisie: string, code: string): Promise<Resultat<IClient>> {
+  const telephone = normaliserMobileCI(String(saisie));
+  if (!telephone) return { ok: false, message: "Numéro invalide. Recommencez la connexion." };
+  if (!/^\d{4}$/.test(String(code))) return { ok: false, message: "Le code compte 4 chiffres." };
   const res = await appelApi<Record<string, unknown> & { token?: string }>("/auth/customer/verify-otp", {
     methode: "POST",
-    corps: { phone: telephone, otp: code },
+    corps: { phone: telephone, otp: String(code) },
     public: true,
   });
   if (!res.ok) {
@@ -49,8 +58,8 @@ export async function obtenirClientAction(): Promise<IClient | null> {
 
 /** Prénom et nom d'un nouveau client (le serveur crée le compte au premier code). */
 export async function completerProfilAction(prenom: string, nom: string): Promise<Resultat<IClient>> {
-  const p = prenom.trim();
-  const n = nom.trim();
+  const p = String(prenom).trim();
+  const n = String(nom).trim();
   if (!p || !n) return { ok: false, message: "Indiquez votre prénom et votre nom." };
   if (p.length > 60 || n.length > 60) return { ok: false, message: "Prénom ou nom trop long." };
   const formulaire = new FormData();

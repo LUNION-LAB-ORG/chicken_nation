@@ -16,9 +16,15 @@ export default async function SuiviPage({
   searchParams: Promise<{ payer?: string }>;
 }) {
   const [{ id }, { payer }, client] = await Promise.all([params, searchParams, obtenirClientAction()]);
+  // Connecté sans prénom ou nom : connexion inachevée, on reprend à l'étape du nom.
+  const connecte = !!client?.first_name && !!client?.last_name;
   return (
     <div className="min-h-[60vh] bg-gray-50 px-4 pb-16 pt-28">
-      {client ? <SuiviCommande id={id} client={client} ouvrirPaiement={payer === "1"} /> : <ConnexionRequise />}
+      {client && connecte ? (
+        <SuiviCommande id={id} client={client} ouvrirPaiement={payer === "1"} />
+      ) : (
+        <ConnexionRequise etapeInitiale={client ? "profil" : "telephone"} />
+      )}
     </div>
   );
 }

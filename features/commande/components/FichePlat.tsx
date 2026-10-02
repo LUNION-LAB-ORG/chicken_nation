@@ -11,10 +11,12 @@ import { addToast } from "@heroui/toast";
 import { obtenirPlatAction } from "../actions/commande.action";
 import { ajouterAuPanierAtom } from "../stores/panier.store";
 import type { IOptionChoisie, IPlatDetail, ISupplementChoisi } from "../types/commande.types";
+import { messageErreurAction } from "../utils/erreur-action.utils";
 import {
   basculerOption,
   fcfa,
   groupeIncomplet,
+  mentionModes,
   platDisponibleMaintenant,
   selectionParDefaut,
   signatureLigne,
@@ -68,13 +70,17 @@ export default function FichePlat({ platId, onClose }: { platId: string | null; 
     setErreur(null);
     setSupplements({});
     setQuantite(1);
-    obtenirPlatAction(platId).then((res) => {
-      if (!actif) return;
-      if (!res.ok) return setErreur(res.message);
-      setPlat(res.data);
-      setEpice(res.data.spice_level === "ALWAYS");
-      setOptions(selectionParDefaut(res.data.groupes));
-    });
+    obtenirPlatAction(platId)
+      .then((res) => {
+        if (!actif) return;
+        if (!res.ok) return setErreur(res.message);
+        setPlat(res.data);
+        setEpice(res.data.spice_level === "ALWAYS");
+        setOptions(selectionParDefaut(res.data.groupes));
+      })
+      .catch((e) => {
+        if (actif) setErreur(messageErreurAction(e));
+      });
     return () => {
       actif = false;
     };
@@ -84,7 +90,13 @@ export default function FichePlat({ platId, onClose }: { platId: string | null; 
     () =>
       (plat?.supplements ?? [])
         .filter((s) => (supplements[s.id] ?? 0) > 0)
-        .map((s) => ({ id: s.id, nom: s.name, prix: s.price, quantite: supplements[s.id] })),
+        .map((s) => ({
+          id: s.id,
+          nom: s.name,
+          prix: s.price,
+          quantite: supplements[s.id],
+          available_order_types: s.available_order_types,
+        })),
     [plat, supplements],
   );
 
@@ -111,6 +123,9 @@ export default function FichePlat({ platId, onClose }: { platId: string | null; 
       supplements: supplementsChoisis,
       quantite,
       available_order_types: plat.available_order_types,
+      available_from: plat.available_from,
+      available_until: plat.available_until,
+      restaurantsExclus: plat.restaurantsExclus,
     });
     addToast({ title: `${plat.name} ajouté au panier`, color: "success" });
     onClose();
@@ -131,6 +146,9 @@ export default function FichePlat({ platId, onClose }: { platId: string | null; 
                 {plat.prixAvantPromo && <span className="mr-2 text-sm text-gray-500 line-through">{fcfa(plat.prixAvantPromo)}</span>}
                 {fcfa(plat.prix)}
               </span>
+              {mentionModes(plat.available_order_types) && (
+                <span className="text-sm font-normal text-warning-700">{mentionModes(plat.available_order_types)}</span>
+              )}
             </ModalHeader>
             <ModalBody className="gap-5">
               <div className="relative mx-auto h-48 w-full">
@@ -209,6 +227,9 @@ export default function FichePlat({ platId, onClose }: { platId: string | null; 
                       <li key={s.id} className="flex items-center justify-between gap-3 text-sm">
                         <span>
                           {s.name} <span className="text-gray-500">+ {fcfa(s.price)}</span>
+                          {mentionModes(s.available_order_types) && (
+                            <span className="block text-xs text-warning-700">{mentionModes(s.available_order_types)}</span>
+                          )}
                         </span>
                         <Compteur
                           libelle={s.name}

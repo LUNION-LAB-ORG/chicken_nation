@@ -3,18 +3,29 @@
 import { useEffect, useState } from "react";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
-import { completerProfilAction, demanderCodeAction, verifierCodeAction } from "../actions/connexion.action";
+import { completerProfilAction, deconnexionAction, demanderCodeAction, verifierCodeAction } from "../actions/connexion.action";
 import type { IClient } from "../types/commande.types";
+import { messageErreurAction } from "../utils/erreur-action.utils";
 import { telephoneLisible } from "../utils/panier.utils";
 
-type Etape = "telephone" | "code" | "profil";
+export type EtapeConnexion = "telephone" | "code" | "profil";
 
 /**
  * Connexion par code reçu sur WhatsApp, avec le même compte que l'application.
  * Un numéro inconnu crée le compte ; on demande alors le prénom et le nom.
+ *
+ * `etapeInitiale="profil"` : client déjà connecté (cookie posé au code validé)
+ * mais sans prénom ou nom, parce qu'il a quitté la page avant cette étape. Sa
+ * connexion n'est pas finie : on reprend au nom, jamais on ne commande sans.
  */
-export default function Connexion({ onConnecte }: { onConnecte: (client: IClient) => void }) {
-  const [etape, setEtape] = useState<Etape>("telephone");
+export default function Connexion({
+  onConnecte,
+  etapeInitiale = "telephone",
+}: {
+  onConnecte: (client: IClient) => void;
+  etapeInitiale?: "telephone" | "profil";
+}) {
+  const [etape, setEtape] = useState<EtapeConnexion>(etapeInitiale);
   const [saisie, setSaisie] = useState("");
   const [telephone, setTelephone] = useState("");
   const [code, setCode] = useState("");
@@ -30,36 +41,51 @@ export default function Connexion({ onConnecte }: { onConnecte: (client: IClient
     return () => clearTimeout(t);
   }, [attente]);
 
-  const envoyerCode = async () => {
+  /** Appel d'une action serveur : bouton jamais bloqué, message si le réseau lâche. */
+  const appeler = async (geste: () => Promise<void>) => {
     setErreur(null);
     setChargement(true);
-    const res = await demanderCodeAction(etape === "telephone" ? saisie : telephone);
-    setChargement(false);
-    if (!res.ok) return setErreur(res.message);
-    setTelephone(res.data.telephone);
-    setCode("");
-    setEtape("code");
-    setAttente(30);
+    try {
+      await geste();
+    } catch (e) {
+      setErreur(messageErreurAction(e));
+    } finally {
+      setChargement(false);
+    }
   };
 
-  const verifier = async () => {
-    setErreur(null);
-    setChargement(true);
-    const res = await verifierCodeAction(telephone, code.trim());
-    setChargement(false);
-    if (!res.ok) return setErreur(res.message);
-    if (!res.data.first_name || !res.data.last_name) return setEtape("profil");
-    onConnecte(res.data);
-  };
+  const envoyerCode = () =>
+    appeler(async () => {
+      const res = await demanderCodeAction(etape === "telephone" ? saisie : telephone);
+      if (!res.ok) return setErreur(res.message);
+      setTelephone(res.data.telephone);
+      setCode("");
+      setEtape("code");
+      setAttente(30);
+    });
 
-  const enregistrerProfil = async () => {
-    setErreur(null);
-    setChargement(true);
-    const res = await completerProfilAction(prenom, nom);
-    setChargement(false);
-    if (!res.ok) return setErreur(res.message);
-    onConnecte(res.data);
-  };
+  const verifier = () =>
+    appeler(async () => {
+      const res = await verifierCodeAction(telephone, code.trim());
+      if (!res.ok) return setErreur(res.message);
+      if (!res.data.first_name || !res.data.last_name) return setEtape("profil");
+      onConnecte(res.data);
+    });
+
+  const enregistrerProfil = () =>
+    appeler(async () => {
+      const res = await completerProfilAction(prenom, nom);
+      if (!res.ok) return setErreur(res.message);
+      onConnecte(res.data);
+    });
+
+  // Session d'un autre numéro restée sur l'appareil : on la ferme et on recommence.
+  const changerDeNumero = () =>
+    appeler(async () => {
+      await deconnexionAction();
+      setSaisie("");
+      setEtape("telephone");
+    });
 
   return (
     <div className="mx-auto w-full max-w-md rounded-2xl bg-white p-6 shadow-md">
@@ -144,6 +170,14 @@ export default function Connexion({ onConnecte }: { onConnecte: (client: IClient
           <Button type="submit" color="primary" className="font-semibold" isLoading={chargement}>
             Continuer
           </Button>
+          <button
+            type="button"
+            className="text-sm text-gray-600 underline disabled:opacity-50"
+            disabled={chargement}
+            onClick={changerDeNumero}
+          >
+            Ce n&apos;est pas votre numéro ? Changer de numéro
+          </button>
         </form>
       )}
     </div>

@@ -1,5 +1,6 @@
 import { Resend } from 'resend';
 import { z } from 'zod';
+import { adresseIpVisiteur } from '@/features/commande/utils/adresse-ip.utils';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -32,11 +33,6 @@ function depasseLaLimite(cle: string, max: number) {
   return false;
 }
 
-function adresseIp(req: Request) {
-  const transmise = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
-  return transmise || req.headers.get('x-real-ip') || null;
-}
-
 function echapper(texte: string) {
   return texte
     .replace(/&/g, '&amp;')
@@ -63,7 +59,9 @@ export async function POST(req: Request) {
 
   // Sans adresse IP (nginx ne la transmet pas), seule la limite globale
   // s'applique : une clé commune bloquerait tous les visiteurs ensemble.
-  const ip = adresseIp(req);
+  // X-Real-IP, sinon la dernière adresse de X-Forwarded-For (celle de nginx) :
+  // la première est fournie par le visiteur et changerait à chaque envoi.
+  const ip = adresseIpVisiteur((nom) => req.headers.get(nom));
   if ((ip && depasseLaLimite(`ip:${ip}`, MAX_PAR_IP)) || depasseLaLimite('total', MAX_TOTAL)) {
     return Response.json({ success: false, reason: 'rate_limited' }, { status: 429 });
   }

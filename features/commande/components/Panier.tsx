@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useAtomValue, useSetAtom } from "jotai";
 import { Bike, Minus, Plus, Store, Trash2 } from "lucide-react";
@@ -11,19 +11,37 @@ import { Spinner } from "@heroui/spinner";
 import { Link, useRouter } from "@/i18n/navigation";
 import type { IRestaurantPublic } from "@/features/restaurants/restaurant.type";
 import { nomCourt } from "@/features/restaurants/restaurant.utils";
-import { calculerFraisAction, creerCommandeAction, verifierCodeReductionAction } from "../actions/commande.action";
+import {
+  calculerFraisAction,
+  creerCommandeAction,
+  revaliderPanierAction,
+  verifierCodeReductionAction,
+} from "../actions/commande.action";
 import { deconnexionAction } from "../actions/connexion.action";
-import { changerQuantiteAtom, panierAtom, viderPanierAtom } from "../stores/panier.store";
-import type { IAdresseLivraison, IClient, IFraisLivraison, ModeCommande } from "../types/commande.types";
-import { fcfa, sousTotal, telephoneLisible, totalLigne } from "../utils/panier.utils";
+import { changerQuantiteAtom, panierAtom, rafraichirPanierAtom, viderPanierAtom } from "../stores/panier.store";
+import type { IAdresseLivraison, IClient, IFraisLivraison, ILivraisonDisponible, ModeCommande } from "../types/commande.types";
+import { messageErreurAction } from "../utils/erreur-action.utils";
+import { sauverPanierCommande } from "../utils/memoire-navigateur.utils";
+import {
+  fcfa,
+  lignesACommander,
+  platsNonProposes,
+  problemesLigne,
+  sousTotal,
+  telephoneLisible,
+  totalLigne,
+} from "../utils/panier.utils";
 import { creneauxRetrait, heureLisible, plageOuverte } from "../utils/retrait.utils";
 import AdresseLivraison from "./AdresseLivraison";
 import Connexion from "./Connexion";
 
-function Bloc({ titre, children }: { titre: string; children: React.ReactNode }) {
+function Bloc({ titre, action, children }: { titre: string; action?: React.ReactNode; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-bold">{titre}</h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-bold">{titre}</h2>
+        {action}
+      </div>
       {children}
     </section>
   );
@@ -32,21 +50,25 @@ function Bloc({ titre, children }: { titre: string; children: React.ReactNode })
 export default function Panier({
   clientInitial,
   restaurants,
+  livraison,
 }: {
   clientInitial: IClient | null;
   restaurants: IRestaurantPublic[];
+  /** Livraison coupée depuis le back office : on part sur « À emporter ». */
+  livraison: ILivraisonDisponible;
 }) {
   const router = useRouter();
   const lignes = useAtomValue(panierAtom);
   const changerQuantite = useSetAtom(changerQuantiteAtom);
   const vider = useSetAtom(viderPanierAtom);
+  const rafraichir = useSetAtom(rafraichirPanierAtom);
 
   // Le panier vit dans le navigateur : on attend d'être monté pour l'afficher.
   const [monte, setMonte] = useState(false);
   useEffect(() => setMonte(true), []);
 
   const [client, setClient] = useState(clientInitial);
-  const [mode, setMode] = useState<ModeCommande>("DELIVERY");
+  const [mode, setMode] = useState<ModeCommande>(livraison.disponible ? "DELIVERY" : "PICKUP");
   const [adresse, setAdresse] = useState<IAdresseLivraison | null>(null);
   const [frais, setFrais] = useState<IFraisLivraison | null>(null);
   const [erreurFrais, setErreurFrais] = useState<string | null>(null);
@@ -59,7 +81,41 @@ export default function Panier({
   const [verifCode, setVerifCode] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [envoi, setEnvoi] = useState(false);
+  // Commande créée, panier vidé : on attend la page de paiement.
+  const [redirection, setRedirection] = useState(false);
+  const [confirmerVider, setConfirmerVider] = useState(false);
+  const [revalidation, setRevalidation] = useState(false);
+  const [prixMisAJour, setPrixMisAJour] = useState(false);
 
+  /**
+   * Connecté mais sans prénom ou nom (code validé, puis page quittée avant
+   * l'étape du nom) : la connexion n'est pas finie. La commande partait sinon
+   * au nom de « null null », vu par la caisse, le livreur et Turbo.
+   */
+  const profilComplet = !!client?.first_name && !!client?.last_name;
+
+  /**
+   * Panier relu au catalogue à l'ouverture : il peut dater de plusieurs jours.
+   * Un plat retiré est marqué et écarté ; prix, modes, créneaux et restaurants
+   * sont remis à jour. Si la relecture échoue, le panier reste tel quel : le
+   * serveur revérifie tout à la création de la commande.
+   */
+  const revalide = useRef(false);
+  useEffect(() => {
+    if (!monte || revalide.current) return;
+    revalide.current = true;
+    const ids = lignes.map((l) => l.dish_id);
+    if (ids.length === 0) return;
+    setRevalidation(true);
+    revaliderPanierAction(ids)
+      .then((plats) => setPrixMisAJour(rafraichir(plats)))
+      .catch(() => {
+        /* relecture impossible : panier gardé tel quel */
+      })
+      .finally(() => setRevalidation(false));
+  }, [monte, lignes, rafraichir]);
+
+  const aCommander = lignesACommander(lignes);
   const total = sousTotal(lignes);
 
   // Frais recalculés à chaque changement d'adresse ou de montant (les offres de
@@ -70,21 +126,30 @@ export default function Panier({
     if (mode !== "DELIVERY" || lat === undefined || lng === undefined) {
       setFrais(null);
       setErreurFrais(null);
+      setCalculFrais(false);
       return;
     }
     let actif = true;
     setCalculFrais(true);
-    calculerFraisAction(lat, lng, total).then((res) => {
-      if (!actif) return;
-      setCalculFrais(false);
-      if (res.ok) {
-        setFrais(res.data);
-        setErreurFrais(null);
-      } else {
+    calculerFraisAction(lat, lng, total)
+      .then((res) => {
+        if (!actif) return;
+        if (res.ok) {
+          setFrais(res.data);
+          setErreurFrais(null);
+        } else {
+          setFrais(null);
+          setErreurFrais(res.message);
+        }
+      })
+      .catch((e) => {
+        if (!actif) return;
         setFrais(null);
-        setErreurFrais(res.message);
-      }
-    });
+        setErreurFrais(messageErreurAction(e));
+      })
+      .finally(() => {
+        if (actif) setCalculFrais(false);
+      });
     return () => {
       actif = false;
     };
@@ -97,59 +162,93 @@ export default function Panier({
   const restaurantsRetrait = useMemo(
     () =>
       restaurants
-        .map((r) => ({ r, ouvert: !!plageOuverte(r.schedule, maintenant), creneaux: creneauxRetrait(r.schedule, maintenant) }))
-        .sort((a, b) => Number(b.ouvert) - Number(a.ouvert)),
-    [restaurants, maintenant],
+        .map((r) => ({
+          r,
+          ouvert: !!plageOuverte(r.schedule, maintenant),
+          creneaux: creneauxRetrait(r.schedule, maintenant),
+          // Plats du panier que ce restaurant ne propose pas : le serveur refuserait.
+          absents: platsNonProposes(lignes, r.id),
+        }))
+        .sort((a, b) => Number(b.ouvert && !b.absents.length) - Number(a.ouvert && !a.absents.length)),
+    [restaurants, maintenant, lignes],
   );
   const retraitChoisi = restaurantsRetrait.find((x) => x.r.id === restaurantId) ?? null;
 
-  const nonDisponibles = lignes.filter((l) => !l.available_order_types.includes(mode));
+  // Heure lue à chaque affichage : un plat peut sortir de son créneau pendant
+  // que le client remplit le formulaire.
+  const problemes = new Map(aCommander.map((l) => [l.cle, problemesLigne(l, mode, new Date())]));
+  const lignesBloquees = aCommander.filter((l) => (problemes.get(l.cle) ?? []).length > 0);
   const remise = reduction?.remise ?? 0;
   const fraisLivraison = mode === "DELIVERY" ? (frais?.montant ?? 0) : 0;
   const estimation = Math.max(0, total - remise) + fraisLivraison;
 
   const pret =
-    !!client &&
-    lignes.length > 0 &&
-    nonDisponibles.length === 0 &&
-    (mode === "DELIVERY" ? !!adresse && !!frais && !calculFrais : !!retraitChoisi?.ouvert);
+    profilComplet &&
+    !revalidation &&
+    aCommander.length > 0 &&
+    lignesBloquees.length === 0 &&
+    (mode === "DELIVERY"
+      ? livraison.disponible && !!adresse && !!frais && !calculFrais
+      : !!retraitChoisi?.ouvert && retraitChoisi.absents.length === 0);
 
   const appliquerCode = async () => {
     setErreurCode(null);
     setVerifCode(true);
-    const res = await verifierCodeReductionAction(saisieCode, lignes, total);
-    setVerifCode(false);
-    if (!res.ok) return setErreurCode(res.message);
-    setReduction(res.data);
+    try {
+      const res = await verifierCodeReductionAction(saisieCode, lignes, total);
+      if (!res.ok) return setErreurCode(res.message);
+      setReduction(res.data);
+    } catch (e) {
+      setErreurCode(messageErreurAction(e));
+    } finally {
+      setVerifCode(false);
+    }
   };
 
   const commander = async () => {
-    if (!client || !pret) return;
+    if (!pret) return;
     setErreur(null);
     setEnvoi(true);
-    const res = await creerCommandeAction({
-      mode,
-      lignes,
-      adresse: mode === "DELIVERY" ? adresse : null,
-      restaurantId: mode === "PICKUP" ? restaurantId : null,
-      heureRetrait: mode === "PICKUP" && heure !== "asap" ? heure : null,
-      code: reduction?.code ?? null,
-      nomComplet: [client.first_name, client.last_name].filter(Boolean).join(" "),
-      telephone: client.phone,
-      email: client.email,
-    });
-    if (!res.ok) {
+    try {
+      const res = await creerCommandeAction({
+        mode,
+        lignes,
+        adresse: mode === "DELIVERY" ? adresse : null,
+        restaurantId: mode === "PICKUP" ? restaurantId : null,
+        heureRetrait: mode === "PICKUP" && heure !== "asap" ? heure : null,
+        code: reduction?.code ?? null,
+      });
+      if (!res.ok) {
+        setEnvoi(false);
+        return setErreur(res.message);
+      }
+      // Gardé le temps de l'onglet : « Modifier ma commande » le remettra.
+      sauverPanierCommande(res.data.id, aCommander);
+      setRedirection(true);
+      vider();
+      router.push(`/commander/${res.data.id}?payer=1`);
+    } catch (e) {
       setEnvoi(false);
-      return setErreur(res.message);
+      setErreur(messageErreurAction(e));
     }
-    vider();
-    router.push(`/commander/${res.data.id}?payer=1`);
   };
 
-  if (!monte) {
+  const seDeconnecter = async () => {
+    setErreur(null);
+    try {
+      await deconnexionAction();
+      setClient(null);
+      router.refresh();
+    } catch (e) {
+      setErreur(messageErreurAction(e));
+    }
+  };
+
+  if (!monte || redirection) {
     return (
-      <div className="flex justify-center py-20">
+      <div className="flex flex-col items-center gap-3 py-20">
         <Spinner color="primary" />
+        {redirection && <p className="text-sm text-gray-600">Ouverture du paiement…</p>}
       </div>
     );
   }
@@ -171,10 +270,46 @@ export default function Panier({
   return (
     <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[1fr_360px]">
       <div className="flex flex-col gap-6">
-        <Bloc titre="Votre panier">
+        <Bloc
+          titre="Votre panier"
+          action={
+            confirmerVider ? (
+              <span className="flex items-center gap-3 text-sm">
+                Vider le panier ?
+                <button
+                  type="button"
+                  className="font-semibold text-danger underline"
+                  onClick={() => {
+                    vider();
+                    setConfirmerVider(false);
+                  }}
+                >
+                  Oui
+                </button>
+                <button type="button" className="font-semibold underline" onClick={() => setConfirmerVider(false)}>
+                  Non
+                </button>
+              </span>
+            ) : (
+              <button type="button" className="text-sm text-gray-600 underline" onClick={() => setConfirmerVider(true)}>
+                Vider le panier
+              </button>
+            )
+          }
+        >
+          {revalidation && (
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Spinner size="sm" color="primary" /> Vérification des plats du panier…
+            </div>
+          )}
+          {prixMisAJour && (
+            <p className="rounded-xl bg-warning-50 p-3 text-sm text-warning-700">
+              Des prix ont changé depuis votre dernier passage : le panier affiche les prix du jour.
+            </p>
+          )}
           <ul className="flex flex-col divide-y divide-gray-100">
             {lignes.map((l) => (
-              <li key={l.cle} className="flex gap-3 py-3">
+              <li key={l.cle} className={`flex gap-3 py-3 ${l.retire ? "opacity-60" : ""}`}>
                 <div className="relative h-16 w-16 shrink-0">
                   <Image src={l.image} alt="" fill sizes="64px" className="rounded-xl object-contain" />
                 </div>
@@ -189,42 +324,62 @@ export default function Panier({
                       .filter(Boolean)
                       .join(" · ")}
                   </p>
-                  {!l.available_order_types.includes(mode) && (
-                    <p className="text-xs text-danger">Indisponible en {mode === "DELIVERY" ? "livraison" : "retrait"}.</p>
+                  {l.retire ? (
+                    <p className="text-xs text-danger">Ce plat n&apos;est plus proposé. Il ne sera pas commandé.</p>
+                  ) : (
+                    (problemes.get(l.cle) ?? []).map((p) => (
+                      <p key={p} className="text-xs text-danger">
+                        {p}
+                      </p>
+                    ))
                   )}
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                    {l.retire ? (
                       <button
                         type="button"
-                        aria-label={l.quantite === 1 ? `Retirer ${l.nom}` : `Diminuer la quantité de ${l.nom}`}
-                        onClick={() => changerQuantite({ cle: l.cle, quantite: l.quantite - 1 })}
-                        className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-300"
+                        onClick={() => changerQuantite({ cle: l.cle, quantite: 0 })}
+                        className="flex items-center gap-1 text-sm font-semibold text-primary underline"
                       >
-                        {l.quantite === 1 ? <Trash2 size={14} /> : <Minus size={14} />}
+                        <Trash2 size={14} /> Retirer
                       </button>
-                      <span className="w-5 text-center text-sm font-semibold">{l.quantite}</span>
-                      <button
-                        type="button"
-                        aria-label={`Augmenter la quantité de ${l.nom}`}
-                        onClick={() => changerQuantite({ cle: l.cle, quantite: Math.min(l.quantite + 1, 20) })}
-                        className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-white"
-                      >
-                        <Plus size={14} />
-                      </button>
-                    </div>
-                    <span className="font-semibold">{fcfa(totalLigne(l))}</span>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          aria-label={l.quantite === 1 ? `Retirer ${l.nom}` : `Diminuer la quantité de ${l.nom}`}
+                          onClick={() => changerQuantite({ cle: l.cle, quantite: l.quantite - 1 })}
+                          className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-300"
+                        >
+                          {l.quantite === 1 ? <Trash2 size={14} /> : <Minus size={14} />}
+                        </button>
+                        <span className="w-5 text-center text-sm font-semibold">{l.quantite}</span>
+                        <button
+                          type="button"
+                          aria-label={`Augmenter la quantité de ${l.nom}`}
+                          onClick={() => changerQuantite({ cle: l.cle, quantite: Math.min(l.quantite + 1, 20) })}
+                          className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-white"
+                        >
+                          <Plus size={14} />
+                        </button>
+                      </div>
+                    )}
+                    {!l.retire && <span className="font-semibold">{fcfa(totalLigne(l))}</span>}
                   </div>
                 </div>
               </li>
             ))}
           </ul>
+          {aCommander.length === 0 && (
+            <p className="text-sm text-danger">Aucun plat de ce panier n&apos;est encore proposé. Ajoutez d&apos;autres plats.</p>
+          )}
           <Link href="/restaurants/nos-menus" className="text-sm font-semibold text-primary">
             + Ajouter d&apos;autres plats
           </Link>
         </Bloc>
 
-        {!client ? (
+        {!profilComplet ? (
           <Connexion
+            etapeInitiale={client ? "profil" : "telephone"}
             onConnecte={(c) => {
               setClient(c);
               router.refresh();
@@ -244,14 +399,20 @@ export default function Panier({
                     key={m.valeur}
                     type="button"
                     aria-pressed={mode === m.valeur}
+                    disabled={m.valeur === "DELIVERY" && !livraison.disponible}
                     onClick={() => setMode(m.valeur)}
-                    className={`flex flex-col items-center gap-1 rounded-xl border-2 p-4 font-semibold ${mode === m.valeur ? "border-primary bg-primary/10 text-primary" : "border-gray-200"}`}
+                    className={`flex flex-col items-center gap-1 rounded-xl border-2 p-4 font-semibold disabled:opacity-50 ${mode === m.valeur ? "border-primary bg-primary/10 text-primary" : "border-gray-200"}`}
                   >
                     {m.icone}
                     {m.libelle}
                   </button>
                 ))}
               </div>
+              {!livraison.disponible && livraison.message && (
+                <p role="status" className="rounded-xl bg-warning-50 p-3 text-sm text-warning-700">
+                  {livraison.message}
+                </p>
+              )}
 
               {mode === "DELIVERY" ? (
                 <>
@@ -269,30 +430,33 @@ export default function Panier({
               ) : (
                 <div className="flex flex-col gap-3">
                   <div className="flex flex-col gap-2" role="radiogroup" aria-label="Restaurant de retrait">
-                    {restaurantsRetrait.map(({ r, ouvert }) => (
+                    {restaurantsRetrait.map(({ r, ouvert, absents }) => (
                       <button
                         key={r.id}
                         type="button"
                         role="radio"
                         aria-checked={restaurantId === r.id}
-                        disabled={!ouvert}
+                        disabled={!ouvert || absents.length > 0}
                         onClick={() => {
                           setRestaurantId(r.id);
                           setHeure("asap");
                         }}
-                        className={`flex items-center justify-between rounded-xl border-2 px-4 py-3 text-left disabled:opacity-50 ${restaurantId === r.id ? "border-primary bg-primary/10" : "border-gray-200"}`}
+                        className={`flex items-center justify-between gap-3 rounded-xl border-2 px-4 py-3 text-left disabled:opacity-50 ${restaurantId === r.id ? "border-primary bg-primary/10" : "border-gray-200"}`}
                       >
                         <span>
                           <span className="block font-semibold">{nomCourt(r.name)}</span>
                           {r.address && <span className="block text-xs text-gray-500">{r.address.replace(/,\s*Côte d['’]Ivoire$/i, "")}</span>}
+                          {absents.length > 0 && (
+                            <span className="block text-xs text-danger">Ne propose pas : {absents.join(", ")}</span>
+                          )}
                         </span>
-                        <span className={`text-xs font-semibold ${ouvert ? "text-success-600" : "text-gray-500"}`}>
+                        <span className={`shrink-0 text-xs font-semibold ${ouvert ? "text-success-600" : "text-gray-500"}`}>
                           {ouvert ? "Ouvert" : "Fermé"}
                         </span>
                       </button>
                     ))}
                   </div>
-                  {retraitChoisi?.ouvert && (
+                  {retraitChoisi?.ouvert && retraitChoisi.absents.length === 0 && (
                     <Select
                       label="Heure de retrait"
                       selectedKeys={[heure]}
@@ -372,27 +536,19 @@ export default function Panier({
             <dd>{fcfa(estimation)}</dd>
           </div>
         </dl>
-        {client && (
+        {client && profilComplet && (
           <p className="text-xs text-gray-500">
-            Commande au nom de {[client.first_name, client.last_name].filter(Boolean).join(" ")}, {telephoneLisible(client.phone)}.{" "}
-            <button
-              type="button"
-              className="underline"
-              onClick={async () => {
-                await deconnexionAction();
-                setClient(null);
-                router.refresh();
-              }}
-            >
+            Commande au nom de {client.first_name} {client.last_name}, {telephoneLisible(client.phone)}.{" "}
+            <button type="button" className="underline" onClick={seDeconnecter}>
               Ce n&apos;est pas vous ?
             </button>
           </p>
         )}
         {erreur && <p role="alert" className="text-sm text-danger">{erreur}</p>}
         <Button color="primary" size="lg" className="font-semibold" isDisabled={!pret} isLoading={envoi} onPress={commander}>
-          Valider et payer
+          Valider la commande
         </Button>
-        {!client && <p className="text-center text-xs text-gray-500">Connectez-vous pour valider la commande.</p>}
+        {!profilComplet && <p className="text-center text-xs text-gray-500">Connectez-vous pour valider la commande.</p>}
         <p className="text-center text-xs text-gray-500">Paiement sécurisé par KKiaPay.</p>
       </aside>
     </div>

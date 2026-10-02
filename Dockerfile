@@ -32,6 +32,14 @@ RUN \
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
+
+# Clé des actions serveur, FIXE d'un déploiement à l'autre (.env du serveur,
+# à générer une fois : openssl rand -base64 32). Sans elle, chaque build tire
+# une clé au hasard : les identifiants d'actions changent et les onglets
+# ouverts (suivi de commande, panier) ne peuvent plus joindre le serveur.
+# Déclarée ici seulement : l'image finale (runner) ne la contient pas en variable.
+ARG NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
+ENV NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=${NEXT_SERVER_ACTIONS_ENCRYPTION_KEY}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 

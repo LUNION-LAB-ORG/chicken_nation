@@ -16,10 +16,15 @@ const dateLisible = (iso: string) =>
 
 export default async function MesCommandesPage() {
   const client = await obtenirClientAction();
-  if (!client) {
+  /**
+   * Connecté sans prénom ou nom : connexion inachevée. Le cookie posé au code
+   * validé redessine la page ; sans ce test, la liste remplaçait l'étape du
+   * nom et les commandes suivantes partaient au nom de « null null ».
+   */
+  if (!client?.first_name || !client?.last_name) {
     return (
       <div className="min-h-[60vh] bg-gray-50 px-4 pb-16 pt-28">
-        <ConnexionRequise />
+        <ConnexionRequise etapeInitiale={client ? "profil" : "telephone"} />
       </div>
     );
   }

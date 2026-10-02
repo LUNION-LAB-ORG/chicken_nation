@@ -3,8 +3,11 @@
 import { useRouter } from "@/i18n/navigation";
 import Connexion from "./Connexion";
 
-/** Affiche la connexion, puis recharge la page une fois le client connecté. */
-export default function ConnexionRequise() {
+/**
+ * Affiche la connexion, puis recharge la page une fois le client connecté.
+ * `etapeInitiale="profil"` : connecté, mais prénom ou nom manquant.
+ */
+export default function ConnexionRequise({ etapeInitiale = "telephone" }: { etapeInitiale?: "telephone" | "profil" }) {
   const router = useRouter();
-  return <Connexion onConnecte={() => router.refresh()} />;
+  return <Connexion etapeInitiale={etapeInitiale} onConnecte={() => router.refresh()} />;
 }

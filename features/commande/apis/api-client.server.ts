@@ -1,6 +1,7 @@
 import { cookies, headers } from "next/headers";
 import { baseURL } from "@/config/api";
 import type { Resultat } from "../types/commande.types";
+import { adresseIpVisiteur } from "../utils/adresse-ip.utils";
 
 /**
  * Accès à l'API pour le compte du client connecté, CÔTÉ SERVEUR uniquement
@@ -51,13 +52,13 @@ function messageErreur(corps: unknown, statut: number): string {
  * Adresse du visiteur, transmise à l'API. Sans elle, toutes les requêtes du
  * site partiraient de l'adresse du serveur du site, et la limite par adresse
  * de l'API (20 demandes de code par minute) s'appliquerait à TOUS les
- * visiteurs ensemble. Vide si nginx ne la transmet pas au site.
+ * visiteurs ensemble. Vide si nginx ne la transmet pas au site. Règles de
+ * lecture (quel en-tête croire) : utils/adresse-ip.utils.ts.
  */
 async function adresseVisiteur(): Promise<string | null> {
   try {
     const h = await headers();
-    const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip")?.trim();
-    return ip && /^[0-9a-fA-F:.]{3,45}$/.test(ip) ? ip : null;
+    return adresseIpVisiteur((nom) => h.get(nom));
   } catch {
     return null;
   }
@@ -98,7 +99,7 @@ export async function appelApi<T>(chemin: string, options: OptionsAppel = {}): P
     if (!res.ok) {
       // Jeton refusé (expiré, compte supprimé) : on oublie la session.
       if (res.status === 401 && jeton) await effacerJetonClient();
-      return { ok: false, message: messageErreur(corps, res.status) };
+      return { ok: false, message: messageErreur(corps, res.status), statut: res.status };
     }
     return { ok: true, data: corps as T };
   } catch {

@@ -12,6 +12,8 @@ services:
         NEXT_PUBLIC_PLAY_STORE_LINK: ${NEXT_PUBLIC_PLAY_STORE_LINK}
         NEXT_PUBLIC_APP_STORE_LINK: ${NEXT_PUBLIC_APP_STORE_LINK}
         NEXT_PUBLIC_APP_SCHEMA: ${NEXT_PUBLIC_APP_SCHEMA}
+        # Clé fixe des actions serveur (cf. Dockerfile), lue dans .env.
+        NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${NEXT_SERVER_ACTIONS_ENCRYPTION_KEY}
     image: chicken-nation-web-prod
     restart: unless-stopped
     ports:

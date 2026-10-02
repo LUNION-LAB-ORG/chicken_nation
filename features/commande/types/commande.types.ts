@@ -25,6 +25,8 @@ export interface ISupplementPlat {
   name: string;
   price: number;
   category: CategorieSupplement;
+  /** Modes où le supplément est vendu (le serveur refuse les autres). */
+  available_order_types: string[];
 }
 
 /** Plat tel que la fiche d'ajout au panier en a besoin (GET /dishes/:id). */
@@ -41,6 +43,8 @@ export interface IPlatDetail {
   available_order_types: string[];
   available_from: string | null;
   available_until: string | null;
+  /** Restaurants qui ne proposent pas ce plat (refusés au retrait par le serveur). */
+  restaurantsExclus: string[];
   groupes: IGroupeOptions[];
   supplements: ISupplementPlat[];
 }
@@ -57,6 +61,8 @@ export interface ISupplementChoisi {
   nom: string;
   prix: number;
   quantite: number;
+  /** Absent dans un panier enregistré avant le 02/10 : vendu partout. */
+  available_order_types?: string[];
 }
 
 export interface ILignePanier {
@@ -71,6 +77,19 @@ export interface ILignePanier {
   supplements: ISupplementChoisi[];
   quantite: number;
   available_order_types: string[];
+  /**
+   * Champs ajoutés le 02/10 : absents dans un panier enregistré avant, d'où
+   * le `?`. Créneau horaire du plat et restaurants qui ne le proposent pas.
+   */
+  available_from?: string | null;
+  available_until?: string | null;
+  restaurantsExclus?: string[];
+  /** Plat retiré du catalogue (relu à l'ouverture du panier) : ligne écartée. */
+  retire?: boolean;
+  /** Options ou suppléments choisis qui ne sont plus proposés. */
+  indisponibles?: string[];
+  /** Choix devenu obligatoire depuis l'ajout (nom du groupe d'options). */
+  choixManquant?: string;
 }
 
 export interface IClient {
@@ -85,7 +104,7 @@ export interface IAdresseLivraison {
   libelle: string;
   latitude: number;
   longitude: number;
-  /** Point de repère saisi par le client, transmis au livreur. */
+  /** Indication saisie par le client (portail, immeuble…), jointe à l'adresse. */
   repere: string;
 }
 
@@ -129,7 +148,23 @@ export interface ICommande {
   recovery_code: string | null;
   restaurant: { id: string; name: string; phone: string | null; address: string | null } | null;
   adresse: string | null;
-  lignes: { nom: string; quantite: number; montant: number }[];
+  lignes: ILigneCommande[];
+}
+
+export interface ILigneCommande {
+  nom: string;
+  quantite: number;
+  /** Total de la ligne : plat, options et suppléments. */
+  montant: number;
+  options: string[];
+  supplements: string[];
+  epice: boolean;
+}
+
+/** Livraison coupée depuis le back office (réglage delivery.app_disabled). */
+export interface ILivraisonDisponible {
+  disponible: boolean;
+  message: string | null;
 }
 
 export interface IConfigPaiement {
@@ -137,4 +172,5 @@ export interface IConfigPaiement {
   sandbox: boolean;
 }
 
-export type Resultat<T> = { ok: true; data: T } | { ok: false; message: string };
+/** `statut` : code HTTP de l'API quand elle a répondu en erreur. */
+export type Resultat<T> = { ok: true; data: T } | { ok: false; message: string; statut?: number };
