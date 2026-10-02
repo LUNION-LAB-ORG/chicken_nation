@@ -8,6 +8,9 @@ export const publicRoutes = [
   "/app-mobile",
   "/auth",
   "/carte-nation",
+  // Commande en ligne : la connexion client (code WhatsApp) est gérée par les
+  // pages elles-mêmes, pas par la session du personnel.
+  "/commander",
   "/contact",
   "/faq",
   "/franchise",

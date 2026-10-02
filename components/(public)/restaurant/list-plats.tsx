@@ -1,15 +1,19 @@
 "use client";
-import { ShoppingCart } from "lucide-react";
+import { useState } from "react";
+import { Plus } from "lucide-react";
 import Image from "next/image";
 import { Tabs, Tab } from "@heroui/react";
 import { Card, CardBody } from "@heroui/card";
 import { Link } from "@/i18n/navigation";
 import Section from "@/components/primitives/Section";
 import type { ICategorieCarte } from "@/features/menus/apis/menu-public.api";
+import FichePlat from "@/features/commande/components/FichePlat";
+import { BarrePanier } from "@/features/commande/components/BarrePanier";
+import { fcfa } from "@/features/commande/utils/panier.utils";
 
-const fcfa = (montant: number) => `${montant.toLocaleString("fr-FR").replace(/ | /g, " ")} FCFA`;
 
 export default function ListPlats({ categories }: { categories: ICategorieCarte[] }) {
+  const [platOuvert, setPlatOuvert] = useState<string | null>(null);
   if (categories.length === 0) {
     return (
       <Section className="text-center text-gray-700">
@@ -52,18 +56,20 @@ export default function ListPlats({ categories }: { categories: ICategorieCarte[
                         <div className="flex justify-between items-center mt-4">
                           <div className="text-left">
                             {plat.prixAvantPromo && (
-                              <div className="text-sm text-gray-500 line-through">
+                              <div className="whitespace-nowrap text-sm text-gray-500 line-through">
                                 {fcfa(plat.prixAvantPromo)}
                               </div>
                             )}
-                            <div className="text-primary text-lg font-bold">{fcfa(plat.prix)}</div>
+                            <div className="whitespace-nowrap text-primary text-lg font-bold">{fcfa(plat.prix)}</div>
                           </div>
-                          <Link href="/app-mobile" aria-label={`Commander ${plat.nom} sur l'application`}>
-                            <ShoppingCart
-                              className="text-primary cursor-pointer rounded-lg border-2 border-primary p-2"
-                              size={48}
-                            />
-                          </Link>
+                          <button
+                            type="button"
+                            onClick={() => setPlatOuvert(plat.id)}
+                            aria-label={`Ajouter ${plat.nom} au panier`}
+                            className="flex items-center gap-1 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-white"
+                          >
+                            <Plus size={18} /> Ajouter
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -74,6 +80,8 @@ export default function ListPlats({ categories }: { categories: ICategorieCarte[
           </Tab>
         ))}
       </Tabs>
+      <FichePlat platId={platOuvert} onClose={() => setPlatOuvert(null)} />
+      <BarrePanier />
     </Section>
   );
 }

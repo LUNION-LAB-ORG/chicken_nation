@@ -44,7 +44,12 @@ function nomCategorie(nom: string) {
 export async function obtenirCartePublique(): Promise<ICategorieCarte[]> {
     let plats: IPlatApi[] = [];
     try {
-        const res = await fetch(`${baseURL}/dishes`, { next: { revalidate: 900 } });
+        const res = await fetch(`${baseURL}/dishes`, {
+            next: { revalidate: 900 },
+            // Le site sait composer un menu (options) : le serveur montre alors
+            // aussi les plats composables, cachés aux anciennes applications.
+            headers: { "x-app-composable": "1" },
+        });
         if (!res.ok) return [];
         const corps = (await res.json()) as IPlatApi[] | { data?: IPlatApi[] };
         plats = Array.isArray(corps) ? corps : (corps.data ?? []);

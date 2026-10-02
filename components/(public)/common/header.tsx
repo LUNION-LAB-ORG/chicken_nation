@@ -14,6 +14,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import ChickenNationLogo from "../../common/chicken-nation-logo";
 import { Link } from "@/i18n/navigation";
+import { IconePanier } from "@/features/commande/components/BarrePanier";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -39,7 +40,7 @@ export default function Header() {
       <NavbarContent>
         <NavbarBrand as={Link} href="/">
           <ChickenNationLogo />
-          <span className="hidden lg:block font-bold text-white text-xl ml-2">
+          <span className="hidden xl:block font-bold text-white text-xl ml-2">
             CHICKEN NATION
           </span>
         </NavbarBrand>
@@ -78,14 +79,26 @@ export default function Header() {
           />
         </NavbarItem> */}
         <NavbarItem>
+          <IconePanier />
+        </NavbarItem>
+        <NavbarItem>
           <Button
             as={Link}
-            className="hidden md:flex bg-secondary text-secondary-foreground font-semibold"
-            href="/app-mobile"
+            className="bg-secondary text-secondary-foreground font-semibold"
+            href="/restaurants/nos-menus"
             variant="flat"
           >
-            Téléchargez{" "}
-            <span className="hidden lg:inline">l&apos;application</span>
+            Commander
+          </Button>
+        </NavbarItem>
+        <NavbarItem className="hidden 2xl:flex">
+          <Button
+            as={Link}
+            className="border-white text-white font-semibold"
+            href="/app-mobile"
+            variant="bordered"
+          >
+            Téléchargez l&apos;application
           </Button>
         </NavbarItem>
         <NavbarMenuToggle
@@ -102,9 +115,14 @@ export default function Header() {
             </Link>
           </NavbarMenuItem>
         ))}
+        <NavbarMenuItem onClick={() => setIsMenuOpen(false)}>
+          <Link className="w-full h-full text-white" href="/commander/mes-commandes">
+            Mes commandes
+          </Link>
+        </NavbarMenuItem>
         <NavbarItem>
           <Button
-            className="bg-secondary text-secondary-foreground font-semibold w-full"
+            className="bg-white text-primary font-semibold w-full"
             variant="flat"
             onPress={() => {
               router.push("/app-mobile");

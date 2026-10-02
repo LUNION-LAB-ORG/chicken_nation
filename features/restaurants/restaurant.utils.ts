@@ -4,34 +4,45 @@ import { ICreneauJour, IRestaurantPublic } from "./restaurant.type";
 const JOURS_COURTS = ["", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam.", "dim."];
 const JOURS_SCHEMA = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
+/**
+ * Plages d'ouverture, une entrée par plage : un jour peut en avoir plusieurs,
+ * séparées par une virgule ("10:00-14:00,18:00-23:00"), comme le lit le
+ * serveur (RestaurantService.isRestaurantOpen). « Fermé » et toute valeur
+ * illisible sont ignorés.
+ */
 export function lireHoraires(schedule: string | null): ICreneauJour[] {
     if (!schedule) return [];
     try {
         const jours = JSON.parse(schedule) as Record<string, string>[];
         return jours
             .flatMap((j) => Object.entries(j))
-            .map(([jour, plage]) => {
-                const [ouverture, fermeture] = plage.split("-");
-                return { jour: Number(jour), ouverture, fermeture };
-            })
-            .filter((c) => c.jour >= 1 && c.jour <= 7 && c.ouverture && c.fermeture)
-            .sort((a, b) => a.jour - b.jour);
+            .flatMap(([jour, plages]) =>
+                String(plages)
+                    .split(",")
+                    .map((plage) => plage.trim().split("-").map((h) => h.trim()))
+                    .filter((parts) => parts.length === 2 && parts.every((h) => /^\d{1,2}:\d{2}$/.test(h)))
+                    .map(([ouverture, fermeture]) => ({ jour: Number(jour), ouverture, fermeture })),
+            )
+            .filter((c) => c.jour >= 1 && c.jour <= 7)
+            .sort((a, b) => a.jour - b.jour || a.ouverture.localeCompare(b.ouverture));
     } catch {
         return [];
     }
 }
 
-// Jours consécutifs aux mêmes horaires regroupés : lundi à jeudi, puis vendredi...
+type Plage = { ouverture: string; fermeture: string };
+
+// Jours consécutifs aux mêmes plages regroupés : lundi à jeudi, puis vendredi...
 function regrouper(creneaux: ICreneauJour[]) {
-    const groupes: { jours: number[]; ouverture: string; fermeture: string }[] = [];
-    for (const c of creneaux) {
+    const parJour = new Map<number, Plage[]>();
+    for (const c of creneaux) parJour.set(c.jour, [...(parJour.get(c.jour) ?? []), c]);
+    const groupes: { jours: number[]; plages: Plage[] }[] = [];
+    const cle = (p: Plage[]) => p.map((x) => `${x.ouverture}-${x.fermeture}`).join(",");
+    for (const [jour, plages] of Array.from(parJour.entries()).sort((a, b) => a[0] - b[0])) {
         const dernier = groupes[groupes.length - 1];
-        const suit = dernier && dernier.jours[dernier.jours.length - 1] === c.jour - 1;
-        if (suit && dernier.ouverture === c.ouverture && dernier.fermeture === c.fermeture) {
-            dernier.jours.push(c.jour);
-        } else {
-            groupes.push({ jours: [c.jour], ouverture: c.ouverture, fermeture: c.fermeture });
-        }
+        const suit = dernier && dernier.jours[dernier.jours.length - 1] === jour - 1;
+        if (suit && cle(dernier.plages) === cle(plages)) dernier.jours.push(jour);
+        else groupes.push({ jours: [jour], plages });
     }
     return groupes;
 }
@@ -44,12 +55,13 @@ function heure(h: string) {
 }
 
 export function horairesLisibles(schedule: string | null): string[] {
-    return regrouper(lireHoraires(schedule)).map(({ jours, ouverture, fermeture }) => {
+    return regrouper(lireHoraires(schedule)).map(({ jours, plages }) => {
         const premier = JOURS_COURTS[jours[0]];
         const dernier = JOURS_COURTS[jours[jours.length - 1]];
         const libelle =
             jours.length === 1 ? premier : jours.length === 2 ? `${premier} et ${dernier}` : `${premier} au ${dernier}`;
-        return `${libelle.charAt(0).toUpperCase()}${libelle.slice(1)} : ${heure(ouverture)} à ${heure(fermeture)}`;
+        const heures = plages.map((p) => `${heure(p.ouverture)} à ${heure(p.fermeture)}`).join(" et ");
+        return `${libelle.charAt(0).toUpperCase()}${libelle.slice(1)} : ${heures}`;
     });
 }
 
@@ -108,12 +120,14 @@ export function restaurantsSchemaOrg(restaurants: IRestaurantPublic[]) {
             ...(r.latitude != null && r.longitude != null
                 ? { geo: { "@type": "GeoCoordinates", latitude: r.latitude, longitude: r.longitude } }
                 : {}),
-            openingHoursSpecification: regrouper(lireHoraires(r.schedule)).map(({ jours, ouverture, fermeture }) => ({
-                "@type": "OpeningHoursSpecification",
-                dayOfWeek: jours.map((j) => `https://schema.org/${JOURS_SCHEMA[j]}`),
-                opens: ouverture,
-                closes: fermeture,
-            })),
+            openingHoursSpecification: regrouper(lireHoraires(r.schedule)).flatMap(({ jours, plages }) =>
+                plages.map((p) => ({
+                    "@type": "OpeningHoursSpecification",
+                    dayOfWeek: jours.map((j) => `https://schema.org/${JOURS_SCHEMA[j]}`),
+                    opens: p.ouverture,
+                    closes: p.fermeture,
+                })),
+            ),
         })),
     };
 }
