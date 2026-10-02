@@ -59,7 +59,7 @@ export default function AddContact() {
     <div className="flex flex-col items-center space-y-4 mt-8 mb-20">
       <Motion variant="verticalSlideIn">
         <h2 className="text-2xl font-title text-primary">
-          POUR ENTRE EN CONTACT
+          POUR ENTRER EN CONTACT
         </h2>
       </Motion>
       <div className="p-0 md:p-24 w-full">

@@ -95,6 +95,8 @@ export function carteSchemaOrg(categories: ICategorieCarte[]) {
     return {
         "@context": "https://schema.org",
         "@type": "Menu",
+        // Repris par le hasMenu des fiches Restaurant (restaurantsSchemaOrg).
+        "@id": "https://www.chicken-nation.com/fr/restaurants/nos-menus#carte",
         name: "La carte CHICKEN NATION",
         url: "https://www.chicken-nation.com/fr/restaurants/nos-menus",
         inLanguage: "fr",

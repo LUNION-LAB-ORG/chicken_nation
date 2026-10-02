@@ -54,10 +54,10 @@ export default function NationCardVisual({
             <div className="mt-1 h-7 w-9 rounded-md bg-gradient-to-br from-secondary to-yellow-500 shadow-inner ring-1 ring-black/10" />
           </div>
 
-          {/* Milieu : -20% */}
+          {/* Milieu : -20% (le « - » et le « % » manquent à la police des titres : police normale pour eux seuls) */}
           <div className="flex items-end gap-2">
             <span className="font-title text-5xl font-bold leading-none tracking-wide text-secondary drop-shadow-[2px_2px_0_rgba(0,0,0,0.25)] sm:text-6xl">
-              -20%
+              <span className="font-sans">-</span>20<span className="font-sans">%</span>
             </span>
           </div>
 

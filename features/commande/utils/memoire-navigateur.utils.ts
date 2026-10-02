@@ -55,6 +55,37 @@ export function oublierPanierCommande(commandeId: string) {
   ecrire(session, clePanier(commandeId), null);
 }
 
+// ── Remise des points plus faible que prévu ───────────────────────────────
+
+/**
+ * Le serveur peut accorder moins que la remise estimée au panier (solde ou
+ * réglages changés entre-temps), ou rien du tout. Noté le temps de l'onglet
+ * pour le dire sur la page de paiement, AVANT que le client ne paie.
+ */
+export interface IEcartPoints {
+  estimee: number;
+  accordee: number;
+}
+
+const cleEcart = (commandeId: string) => `cn-ecart-points-${commandeId}`;
+
+export function noterEcartPoints(commandeId: string, ecart: IEcartPoints) {
+  ecrire(session, cleEcart(commandeId), JSON.stringify(ecart));
+}
+
+export function lireEcartPoints(commandeId: string): IEcartPoints | null {
+  try {
+    const e = JSON.parse(lire(session, cleEcart(commandeId)) ?? "null") as IEcartPoints | null;
+    return e && typeof e.estimee === "number" && typeof e.accordee === "number" && e.accordee < e.estimee ? e : null;
+  } catch {
+    return null;
+  }
+}
+
+export function oublierEcartPoints(commandeId: string) {
+  ecrire(session, cleEcart(commandeId), null);
+}
+
 // ── Tentative de paiement ─────────────────────────────────────────────────
 
 /**

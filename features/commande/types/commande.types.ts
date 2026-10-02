@@ -139,7 +139,10 @@ export interface ICommande {
   paied: boolean;
   payment_method: string | null;
   net_amount: number;
+  /** Remise totale : code promo ou bon, OU points de fidélité (jamais les deux). */
   discount: number;
+  /** Points de fidélité retenus par le serveur (0 si aucun, ou s'il les a refusés). */
+  points: number;
   tax: number;
   delivery_fee: number;
   amount: number;
@@ -170,6 +173,69 @@ export interface ILivraisonDisponible {
 export interface IConfigPaiement {
   public_key: string;
   sandbox: boolean;
+}
+
+// ── Fidélité ──────────────────────────────────────────────────────────────
+
+/**
+ * Points du client et réglages de fidélité, lus tels quels sur l'API
+ * (GET /fidelity/loyalty/config et /fidelity/loyalty/customer/:id). Le back
+ * office peut changer ces réglages : rien n'est écrit en dur sur le site.
+ */
+export interface IPointsFidelite {
+  /** Solde utilisable (redeemable_points, sinon total_points). */
+  solde: number;
+  /** Valeur d'un point en francs (point_value_in_xof). */
+  valeurPoint: number;
+  /** Minimum de points par commande (minimum_redemption_points). */
+  minimum: number;
+  /** Part maximale du sous-total payable en points (max_redemption_pct). 0 ou 100 et plus : aucune. */
+  plafondPct: number;
+  /** Points gagnés par franc (points_per_xof). */
+  pointsParFranc: number;
+}
+
+/**
+ * Cadeau gagné (récompense GIFT grattée) : un plat ou un supplément offert,
+ * ajouté à la commande à 0 F. `available_order_types`, créneau et restaurants
+ * viennent de l'article relu au catalogue ; absents si la relecture a échoué
+ * (le serveur reste alors le seul juge).
+ */
+export interface ICadeau {
+  /** Identifiant de la récompense (reward_id). */
+  id: string;
+  type: "PLAT" | "SUPPLEMENT";
+  /** dish_id ou supplement_id du payload. */
+  articleId: string;
+  nom: string;
+  image: string;
+  expireLe: string | null;
+  available_order_types?: string[];
+  available_from?: string | null;
+  available_until?: string | null;
+  restaurantsExclus?: string[];
+  /** Article retiré du catalogue ou indisponible : le serveur refuserait la commande. */
+  indisponible?: boolean;
+}
+
+/** Ce que le panier montre au client connecté : ses points (null si illisibles) et ses cadeaux. */
+export interface IFideliteClient {
+  points: IPointsFidelite | null;
+  cadeaux: ICadeau[];
+}
+
+/** Ce que le navigateur transmet d'un cadeau choisi (le serveur revérifie tout). */
+export type CadeauChoisi = Pick<ICadeau, "id" | "type" | "articleId" | "nom">;
+
+/** Ligne de commande telle que POST /orders/create-v2 l'attend. */
+export interface IArticleCommande {
+  dish_id: string;
+  quantity: number;
+  epice: boolean;
+  supplements: { id: string; quantity: number; reward_id?: string }[];
+  option_item_ids?: string[];
+  /** Ligne offerte (plat d'un cadeau). */
+  reward_id?: string;
 }
 
 /** `statut` : code HTTP de l'API quand elle a répondu en erreur. */

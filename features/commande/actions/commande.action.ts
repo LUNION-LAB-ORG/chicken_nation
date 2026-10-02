@@ -3,25 +3,32 @@
 import { formatImageUrl } from "@/utils/formatImageUrl";
 import { appelApi } from "../apis/api-client.server";
 import type {
+  CadeauChoisi,
   CategorieSupplement,
   IAdresseLivraison,
+  ICadeau,
   ICommande,
   IConfigPaiement,
+  IFideliteClient,
   IFraisLivraison,
   ILignePanier,
   ILivraisonDisponible,
   IPlatDetail,
+  IPointsFidelite,
   ISuggestionAdresse,
   ModeCommande,
   Resultat,
 } from "../types/commande.types";
 import { versCommande } from "../utils/commande.utils";
+import { articlesAvecCadeaux, erreurPoints, soldeUtilisable, versCadeau } from "../utils/fidelite.utils";
 import {
+  articlesPayants,
   assietteCodePromo,
   lignesACommander,
   normaliserGroupes,
   platsNonProposes,
   problemesLigne,
+  sousTotal,
 } from "../utils/panier.utils";
 import { obtenirClientAction } from "./connexion.action";
 
@@ -212,6 +219,79 @@ export async function verifierCodeReductionAction(
   return { ok: false, message };
 }
 
+// ── Fidélité : points et cadeaux ──────────────────────────────────────────
+
+/** Réglages de fidélité (route publique), lus à chaque fois : le back office peut les changer. */
+async function lireReglagesFidelite(): Promise<Resultat<Omit<IPointsFidelite, "solde">>> {
+  const res = await appelApi<Brut>("/fidelity/loyalty/config", { public: true });
+  if (!res.ok) return res;
+  const d = res.data ?? {};
+  return {
+    ok: true,
+    data: {
+      valeurPoint: Math.max(0, nombre(d.point_value_in_xof)),
+      minimum: Math.max(0, nombre(d.minimum_redemption_points)),
+      // Absent : le serveur applique 50 (loyalty.service, capLoyaltyDiscount).
+      plafondPct: d.max_redemption_pct === null || d.max_redemption_pct === undefined ? 50 : nombre(d.max_redemption_pct),
+      pointsParFranc: Math.max(0, nombre(d.points_per_xof)),
+    },
+  };
+}
+
+/**
+ * Cadeau complété par son article relu au catalogue : le serveur contrôle le
+ * plat ou le supplément offert comme un autre (mode, créneau, restaurant) et
+ * refuserait la commande ENTIÈRE. Relecture impossible (réseau) : cadeau
+ * laissé tel quel, le serveur reste le garde-fou.
+ */
+async function completerCadeau(c: ICadeau): Promise<ICadeau> {
+  const image = c.image ? formatImageUrl(c.image, "/assets/images/logo.png") : "/assets/images/logo.png";
+  if (c.type === "PLAT") {
+    const plat = await obtenirPlatAction(c.articleId);
+    if (!plat.ok) return { ...c, image, ...(plat.statut === 404 ? { indisponible: true } : {}) };
+    return {
+      ...c,
+      image: c.image ? image : plat.data.image,
+      available_order_types: plat.data.available_order_types,
+      available_from: plat.data.available_from,
+      available_until: plat.data.available_until,
+      restaurantsExclus: plat.data.restaurantsExclus,
+    };
+  }
+  const supplement = await appelApi<Brut>(`/supplements/${c.articleId}`, { public: true });
+  if (!supplement.ok) return { ...c, image, ...(supplement.statut === 404 ? { indisponible: true } : {}) };
+  // Réponse vide : rien à contrôler, plutôt que de faire échouer toute la lecture.
+  const s = supplement.data ?? {};
+  return {
+    ...c,
+    image,
+    available_order_types: modes(s.available_order_types),
+    ...(s.available === false ? { indisponible: true } : {}),
+  };
+}
+
+/**
+ * Points et cadeaux du client connecté, pour le panier. Son identifiant est
+ * relu ici avec le jeton, jamais reçu du navigateur. Chaque partie peut
+ * manquer sans l'autre : la commande reste possible sans elles.
+ */
+export async function lireFideliteAction(): Promise<Resultat<IFideliteClient>> {
+  const client = await obtenirClientAction();
+  if (!client) return { ok: false, message: "Connectez-vous pour continuer." };
+  const [reglages, compte, gagnes] = await Promise.all([
+    lireReglagesFidelite(),
+    appelApi<Brut>(`/fidelity/loyalty/customer/${encodeURIComponent(client.id)}`),
+    appelApi<Brut[]>("/fidelity/rewards/redeemable-gifts"),
+  ]);
+  const points = reglages.ok && compte.ok ? { ...reglages.data, solde: soldeUtilisable(compte.data) } : null;
+  if (!points && !gagnes.ok) return gagnes;
+  const cadeaux = (gagnes.ok && Array.isArray(gagnes.data) ? gagnes.data : [])
+    .map(versCadeau)
+    .filter((x): x is ICadeau => x !== null)
+    .slice(0, 10);
+  return { ok: true, data: { points, cadeaux: await Promise.all(cadeaux.map(completerCadeau)) } };
+}
+
 // ── Commande ──────────────────────────────────────────────────────────────
 
 export interface ICreationCommande {
@@ -222,13 +302,32 @@ export interface ICreationCommande {
   /** ISO ; null = dès que possible. */
   heureRetrait: string | null;
   code: string | null;
+  /** Points de fidélité à utiliser, jamais avec un code. Absent : page d'avant le 02/10. */
+  points?: number;
+  /** Cadeaux choisis, ajoutés à 0 F. */
+  cadeaux?: CadeauChoisi[];
 }
 
+/**
+ * `remise` : remise accordée par le serveur (code ou points). Le panier la
+ * compare à son estimation pour prévenir le client avant le paiement.
+ */
 export async function creerCommandeAction(
   c: ICreationCommande,
-): Promise<Resultat<{ id: string }>> {
+): Promise<Resultat<{ id: string; remise: number }>> {
   const lignes = lignesACommander(c.lignes);
   if (lignes.length === 0) return { ok: false, message: "Votre panier est vide." };
+
+  // Une action serveur s'appelle avec n'importe quels arguments : on filtre.
+  const points = Number.isInteger(c.points) && (c.points as number) > 0 ? (c.points as number) : 0;
+  const cadeaux: CadeauChoisi[] = (Array.isArray(c.cadeaux) ? c.cadeaux : [])
+    .filter((x) => !!x && estUuid(String(x.id)) && estUuid(String(x.articleId)) && (x.type === "PLAT" || x.type === "SUPPLEMENT"))
+    .slice(0, 10)
+    .map((x) => ({ id: x.id, type: x.type, articleId: x.articleId, nom: String(x.nom ?? "").slice(0, 80) }));
+  // RG-02 : points OU code, jamais les deux (le serveur refuserait aussi).
+  if (points > 0 && c.code) {
+    return { ok: false, message: "Les points et un code ne se cumulent pas. Retirez l'un des deux." };
+  }
   if (c.mode === "DELIVERY" && !c.adresse) return { ok: false, message: "Choisissez l'adresse de livraison." };
   if (c.mode === "PICKUP" && !c.restaurantId) return { ok: false, message: "Choisissez le restaurant de retrait." };
   const maintenant = new Date();
@@ -255,16 +354,33 @@ export async function creerCommandeAction(
     return { ok: false, message: "Indiquez votre prénom et votre nom avant de commander." };
   }
 
+  /**
+   * Plafond des points revérifié avec les réglages du moment (le panier a pu
+   * les lire il y a longtemps). Le serveur enregistre les points DEMANDÉS et
+   * les déduit tous au paiement, même quand il plafonne la remise : en
+   * envoyer plus que le plafond n'en couvre ferait perdre des points au
+   * client. Le solde, lui, est contrôlé par le serveur.
+   */
+  if (points > 0) {
+    const reglages = await lireReglagesFidelite();
+    if (!reglages.ok) return reglages;
+    const erreur = erreurPoints(points, { ...reglages.data, solde: points }, sousTotal(lignes));
+    if (erreur) return { ok: false, message: `${erreur} Modifiez vos points puis réessayez.` };
+  }
+
+  // Cadeaux placés comme dans l'application (cf. articlesAvecCadeaux).
+  const { articles, nonPlaces } = articlesAvecCadeaux(articlesPayants(lignes), cadeaux);
+  if (nonPlaces.length) {
+    return {
+      ok: false,
+      message: `« ${nonPlaces[0].nom} » : chaque plat du panier a déjà ce supplément. Retirez le cadeau ou ajoutez un plat.`,
+    };
+  }
+
   const corps = {
     type: c.mode,
     ...(c.mode === "PICKUP" ? { restaurant_id: c.restaurantId } : {}),
-    items: lignes.map((l) => ({
-      dish_id: l.dish_id,
-      quantity: l.quantite,
-      epice: l.epice,
-      supplements: l.supplements.filter((s) => s.quantite > 0).map((s) => ({ id: s.id, quantity: s.quantite })),
-      ...(l.options.length ? { option_item_ids: l.options.map((o) => o.item_id) } : {}),
-    })),
+    items: articles,
     phone: client.phone,
     fullname: `${client.first_name} ${client.last_name}`,
     ...(client.email ? { email: client.email } : {}),
@@ -283,6 +399,7 @@ export async function creerCommandeAction(
     payment_method: "ONLINE",
     date: c.heureRetrait ?? new Date().toISOString(),
     ...(c.code ? { code_promo: c.code } : {}),
+    ...(points > 0 ? { points } : {}),
   };
 
   const res = await appelApi<Brut>("/orders/create-v2", {
@@ -291,13 +408,15 @@ export async function creerCommandeAction(
     entetes: { "x-canal-commande": "web" },
   });
   if (!res.ok) return res;
-  return { ok: true, data: { id: String(res.data.id) } };
+  return { ok: true, data: { id: String(res.data.id), remise: nombre(res.data.discount) } };
 }
 
 /**
  * Annulation par le client d'une commande pas encore payée, pour la modifier.
- * Le serveur rend le bon d'achat ou le code promo engagé, et range le panier
- * annulé dans « À relancer » pour le centre d'appels.
+ * Le serveur rend le bon d'achat ou le code promo engagé et les cadeaux
+ * (reward.service, restoreConsumedGiftsForOrder), et range le panier annulé
+ * dans « À relancer » pour le centre d'appels. Les points, eux, ne sont
+ * jamais déduits d'une commande non payée : rien à rendre.
  */
 export async function annulerCommandeAction(id: string): Promise<Resultat<null>> {
   if (!estUuid(id)) return { ok: false, message: "Commande introuvable." };

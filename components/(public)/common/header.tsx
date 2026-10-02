@@ -10,10 +10,12 @@ import {
   NavbarMenuItem,
   NavbarMenuToggle,
 } from "@heroui/react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { ReceiptText } from "lucide-react";
 import ChickenNationLogo from "../../common/chicken-nation-logo";
-import { Link } from "@/i18n/navigation";
+// Routeur next-intl : il garde la langue dans l'adresse (/fr/...).
+import { Link, useRouter } from "@/i18n/navigation";
 import { IconePanier } from "@/features/commande/components/BarrePanier";
 
 export default function Header() {
@@ -78,6 +80,20 @@ export default function Header() {
             size={24}
           />
         </NavbarItem> */}
+        {/* Sur ordinateur, « Mes commandes » n'était joignable que panier vide :
+            icône seule jusqu'à xl pour ne pas charger la barre. Sur téléphone,
+            le lien est dans le menu. */}
+        <NavbarItem className="hidden sm:flex">
+          <Link
+            href="/commander/mes-commandes"
+            aria-label="Mes commandes"
+            title="Mes commandes"
+            className="flex items-center gap-2 text-white"
+          >
+            <ReceiptText size={24} />
+            <span className="hidden xl:inline">Mes commandes</span>
+          </Link>
+        </NavbarItem>
         <NavbarItem>
           <IconePanier />
         </NavbarItem>

@@ -16,7 +16,7 @@ export default async function Special() {
   return (
     <Section >
       <Motion variant="verticalSlideIn">
-        <Title>SPECIAL DEAL</Title>
+        <Title>OFFRES DU MOMENT</Title>
       </Motion>
       <SpecialContent promos={promotions.data} />
     </Section>

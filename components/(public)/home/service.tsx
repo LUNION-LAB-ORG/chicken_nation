@@ -8,20 +8,21 @@ const serviceItems = [
     id: 1,
     name: "Passez une commande",
     picture: "assets/images/illustrations/page-accueil/service1.png",
-    // url: "https://app.eatself.com/3787/carte/0",
-    url: "/app-mobile",
+    // La commande se fait sur le site : la carte, avec le bouton « Ajouter ».
+    url: "/restaurants/nos-menus",
   },
   {
     id: 2,
     name: "Réservez une table",
     picture: "assets/images/illustrations/page-accueil/service2.png",
+    // Le site ne prend pas de réservation : elle se fait dans l'application.
     url: "/app-mobile",
   },
   {
     id: 3,
     name: "Trouver un restaurant",
     picture: "assets/images/illustrations/page-accueil/service3.png",
-    url: "/app-mobile",
+    url: "/restaurants",
   },
 ];
 export default function Service() {

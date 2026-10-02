@@ -1,3 +1,4 @@
+import { Link } from '@/i18n/navigation';
 import Motion from '@/lib/motion';
 import { Mail, MapPin, Phone } from 'lucide-react';
 
@@ -25,10 +26,23 @@ export default function News() {
         <div className="flex flex-col items-center gap-2">
           <Phone className="h-8 w-8 border-2 border-gray-600 rounded-full text-gray-600" />
           <p className="text-xl font-medium text-gray-600">Téléphone</p>
-          <p className="text-primary">07 47 00 00 34 <br /> 07 20 35 35 35</p>
+          <p className="text-primary flex flex-col">
+            <a href="tel:+2250747000034">07 47 00 00 34</a>
+            <a href="tel:+2250720353535">07 20 35 35 35</a>
+          </p>
         </div>
       </div>
       </Motion>
+      <p className="text-gray-700">
+        Pour commander : en ligne sur{' '}
+        <Link href="/restaurants/nos-menus" className="font-semibold text-primary underline underline-offset-4">
+          Nos menus
+        </Link>{' '}
+        ou au{' '}
+        <a href="tel:+2252721712130" className="font-semibold text-primary whitespace-nowrap">
+          27 21 71 21 30
+        </a>
+      </p>
     </div>
   );
 }

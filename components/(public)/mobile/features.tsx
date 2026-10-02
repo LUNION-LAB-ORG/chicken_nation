@@ -11,7 +11,7 @@ import {
 const features = [
   {
     name: "Livraison Express",
-    description: "Moins de 30 minutes de la cuisine à votre porte.",
+    description: "De la cuisine à votre porte en 20 à 35 minutes.",
     icon: <TruckIcon className="h-6 w-6" />,
   },
   {
@@ -27,7 +27,7 @@ const features = [
   },
   {
     name: "Modes de Réception",
-    description: "Livraison, à emporter ou sur place (dine-in).",
+    description: "Livraison, à emporter ou sur place.",
     icon: <ListOrderedIcon className="h-6 w-6" />,
   },
   {

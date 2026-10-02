@@ -1,4 +1,5 @@
 import type {
+  IArticleCommande,
   IGroupeOptions,
   ILignePanier,
   IOptionChoisie,
@@ -29,6 +30,20 @@ export const lignesACommander = (lignes: ILignePanier[]) => lignes.filter((l) =>
 export const sousTotal = (lignes: ILignePanier[]) => lignesACommander(lignes).reduce((s, l) => s + totalLigne(l), 0);
 
 export const nombreArticles = (lignes: ILignePanier[]) => lignesACommander(lignes).reduce((s, l) => s + l.quantite, 0);
+
+/**
+ * Lignes payantes telles que POST /orders/create-v2 les attend. Partagé par
+ * l'action de commande et le panier, qui place les suppléments offerts sur
+ * ces mêmes lignes (fidelite.utils, articlesAvecCadeaux).
+ */
+export const articlesPayants = (lignes: ILignePanier[]): IArticleCommande[] =>
+  lignesACommander(lignes).map((l) => ({
+    dish_id: l.dish_id,
+    quantity: l.quantite,
+    epice: l.epice,
+    supplements: l.supplements.filter((s) => s.quantite > 0).map((s) => ({ id: s.id, quantity: s.quantite })),
+    ...(l.options.length ? { option_item_ids: l.options.map((o) => o.item_id) } : {}),
+  }));
 
 /**
  * Lignes envoyées à la vérification d'un code promo, avec la même assiette

@@ -6,12 +6,12 @@ import OderFood from "@/components/(public)/home/oder-food";
 import Service from "@/components/(public)/home/service";
 import Special from "@/components/(public)/home/special";
 import Testimonials from "@/components/(public)/home/testimonials";
-import { pageMetadata } from "../meta";
+import { DESCRIPTION_ACCUEIL, pageMetadata } from "../meta";
 
+// Le titre de l'accueil est TITRE_ACCUEIL (meta.ts), repris par pageMetadata.
 export const metadata = pageMetadata({
   chemin: "/",
-  description:
-    "CHICKEN NATION, la référence du fast-food à Abidjan. Poulet 100% local élevé dans nos fermes. Croustillant, grillé ou épicé. Livraison en 20 à 35 min. Restaurants à Zone 4, Angré, Sococé, Faya et Yopougon.",
+  description: DESCRIPTION_ACCUEIL,
 });
 
 export default function Home() {

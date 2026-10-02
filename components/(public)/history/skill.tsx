@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Button } from "@heroui/button";
+import { Link } from "@/i18n/navigation";
 import Motion from "@/lib/motion";
 import Title from "@/components/primitives/Title";
 import Section from "@/components/primitives/Section";
@@ -9,7 +9,8 @@ export default function Skill() {
     <Section className="flex flex-col gap-8 md:gap-12">
       <Motion variant="verticalSlideIn">
         <Title size="md">
-          NOTRE <span className="block sm:inline">SAVOIR-FAIRE</span>
+          {/* Le trait d'union manque à la police des titres : police normale pour lui seul. */}
+          NOTRE <span className="block sm:inline">SAVOIR<span className="font-sans">-</span>FAIRE</span>
         </Title>
       </Motion>
       <div className="flex flex-col md:flex-row justify-between gap-4">
@@ -39,12 +40,14 @@ export default function Skill() {
                 envies.
               </div>
             </div>
-            <Button
-              color="primary"
-              className="hidden md:block w-fit self-start px-8"
+            {/* Ce bouton ne menait nulle part et disparaissait sur téléphone.
+                Composant serveur : un Link mis en forme, pas de Button as={Link}. */}
+            <Link
+              href="/restaurants/nos-menus"
+              className="w-fit self-start rounded-xl bg-primary px-8 py-3 font-semibold text-white"
             >
               Commander en ligne
-            </Button>
+            </Link>
           </div>
         </Motion>
         <Motion variant="horizontalSlideIn" animationParams={{ offset: 50 }}>

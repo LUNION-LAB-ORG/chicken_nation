@@ -59,7 +59,7 @@ export default function About() {
             </p>
 
             <p className="font-bold text-primary">
-              Chicken Nation — Du bon. Du frais. Du champion !
+              Chicken Nation. Du bon. Du frais. Du champion !
             </p>
           </div>
         </div>

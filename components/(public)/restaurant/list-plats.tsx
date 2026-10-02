@@ -20,7 +20,11 @@ export default function ListPlats({ categories }: { categories: ICategorieCarte[
         La carte est momentanément indisponible. Retrouvez tous nos plats dans{" "}
         <Link href="/app-mobile" className="font-semibold text-primary">
           l&apos;application CHICKEN NATION
-        </Link>
+        </Link>{" "}
+        ou commandez par téléphone au{" "}
+        <a href="tel:+2252721712130" className="font-semibold text-primary">
+          27 21 71 21 30
+        </a>
         .
       </Section>
     );

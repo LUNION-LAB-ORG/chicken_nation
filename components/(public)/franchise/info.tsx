@@ -6,7 +6,10 @@ export default function Info() {
   return (
     <Section className="max-w-4xl mx-auto space-y-8">
       <Motion variant="verticalSlideIn">
-        <Title size="sm">REJOIGNEZ L&apos;AVENTURE CHICKEN NATION</Title>
+        {/* L'apostrophe manque à la police des titres : police normale pour elle seule. */}
+        <Title size="sm">
+          REJOIGNEZ L<span className="font-sans">&apos;</span>AVENTURE CHICKEN NATION
+        </Title>
       </Motion>
 
       <Motion variant="verticalSlideIn">

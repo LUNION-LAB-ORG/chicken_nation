@@ -12,13 +12,17 @@ import { useKkiapay } from "../hooks/useKkiapay";
 import { restaurerPanierAtom } from "../stores/panier.store";
 import type { IClient, ICommande, IConfigPaiement } from "../types/commande.types";
 import { actionPerimee, messageErreurAction } from "../utils/erreur-action.utils";
+import { pointsLisibles } from "../utils/fidelite.utils";
 import {
   ecrireMarquePaiement,
   effacerMarquePaiement,
   etatPaiement,
+  type IEcartPoints,
   type IMarquePaiement,
+  lireEcartPoints,
   lireMarquePaiement,
   lirePanierCommande,
+  oublierEcartPoints,
   oublierPanierCommande,
 } from "../utils/memoire-navigateur.utils";
 import { fcfa, telephoneLisible } from "../utils/panier.utils";
@@ -60,6 +64,8 @@ export default function SuiviCommande({
   // Tentative de paiement gardée dans le navigateur (cf. memoire-navigateur.utils).
   const [marque, setMarque] = useState<IMarquePaiement | null>(null);
   const [panierSauve, setPanierSauve] = useState(false);
+  // Remise des points plus faible que celle estimée au panier (cf. Panier).
+  const [ecartPoints, setEcartPoints] = useState<IEcartPoints | null>(null);
   const [confirmerModif, setConfirmerModif] = useState(false);
   const [enModification, setEnModification] = useState(false);
   const [erreurModif, setErreurModif] = useState<string | null>(null);
@@ -119,6 +125,7 @@ export default function SuiviCommande({
 
   useEffect(() => {
     setPanierSauve(lirePanierCommande(id).length > 0);
+    setEcartPoints(lireEcartPoints(id));
   }, [id]);
 
   const reference = commande?.reference ?? null;
@@ -133,7 +140,9 @@ export default function SuiviCommande({
     if (!paye || !reference) return;
     effacerMarquePaiement(reference);
     oublierPanierCommande(id);
+    oublierEcartPoints(id);
     setMarque(null);
+    setEcartPoints(null);
   }, [paye, reference, id]);
 
   const etat = commande && aPayer(commande) ? etatPaiement(marque, horloge) : "libre";
@@ -222,9 +231,11 @@ export default function SuiviCommande({
         setEnModification(false);
         return setErreurModif(res.message);
       }
+      // Cadeaux rendus par le serveur ; points jamais déduits (commande non payée).
       const lignes = lirePanierCommande(id);
       if (lignes.length) restaurerPanier(lignes);
       oublierPanierCommande(id);
+      oublierEcartPoints(id);
       if (reference) effacerMarquePaiement(reference);
       router.push("/commander");
     } catch (e) {
@@ -294,6 +305,14 @@ export default function SuiviCommande({
           ) : (
             <>
               <p className="font-semibold">Votre commande sera envoyée au restaurant dès le paiement.</p>
+              {ecartPoints && (
+                <p role="status" className="rounded-xl bg-warning-50 p-3 text-sm text-warning-700">
+                  {ecartPoints.accordee > 0
+                    ? `Vos points donnent une remise de ${fcfa(ecartPoints.accordee)}, et non ${fcfa(ecartPoints.estimee)} comme estimé.`
+                    : "Vos points n'ont pas pu être utilisés sur cette commande."}{" "}
+                  Vous pouvez modifier votre commande avant de payer.
+                </p>
+              )}
               {etat === "commence" && (
                 <p className="rounded-xl bg-warning-50 p-3 text-sm text-warning-700">
                   Un paiement a déjà été commencé pour cette commande. Si vous avez été débité, ne payez pas une seconde
@@ -404,10 +423,17 @@ export default function SuiviCommande({
             <dt>Sous-total</dt>
             <dd>{fcfa(commande.net_amount)}</dd>
           </div>
+          {/* Réduction = code promo ou bon, OU points (le serveur refuse les deux ensemble). */}
           {commande.discount > 0 && (
             <div className="flex justify-between text-success-600">
               <dt>Réduction</dt>
               <dd>− {fcfa(commande.discount)}</dd>
+            </div>
+          )}
+          {commande.discount > 0 && commande.points > 0 && (
+            <div className="flex justify-between text-xs text-gray-500">
+              <dt>dont points de fidélité</dt>
+              <dd>{pointsLisibles(commande.points)}</dd>
             </div>
           )}
           {commande.type !== "PICKUP" && (

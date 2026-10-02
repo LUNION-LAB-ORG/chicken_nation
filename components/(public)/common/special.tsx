@@ -215,7 +215,7 @@ export default function Special() {
   return (
     <Section>
       <Motion variant="verticalSlideIn">
-        <Title>SPECIAL DEAL</Title>
+        <Title>OFFRES DU MOMENT</Title>
       </Motion>
 
       <div className="flex justify-center md:justify-end my-6">

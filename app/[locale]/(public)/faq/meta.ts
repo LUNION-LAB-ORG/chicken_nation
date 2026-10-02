@@ -6,17 +6,28 @@ export const faqMetadata = pageMetadata({
   description: "Trouvez les réponses à vos questions sur CHICKEN NATION : commandes, livraison, menu, horaires, paiements et plus encore.",
 });
 
-// Schema.org FAQ pour le SEO
+// Schema.org FAQ pour le SEO.
+// Chaque question et chaque réponse reprennent le texte affiché par
+// components/(public)/faq/faq.tsx : Google écarte un balisage qui ne
+// correspond pas à la page. Modifier les deux ensemble.
 export const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "Comment puis-je commander chez Chicken Nation ?",
+      "name": "Comment puis-je commander ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Vous pouvez commander de plusieurs façons : sur place dans nos restaurants à Zone 4, Angré, Sococé, Riviera Faya ou Yopougon, par téléphone au +225 0747000034, via notre application mobile disponible sur l'App Store et Google Play Store, ou via nos partenaires de livraison (Turbo, Glovo, Yango)."
+        "text": "En ligne sur notre site www.chicken-nation.com : choisissez vos plats dans Nos menus, en livraison ou à emporter, et payez en ligne. Sur place dans nos restaurants (Zone 4, Angré, Sococé, Riviera Faya, Yopougon). Par téléphone au 27 21 71 21 30, ou directement au restaurant. Via notre application mobile Chicken Nation."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Puis-je commander sans installer l'application ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui. Ouvrez Nos menus, ajoutez vos plats, puis connectez-vous avec le code reçu sur WhatsApp. C'est le même compte que l'application."
       }
     },
     {
@@ -24,31 +35,15 @@ export const faqSchema = {
       "name": "Quelles sont les zones de livraison ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Nous livrons partout dans le Grand Abidjan, y compris Bingerville et Grand-Bassam. La livraison prend en moyenne 20 à 35 minutes selon votre localisation."
+        "text": "Nous livrons partout dans Abidjan, même Bingerville et Grand-Bassam."
       }
     },
     {
       "@type": "Question",
-      "name": "Quels sont les horaires d'ouverture de Chicken Nation ?",
+      "name": "Quel est le délai de livraison moyen ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Tous nos restaurants sont ouverts 7 jours sur 7, de 10h00 à 23h00."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Quels moyens de paiement acceptez-vous ?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Nous acceptons les paiements en espèces, mobile money (Orange Money, MTN Money, Wave, Moov Money) et carte bancaire."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Proposez-vous des options végétariennes ?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Oui, nous proposons une salade de choux disponible en supplément ou en accompagnement."
+        "text": "Le délai moyen est de 20 à 35 minutes, selon votre emplacement."
       }
     },
     {
@@ -56,15 +51,31 @@ export const faqSchema = {
       "name": "Puis-je personnaliser mon burger ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Oui, vous pouvez personnaliser votre burger selon vos préférences. N'hésitez pas à demander lors de votre commande."
+        "text": "Oui, vous pouvez personnaliser votre burger selon vos préférences."
       }
     },
     {
       "@type": "Question",
-      "name": "Comment réserver une table ?",
+      "name": "Quels moyens de paiement acceptez-vous ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Pour réserver une table, appelez directement le restaurant : Zone 4 au 07 20 35 35 35, Angré au 07 47 00 00 34, Sococé au 07 00 00 55 56, Riviera Faya au 07 20 20 83 52, Yopougon au 07 12 85 32 11."
+        "text": "Nous acceptons les espèces, le Mobile Money (Orange Money, MTN Money, Wave, Moov Money) et la carte bancaire (Visa, Mastercard). Sur notre site, le paiement se fait uniquement en ligne."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quels sont vos horaires d'ouverture ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Tous nos restaurants sont ouverts 7 jours sur 7, dès 10h. Ils ferment vers minuit, un peu plus tard le week-end selon le restaurant. Les horaires de chacun sont sur la page Nos restaurants."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Peut-on réserver une table ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui, contactez-nous par téléphone pour réserver : Zone 4 (Marcory) au 07 20 35 35 35, Angré-Djibi au 07 47 00 00 34, Sococé au 07 00 00 55 56, Riviera Faya au 07 20 20 83 52, Yopougon au 07 12 85 32 11. Vous pouvez également réserver une table en ligne sur notre application mobile Chicken Nation."
       }
     }
   ]

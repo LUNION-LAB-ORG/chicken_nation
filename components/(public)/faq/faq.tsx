@@ -1,7 +1,11 @@
 "use client";
 
 import { Accordion, AccordionItem } from "@heroui/accordion";
+import { Link } from "@/i18n/navigation";
 
+// Le JSON-LD de app/[locale]/(public)/faq/meta.ts reprend une partie de ces
+// questions mot pour mot : Google écarte un balisage qui ne correspond pas au
+// texte affiché. Modifier les deux ensemble.
 const faqs = [
   {
     key: "1",
@@ -13,15 +17,35 @@ const faqs = [
         </p>
         <ul className="list-none space-y-2">
           <li className="flex items-center gap-2">
+            <span className="text-primary-600">🛒</span>
+            <span>
+              En ligne sur notre site : choisissez vos plats dans{" "}
+              <Link
+                href="/restaurants/nos-menus"
+                className="font-semibold text-primary-600 hover:text-primary-500"
+              >
+                Nos menus
+              </Link>
+              , en livraison ou à emporter, et payez en ligne.
+            </span>
+          </li>
+          <li className="flex items-center gap-2">
             <span className="text-primary-600">🏪</span>
             <span>
-              Sur place dans nos restaurants (Zone 4, Angré, Sococé, Faya, Yopougon)
+              Sur place dans nos restaurants (Zone 4, Angré, Sococé, Riviera Faya, Yopougon)
             </span>
           </li>
           <li className="flex items-center gap-2">
             <span className="text-primary-600">📞</span>
             <span>
-              Par téléphone :{" "}
+              Par téléphone au{" "}
+              <a
+                href="tel:+2252721712130"
+                className="font-semibold text-primary-600 hover:text-primary-500"
+              >
+                27 21 71 21 30
+              </a>
+              , ou directement au restaurant :{" "}
               <a
                 href="tel:+2250720353535"
                 className="font-semibold text-primary-600 hover:text-primary-500"
@@ -34,7 +58,8 @@ const faqs = [
                 className="font-semibold text-primary-600 hover:text-primary-500"
               >
                 07 47 00 00 34
-              </a> /
+              </a>{" "}
+              /{" "}
               <a
                 href="tel:+2250700005556"
                 className="font-semibold text-primary-600 hover:text-primary-500"
@@ -55,23 +80,40 @@ const faqs = [
   },
   {
     key: "2",
+    question: "Puis-je commander sans installer l'application ?",
+    answer: (
+      <p>
+        Oui. Ouvrez{" "}
+        <Link
+          href="/restaurants/nos-menus"
+          className="font-semibold text-primary-600 hover:underline"
+        >
+          Nos menus
+        </Link>
+        , ajoutez vos plats, puis connectez-vous avec le code reçu sur WhatsApp.
+        C&apos;est le même compte que l&apos;application.
+      </p>
+    ),
+  },
+  {
+    key: "3",
     question: "Quelles sont les zones de livraison ?",
     answer:
       "Nous livrons partout dans Abidjan, même Bingerville et Grand-Bassam.",
   },
   {
-    key: "3",
+    key: "4",
     question: "Quel est le délai de livraison moyen ?",
     answer: "Le délai moyen est de 20 à 35 minutes, selon votre emplacement.",
   },
   {
-    key: "4",
+    key: "5",
     question: "Puis-je personnaliser mon burger ?",
     answer:
       "Oui, vous pouvez personnaliser votre burger selon vos préférences.",
   },
   {
-    key: "5",
+    key: "6",
     question: "Quels moyens de paiement acceptez-vous ?",
     answer: (
       <div className="space-y-2">
@@ -88,47 +130,67 @@ const faqs = [
             💳 <strong>Carte bancaire</strong> (Visa, Mastercard)
           </li>
         </ul>
+        {/* Le serveur refuse les espèces pour une commande passée sur le site. */}
+        <p>Sur notre site, le paiement se fait uniquement en ligne.</p>
       </div>
     ),
   },
   {
-    key: "6",
+    key: "7",
     question: "Avez-vous une carte de fidélité ?",
     answer: (
       <div className="space-y-2">
         <p>
-          Oui ! Notre <strong className="text-primary-600">Carte Nation</strong>{" "}
-          sera bientôt disponible sur l&apos;application Chicken Nation.
+          Oui ! La <strong className="text-primary-600">Carte Nation</strong>{" "}
+          donne accès à des menus et des prix réservés à ses membres.
         </p>
-        <p className="text-sm bg-secondary-200/30 p-2 rounded border-l-4 border-secondary-600">
-          <strong>Avantages :</strong> -20% sur tous les menus étudiants +
-          offres exclusives !
-        </p>
-      </div>
-    ),
-  },
-  {
-    key: "6",
-    question: "Comment utiliser mes points fidélité ?",
-    answer:
-      "Les conditions d'éligibilité et d'utilisation de la carte de fidélité vous sont communiquées très prochainement via l'application.",
-  },
-  {
-    key: "7",
-    question: "Quels sont vos horaires d'ouverture ?",
-    answer: (
-      <div className="space-y-2">
-        <p className="font-semibold text-primary-600">
-          Tous nos restaurants sont ouverts 7 jours sur 7 :
-        </p>
-        <p className="ml-2">
-          🕐 <strong>Lundi au Dimanche :</strong> 10h00 - 23h00
+        <p>
+          <Link href="/carte-nation/adhesion" className="font-semibold text-primary-600 underline">
+            Demandez votre carte en ligne
+          </Link>{" "}
+          : une fois votre demande validée, elle vous arrive sur WhatsApp.
         </p>
       </div>
     ),
   },
   {
     key: "8",
+    question: "Comment utiliser mes points fidélité ?",
+    answer: (
+      <div className="space-y-2">
+        <p>
+          Vous gagnez des points à chaque commande payée en ligne, dans
+          l&apos;application comme sur le site.
+        </p>
+        <p>
+          Au moment de commander, choisissez combien de points utiliser : ils
+          deviennent une réduction sur votre commande. On utilise soit ses
+          points, soit un code promo, pas les deux.
+        </p>
+      </div>
+    ),
+  },
+  {
+    key: "9",
+    question: "Quels sont vos horaires d'ouverture ?",
+    answer: (
+      <div className="space-y-2">
+        <p className="font-semibold text-primary-600">
+          Tous nos restaurants sont ouverts 7 jours sur 7, dès 10h.
+        </p>
+        <p className="ml-2">
+          🕐 Ils ferment vers minuit, un peu plus tard le week-end selon le
+          restaurant. Les horaires de chacun sont sur la page{" "}
+          <Link href="/restaurants" className="font-semibold text-primary-600 underline">
+            Nos restaurants
+          </Link>
+          .
+        </p>
+      </div>
+    ),
+  },
+  {
+    key: "10",
     question: "Peut-on réserver une table ?",
     answer: (
       <div className="space-y-2">
@@ -177,13 +239,13 @@ const faqs = [
     ),
   },
   {
-    key: "9",
+    key: "11",
     question: "Proposez-vous des services pour les entreprises ?",
     answer:
       "Nous travaillons sur une offre dédiée aux entreprises. Ce service sera bientôt disponible.",
   },
   {
-    key: "10",
+    key: "12",
     question: "Quelles mesures d'hygiène appliquez-vous ?",
     answer: (
       <div className="space-y-2">
@@ -198,13 +260,13 @@ const faqs = [
     ),
   },
   {
-    key: "11",
+    key: "13",
     question: "Comment sont préparés les plats ?",
     answer:
       "Tous nos plats sont préparés à la commande avec des ingrédients frais et de qualité. Notre poulet est mariné avec amour et frit à la perfection.",
   },
   {
-    key: "12",
+    key: "14",
     question: "Comment puis-je vous contacter ?",
     answer: (
       <div className="space-y-2">
@@ -272,7 +334,7 @@ const faqs = [
     ),
   },
   {
-    key: "13",
+    key: "15",
     question: "Que faire en cas de problème avec ma commande ?",
     answer: (
       <div className="space-y-2">
@@ -290,7 +352,7 @@ const faqs = [
             className="font-semibold text-primary-600 hover:underline"
           >
             07 47 00 00 34
-          </a>
+          </a>{" "}
           ou au{" "}
           <a
             href="tel:+2250700005556"

@@ -25,7 +25,9 @@ function AppMobileDeepLinkContent() {
         <h1 className="text-[#ff6200] font-title text-4xl md:text-5xl font-bold text-center tracking-wider leading-tight">
           DELICIEUX
           <br />
-          JUSQU&apos;A L&apos;OS
+          {/* L'apostrophe manque à la police des titres : on la prend
+              dans une police normale plutôt que de laisser le navigateur choisir. */}
+          JUSQU<span className="font-sans">&apos;</span>A L<span className="font-sans">&apos;</span>OS
         </h1>
       </div>
 
@@ -80,7 +82,7 @@ function AppMobileDeepLinkContent() {
             />
           </div>
           <span className="font-urbanist-bold text-[#ff6200] text-sm uppercase tracking-wide">
-            Livraison en moins de 30 min
+            Livraison en 20 à 35 min
           </span>
         </div>
         <p className="text-[11px] text-slate-400 font-urbanist-medium text-center max-w-xs">

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Clock, MapPin, Navigation, Phone } from "lucide-react";
+import { Clock, MapPin, Navigation, Phone, ShoppingBag } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import Motion from "@/lib/motion";
 import Section from "@/components/primitives/Section";
@@ -30,7 +30,11 @@ export default async function List() {
           La liste des restaurants est momentanément indisponible. Appelez-nous au{" "}
           <a href="tel:+2250720353535" className="font-semibold text-primary">
             07 20 35 35 35
-          </a>
+          </a>{" "}
+          ou{" "}
+          <Link href="/restaurants/nos-menus" className="font-semibold text-primary">
+            commandez en ligne
+          </Link>
           .
         </p>
       ) : (
@@ -57,7 +61,7 @@ export default async function List() {
                         href="/restaurants/nos-menus"
                         className="rounded-xl bg-primary px-5 py-2.5 font-medium text-white shadow-lg shadow-primary/40"
                       >
-                        Voir le menu
+                        Voir le menu et commander
                       </Link>
                     </div>
                   </div>
@@ -115,6 +119,14 @@ export default async function List() {
                           Itinéraire
                         </a>
                       )}
+                      {/* Lien général : le restaurant de retrait se choisit au panier. */}
+                      <Link
+                        href="/restaurants/nos-menus"
+                        className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white"
+                      >
+                        <ShoppingBag className="w-4 h-4" />
+                        Commander en ligne
+                      </Link>
                     </div>
                   </div>
                 </article>

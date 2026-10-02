@@ -48,7 +48,7 @@ const Footer = () => {
               />
             </div>
             <p className="text-center md:text-left opacity-80 leading-relaxed">
-              Chicken Nation — le goût du vrai poulet croustillant
+              Chicken Nation, le goût du vrai poulet croustillant
             </p>
           </div>
 
@@ -101,10 +101,10 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Légal */}
+          {/* Légal (sans accent : la police des titres n'en a pas) */}
           <div className="flex flex-col gap-2">
             <Title size="xs" color="white" className="mb-4 text-left">
-              LÉGAL
+              LEGAL
             </Title>
             <ul className="space-y-3">
               <li>
@@ -137,8 +137,24 @@ const Footer = () => {
                   href="/restaurants/nos-menus"
                   className="hover:text-primary-300 transition-colors"
                 >
-                  Notre menu
+                  Commander en ligne
                 </Link>
+              </li>
+              <li>
+                <Link
+                  href="/commander/mes-commandes"
+                  className="hover:text-primary-300 transition-colors"
+                >
+                  Mes commandes
+                </Link>
+              </li>
+              <li>
+                <a
+                  href="tel:+2252721712130"
+                  className="hover:text-primary-300 transition-colors"
+                >
+                  Par téléphone : <span className="whitespace-nowrap">27 21 71 21 30</span>
+                </a>
               </li>
               <li>
                 <Link
@@ -164,7 +180,7 @@ const Footer = () => {
       {/* === Bottom Bar === */}
       <div className="bg-white py-3 px-4 text-center text-primary text-xs sm:text-sm">
         <p>
-          © {new Date().getFullYear()} <span className="font-semibold">Chicken Nation</span> — Tous
+          © {new Date().getFullYear()} <span className="font-semibold">Chicken Nation</span>. Tous
           droits réservés |{" "}
           <a
             href="https://lunion-lab.com"

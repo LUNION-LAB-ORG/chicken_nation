@@ -9,8 +9,10 @@ const IMAGE_PARTAGE = {
     alt: "CHICKEN NATION, délicieux jusqu'à l'os",
 };
 
-const TITRE_ACCUEIL = "CHICKEN NATION - Le Meilleur du Poulet à Abidjan, Côte d'Ivoire";
-const DESCRIPTION_ACCUEIL = "CHICKEN NATION, la référence du fast-food à Abidjan. Poulet 100% local élevé dans nos fermes. Croustillant, grillé ou épicé. Livraison en 20 à 35 min. Restaurants à Zone 4, Angré, Sococé, Faya et Yopougon.";
+// La commande en ligne figure dans le titre et la description : c'est ce que
+// Google affiche, et la page d'accueil y mène en un clic.
+const TITRE_ACCUEIL = "CHICKEN NATION : poulet à Abidjan, commande en ligne et livraison";
+export const DESCRIPTION_ACCUEIL = "CHICKEN NATION, le poulet 100% local d'Abidjan. Commandez en ligne, en livraison ou à emporter. Restaurants à Zone 4, Angré, Sococé, Faya et Yopougon.";
 
 export const metadata: Metadata = {
     metadataBase: new URL(SITE_URL),
@@ -38,7 +40,7 @@ export const metadata: Metadata = {
         "Restauration rapide Côte d'Ivoire",
         "Chicken Nation CI",
         "Poulet local Abidjan",
-        "Turbo Glovo Yango delivery",
+        "Commande en ligne poulet Abidjan",
     ],
     authors: [{ name: "CHICKEN NATION", url: "https://www.chicken-nation.com" }],
     creator: "CHICKEN NATION",
@@ -49,7 +51,7 @@ export const metadata: Metadata = {
         url: SITE_URL,
         siteName: "CHICKEN NATION",
         title: TITRE_ACCUEIL,
-        description: "Découvrez CHICKEN NATION, fast-food 100% poulet local élevé dans nos fermes. Burgers, wings, wraps, tenders et menus gourmands. Livraison rapide à Abidjan.",
+        description: DESCRIPTION_ACCUEIL,
         images: [IMAGE_PARTAGE],
     },
     twitter: {
@@ -135,6 +137,14 @@ export const organizationSchema = {
     "description": "Fast-food spécialisé dans le poulet 100% local élevé dans nos propres fermes en Côte d'Ivoire.",
     "email": "info@chicken-nation.com",
     "telephone": ["+225 07 20 35 35 35", "+225 07 47 00 00 34", "+225 07 00 00 55 56"],
+    // Numéro unique de commande par téléphone (les numéros ci-dessus sont ceux des restaurants).
+    "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+225 27 21 71 21 30",
+        "contactType": "customer service",
+        "areaServed": "CI",
+        "availableLanguage": "French"
+    },
     "address": {
         "@type": "PostalAddress",
         "streetAddress": "Marcory Zone 4",

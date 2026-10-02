@@ -91,7 +91,7 @@ export default function PrivacyPolicyPage() {
         <ul className="list-none space-y-1 mt-2">
           <li><strong>Email Client :</strong> info@chicken-nation.com</li>
           <li><strong>Email Technique :</strong> support@lunion-lab.com</li>
-          <li><strong>Téléphone :</strong> +225 07 07 58 14 10 / +225 07 07 58 14 11</li>
+          <li><strong>Téléphone :</strong> +225 27 21 71 21 30</li>
           <li><strong>Site Web :</strong> www.chicken-nation.com</li>
         </ul>
       </div>

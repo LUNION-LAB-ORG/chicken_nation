@@ -93,6 +93,8 @@ export function imageRestaurant(r: IRestaurantPublic) {
     return r.image ? formatImageUrl(r.image) : "/assets/images/illustrations/restaurant/marcory-1.png";
 }
 
+const URL_CARTE = "https://www.chicken-nation.com/fr/restaurants/nos-menus";
+
 /** Fiche schema.org « Restaurant » : adresse, position et horaires lus par Google. */
 export function restaurantsSchemaOrg(restaurants: IRestaurantPublic[]) {
     return {
@@ -103,7 +105,23 @@ export function restaurantsSchemaOrg(restaurants: IRestaurantPublic[]) {
             name: `CHICKEN NATION ${nomCourt(r.name)}`,
             brand: { "@id": "https://www.chicken-nation.com" },
             url: "https://www.chicken-nation.com/fr/restaurants",
-            menu: "https://www.chicken-nation.com/fr/restaurants/nos-menus",
+            menu: URL_CARTE,
+            // Même @id que le « Menu » publié sur la page Menus (carteSchemaOrg).
+            hasMenu: { "@id": `${URL_CARTE}#carte` },
+            // Commande en ligne : la carte du site, le restaurant se choisit au panier.
+            // Pas de deliveryMethod : une partie des livraisons passe par Turbo.
+            potentialAction: {
+                "@type": "OrderAction",
+                target: {
+                    "@type": "EntryPoint",
+                    urlTemplate: URL_CARTE,
+                    inLanguage: "fr",
+                    actionPlatform: [
+                        "https://schema.org/DesktopWebPlatform",
+                        "https://schema.org/MobileWebPlatform",
+                    ],
+                },
+            },
             servesCuisine: ["Poulet", "Fast-food", "Halal"],
             ...(r.image ? { image: imageRestaurant(r) } : {}),
             ...(r.phone ? { telephone: `+225 ${telephoneLisible(r.phone)}` } : {}),

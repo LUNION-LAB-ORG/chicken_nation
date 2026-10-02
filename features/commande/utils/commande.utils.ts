@@ -27,6 +27,8 @@ export function versCommande(o: Brut): ICommande {
     payment_method: (o.payment_method as string) ?? null,
     net_amount: nombre(o.net_amount),
     discount: nombre(o.discount),
+    // Enregistrés par le serveur seulement s'il a accordé la remise.
+    points: Math.max(0, nombre(o.points)),
     tax: nombre(o.tax),
     delivery_fee: nombre(o.delivery_fee),
     amount: nombre(o.amount),

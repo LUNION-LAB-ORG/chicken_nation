@@ -43,7 +43,8 @@ export function TestimonialsContent({
 /** « Awa Koné » → « AK » ; secours « CN ». */
 function initiales(prenom?: string, nom?: string): string {
   const lettres = `${(prenom ?? "").trim().charAt(0)}${(nom ?? "").trim().charAt(0)}`;
-  return lettres.toUpperCase() || "CN";
+  // Affichées en police des titres, qui n'a que A-Z : « É » devient « E ».
+  return lettres.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase() || "CN";
 }
 
 /** « Awa Koné » → « Awa K. » (prénom + initiale du nom, sobre et discret). */
@@ -70,10 +71,10 @@ function TestimonialCard({
         index % 3 === 1 ? "lg:translate-y-6" : ""
       }`}
     >
-      {/* Guillemet géant en filigrane */}
+      {/* Guillemet géant en filigrane (police normale : la police des titres n'a pas ce signe) */}
       <span
         aria-hidden
-        className="pointer-events-none absolute -top-3 right-4 select-none font-title text-8xl leading-none text-neutral-100"
+        className="pointer-events-none absolute -top-3 right-4 select-none font-sans text-8xl leading-none text-neutral-100"
       >
         &ldquo;
       </span>

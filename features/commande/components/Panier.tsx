@@ -14,15 +14,34 @@ import { nomCourt } from "@/features/restaurants/restaurant.utils";
 import {
   calculerFraisAction,
   creerCommandeAction,
+  lireFideliteAction,
   revaliderPanierAction,
   verifierCodeReductionAction,
 } from "../actions/commande.action";
 import { deconnexionAction } from "../actions/connexion.action";
 import { changerQuantiteAtom, panierAtom, rafraichirPanierAtom, viderPanierAtom } from "../stores/panier.store";
-import type { IAdresseLivraison, IClient, IFraisLivraison, ILivraisonDisponible, ModeCommande } from "../types/commande.types";
+import type {
+  IAdresseLivraison,
+  IClient,
+  IFideliteClient,
+  IFraisLivraison,
+  ILivraisonDisponible,
+  ModeCommande,
+} from "../types/commande.types";
 import { messageErreurAction } from "../utils/erreur-action.utils";
-import { sauverPanierCommande } from "../utils/memoire-navigateur.utils";
 import {
+  articlesAvecCadeaux,
+  cadeauxNonProposes,
+  pointsGagnes,
+  pointsLisibles,
+  pointsRetenus,
+  pointsUtilisables,
+  problemesCadeau,
+  remisePoints,
+} from "../utils/fidelite.utils";
+import { noterEcartPoints, sauverPanierCommande } from "../utils/memoire-navigateur.utils";
+import {
+  articlesPayants,
   fcfa,
   lignesACommander,
   platsNonProposes,
@@ -34,6 +53,8 @@ import {
 import { creneauxRetrait, heureLisible, plageOuverte } from "../utils/retrait.utils";
 import AdresseLivraison from "./AdresseLivraison";
 import Connexion from "./Connexion";
+import MesCadeaux from "./MesCadeaux";
+import MesPoints from "./MesPoints";
 
 function Bloc({ titre, action, children }: { titre: string; action?: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -86,6 +107,14 @@ export default function Panier({
   const [confirmerVider, setConfirmerVider] = useState(false);
   const [revalidation, setRevalidation] = useState(false);
   const [prixMisAJour, setPrixMisAJour] = useState(false);
+  // Fidélité du client connecté : points et cadeaux (cf. lireFideliteAction).
+  const [fidelite, setFidelite] = useState<IFideliteClient | null>(null);
+  const [erreurFidelite, setErreurFidelite] = useState<string | null>(null);
+  const [essaiFidelite, setEssaiFidelite] = useState(0);
+  const [pointsChoisis, setPointsChoisis] = useState(0);
+  const [cadeauxChoisis, setCadeauxChoisis] = useState<string[]>([]);
+  // Phrase de non-cumul (RG-02), affichée dans le bloc où le client a agi.
+  const [avisCumul, setAvisCumul] = useState<{ ou: "points" | "code"; texte: string } | null>(null);
 
   /**
    * Connecté mais sans prénom ou nom (code validé, puis page quittée avant
@@ -93,6 +122,41 @@ export default function Panier({
    * au nom de « null null », vu par la caisse, le livreur et Turbo.
    */
   const profilComplet = !!client?.first_name && !!client?.last_name;
+
+  /**
+   * Points et cadeaux lus une fois la connexion finie, et relus si le client
+   * change. Un échec ne bloque pas la commande : elle reste possible sans eux.
+   */
+  const clientId = profilComplet ? (client?.id ?? null) : null;
+  // Autre client, ou déconnexion : rien du précédent ne doit rester.
+  useEffect(() => {
+    setFidelite(null);
+    setPointsChoisis(0);
+    setCadeauxChoisis([]);
+  }, [clientId]);
+  // Relecture (« Recharger », commande refusée) : la lecture précédente reste
+  // affichée jusqu'à la nouvelle. Un échec réseau ne retire donc pas en
+  // silence les points choisis de la commande.
+  useEffect(() => {
+    setErreurFidelite(null);
+    if (!clientId) return;
+    let actif = true;
+    lireFideliteAction()
+      .then((res) => {
+        if (!actif) return;
+        if (!res.ok) return setErreurFidelite(res.message);
+        setFidelite(res.data);
+        // Un cadeau qui n'est plus proposé est oublié : rendu plus tard, il
+        // ne doit pas revenir déjà choisi.
+        setCadeauxChoisis((avant) => avant.filter((id) => res.data.cadeaux.some((c) => c.id === id)));
+      })
+      .catch((e) => {
+        if (actif) setErreurFidelite(messageErreurAction(e));
+      });
+    return () => {
+      actif = false;
+    };
+  }, [clientId, essaiFidelite]);
 
   /**
    * Panier relu au catalogue à l'ouverture : il peut dater de plusieurs jours.
@@ -117,6 +181,9 @@ export default function Panier({
 
   const aCommander = lignesACommander(lignes);
   const total = sousTotal(lignes);
+  // Cadeaux choisis encore proposés (un cadeau utilisé ailleurs a quitté la liste).
+  const cadeaux = useMemo(() => fidelite?.cadeaux ?? [], [fidelite]);
+  const cadeauxRetenus = useMemo(() => cadeaux.filter((c) => cadeauxChoisis.includes(c.id)), [cadeaux, cadeauxChoisis]);
 
   // Frais recalculés à chaque changement d'adresse ou de montant (les offres de
   // livraison dépendent du montant du panier).
@@ -166,11 +233,11 @@ export default function Panier({
           r,
           ouvert: !!plageOuverte(r.schedule, maintenant),
           creneaux: creneauxRetrait(r.schedule, maintenant),
-          // Plats du panier que ce restaurant ne propose pas : le serveur refuserait.
-          absents: platsNonProposes(lignes, r.id),
+          // Plats du panier, cadeaux compris, que ce restaurant ne propose pas : le serveur refuserait.
+          absents: [...platsNonProposes(lignes, r.id), ...cadeauxNonProposes(cadeauxRetenus, r.id)],
         }))
         .sort((a, b) => Number(b.ouvert && !b.absents.length) - Number(a.ouvert && !a.absents.length)),
-    [restaurants, maintenant, lignes],
+    [restaurants, maintenant, lignes, cadeauxRetenus],
   );
   const retraitChoisi = restaurantsRetrait.find((x) => x.r.id === restaurantId) ?? null;
 
@@ -178,7 +245,30 @@ export default function Panier({
   // que le client remplit le formulaire.
   const problemes = new Map(aCommander.map((l) => [l.cle, problemesLigne(l, mode, new Date())]));
   const lignesBloquees = aCommander.filter((l) => (problemes.get(l.cle) ?? []).length > 0);
-  const remise = reduction?.remise ?? 0;
+
+  // Points : jamais avec un code (RG-02), ramenés au maximum de ce panier.
+  const f = fidelite?.points ?? null;
+  const retenus = reduction ? 0 : pointsRetenus(pointsChoisis, f, total);
+  const remiseDesPoints = remisePoints(retenus, f, total);
+  const remise = reduction?.remise ?? remiseDesPoints;
+  const gagnes = f ? pointsGagnes(total, f.pointsParFranc) : 0;
+
+  // Cadeaux : mêmes contrôles que le serveur sur l'article offert, et place
+  // des suppléments offerts sur les plats payants.
+  const { nonPlaces } = articlesAvecCadeaux(articlesPayants(lignes), cadeauxRetenus);
+  const problemesCadeaux = new Map(
+    cadeaux.map((c) => [
+      c.id,
+      [
+        ...problemesCadeau(c, mode, new Date()),
+        ...(nonPlaces.some((n) => n.id === c.id)
+          ? ["Chaque plat du panier a déjà ce supplément. Ajoutez un plat ou retirez ce cadeau."]
+          : []),
+      ],
+    ]),
+  );
+  const cadeauxBloques = cadeauxRetenus.filter((c) => (problemesCadeaux.get(c.id) ?? []).length > 0);
+
   const fraisLivraison = mode === "DELIVERY" ? (frais?.montant ?? 0) : 0;
   const estimation = Math.max(0, total - remise) + fraisLivraison;
 
@@ -187,6 +277,7 @@ export default function Panier({
     !revalidation &&
     aCommander.length > 0 &&
     lignesBloquees.length === 0 &&
+    cadeauxBloques.length === 0 &&
     (mode === "DELIVERY"
       ? livraison.disponible && !!adresse && !!frais && !calculFrais
       : !!retraitChoisi?.ouvert && retraitChoisi.absents.length === 0);
@@ -198,12 +289,31 @@ export default function Panier({
       const res = await verifierCodeReductionAction(saisieCode, lignes, total);
       if (!res.ok) return setErreurCode(res.message);
       setReduction(res.data);
+      // RG-02 : le code remplace les points. Choix oublié même s'il ne
+      // comptait plus (panier diminué) : retirer le code ne doit pas le
+      // remettre sans que le client l'ait redemandé.
+      setPointsChoisis(0);
+      if (retenus > 0) {
+        setAvisCumul({ ou: "code", texte: "Vos points ont été retirés : points et code ne se cumulent pas." });
+      } else setAvisCumul(null);
     } catch (e) {
       setErreurCode(messageErreurAction(e));
     } finally {
       setVerifCode(false);
     }
   };
+
+  // RG-02 : les points remplacent le code.
+  const utiliserPoints = (n: number) => {
+    setPointsChoisis(n);
+    if (reduction) {
+      setAvisCumul({ ou: "points", texte: `Le code ${reduction.code} a été retiré : points et code ne se cumulent pas.` });
+      setReduction(null);
+    } else setAvisCumul(null);
+  };
+
+  const basculerCadeau = (id: string) =>
+    setCadeauxChoisis((avant) => (avant.includes(id) ? avant.filter((x) => x !== id) : [...avant, id]));
 
   const commander = async () => {
     if (!pret) return;
@@ -217,12 +327,24 @@ export default function Panier({
         restaurantId: mode === "PICKUP" ? restaurantId : null,
         heureRetrait: mode === "PICKUP" && heure !== "asap" ? heure : null,
         code: reduction?.code ?? null,
+        points: retenus,
+        cadeaux: cadeauxRetenus.map(({ id, type, articleId, nom }) => ({ id, type, articleId, nom })),
       });
       if (!res.ok) {
         setEnvoi(false);
+        // Cadeau utilisé depuis l'application, solde ou réglages changés :
+        // relus, pour que le panier montre l'état du jour (un cadeau qui n'est
+        // plus proposé quitte aussi la sélection).
+        if (retenus > 0 || cadeauxRetenus.length > 0) setEssaiFidelite((n) => n + 1);
         return setErreur(res.message);
       }
+      // Remise des points plus faible que l'estimation : la page de paiement le dira.
+      if (retenus > 0 && res.data.remise < remiseDesPoints) {
+        noterEcartPoints(res.data.id, { estimee: remiseDesPoints, accordee: res.data.remise });
+      }
       // Gardé le temps de l'onglet : « Modifier ma commande » le remettra.
+      // Les cadeaux n'y sont pas : le serveur les rend à l'annulation, le
+      // client les choisit de nouveau.
       sauverPanierCommande(res.data.id, aCommander);
       setRedirection(true);
       vider();
@@ -503,7 +625,50 @@ export default function Panier({
                 </form>
               )}
               {erreurCode && <p role="alert" className="text-sm text-danger">{erreurCode}</p>}
+              {avisCumul?.ou === "code" && <p role="status" className="text-sm text-warning-700">{avisCumul.texte}</p>}
             </Bloc>
+
+            {f && pointsUtilisables(f, total) && (
+              <Bloc titre="Mes points">
+                <MesPoints
+                  points={f}
+                  sousTotal={total}
+                  retenus={retenus}
+                  remise={remiseDesPoints}
+                  avis={avisCumul?.ou === "points" ? avisCumul.texte : null}
+                  onUtiliser={utiliserPoints}
+                  onRetirer={() => {
+                    setPointsChoisis(0);
+                    setAvisCumul(null);
+                  }}
+                />
+              </Bloc>
+            )}
+
+            {cadeaux.length > 0 && (
+              <Bloc titre="Mes cadeaux">
+                <MesCadeaux
+                  cadeaux={cadeaux}
+                  choisis={cadeauxChoisis}
+                  problemes={problemesCadeaux}
+                  actif={aCommander.length > 0}
+                  onBasculer={basculerCadeau}
+                />
+              </Bloc>
+            )}
+
+            {erreurFidelite && (
+              <p role="alert" className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+                Points et cadeaux : {erreurFidelite}
+                <button
+                  type="button"
+                  className="font-semibold text-primary underline"
+                  onClick={() => setEssaiFidelite((n) => n + 1)}
+                >
+                  Recharger
+                </button>
+              </p>
+            )}
           </>
         )}
       </div>
@@ -517,10 +682,16 @@ export default function Panier({
           </div>
           {remise > 0 && (
             <div className="flex justify-between text-success-600">
-              <dt>Réduction</dt>
+              <dt>{retenus > 0 ? "Points de fidélité (estimation)" : "Réduction"}</dt>
               <dd>− {fcfa(remise)}</dd>
             </div>
           )}
+          {cadeauxRetenus.map((c) => (
+            <div key={c.id} className="flex justify-between gap-3 text-success-600">
+              <dt className="min-w-0">Cadeau : {c.nom}</dt>
+              <dd className="shrink-0">Offert</dd>
+            </div>
+          ))}
           {mode === "DELIVERY" && (
             <div className="flex justify-between">
               <dt>Livraison</dt>
@@ -536,6 +707,11 @@ export default function Panier({
             <dd>{fcfa(estimation)}</dd>
           </div>
         </dl>
+        {profilComplet && gagnes > 0 && (
+          <p className="text-xs text-success-600">
+            Vous gagnerez environ {pointsLisibles(gagnes)}, crédité{gagnes >= 2 ? "s" : ""} une fois le paiement validé.
+          </p>
+        )}
         {client && profilComplet && (
           <p className="text-xs text-gray-500">
             Commande au nom de {client.first_name} {client.last_name}, {telephoneLisible(client.phone)}.{" "}

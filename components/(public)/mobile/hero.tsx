@@ -7,7 +7,7 @@ import { siteConfig } from "@/config/site";
 import { easeInOutCubic } from "@/lib/animation";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 export function Hero() {
   const { scrollY } = useScroll({
@@ -71,9 +71,10 @@ export function Hero() {
           <div className="flex justify-center items-center mb-4">
             <QRCode className="size-28" data="https://chicken-nation.com/fr/app-mobile/deep-link" />
           </div>
-          <div className="flex justify-center items-center gap-4 mb-16">
-            <Link
+          <div className="flex justify-center items-center gap-4 mb-6">
+            <a
               target="_blank"
+              rel="noopener noreferrer"
               href="https://play.google.com/store/apps/details?id=com.chickennation.app"
             >
               <motion.div
@@ -84,15 +85,16 @@ export function Hero() {
               >
                 <Image
                   src="/download-playstore-fr-FR.png"
-                  alt="Download"
+                  alt="Disponible sur Google Play"
                   width={200}
                   height={200}
                   className="w-40"
                 />
               </motion.div>
-            </Link>
-            <Link
+            </a>
+            <a
               target="_blank"
+              rel="noopener noreferrer"
               href="https://apps.apple.com/ci/app/chicken-nation/id6745905607"
             >
               <motion.div
@@ -103,14 +105,24 @@ export function Hero() {
               >
                 <Image
                   src="/download-apple-fr-FR.svg"
-                  alt="Download"
+                  alt="Télécharger dans l'App Store"
                   width={200}
                   height={200}
                   className="w-40"
                 />
               </motion.div>
-            </Link>
+            </a>
           </div>
+          {/* Pour qui ne veut pas installer l'application : la commande sur le site. */}
+          <p className="mb-16 text-base md:text-lg">
+            Pas envie d&apos;installer l&apos;application ?{" "}
+            <Link
+              href="/restaurants/nos-menus"
+              className="font-semibold text-primary underline underline-offset-4"
+            >
+              Commandez sur le site
+            </Link>
+          </p>
         </div>
         <div className="flex flex-nowrap items-center justify-center gap-4 sm:gap-8 h-auto sm:h-[500px] select-none">
           <motion.div
