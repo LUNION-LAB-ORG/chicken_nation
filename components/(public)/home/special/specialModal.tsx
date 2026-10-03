@@ -1,5 +1,8 @@
 "use client";
 import { useRouter } from "@/i18n/navigation";
+// Montants formatés pareil sur le serveur et dans le navigateur (sinon erreur d'hydratation).
+import { fcfa } from "@/features/commande/utils/panier.utils";
+import { datePromotion, dernierJourValable } from "@/features/promotion/promotion.utils";
 export const SpecialModal = ({
   promo,
   onClose,
@@ -15,20 +18,14 @@ export const SpecialModal = ({
     if (promo.discount_type === "PERCENTAGE") {
       return `-${promo.discount_value}%`;
     } else if (promo.discount_type === "FIXED_AMOUNT") {
-      return `-${promo.discount_value} FCFA`;
+      return `-${fcfa(promo.discount_value)}`;
+    } else if (promo.discount_type === "BUY_X_GET_Y") {
+      return "Offre spéciale";
     }
     return "";
   };
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("fr-FR", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    });
-  };
+  const formatDate = (dateString: string) => (dateString ? datePromotion(dateString, "long") : "");
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
@@ -59,7 +56,7 @@ export const SpecialModal = ({
             <div className="bg-orange-50 rounded-2xl p-4 border border-orange-100">
               <p className="text-sm text-gray-700">
                 <span className="font-semibold">Commande minimum:</span>{" "}
-                {promo.min_order_amount.toLocaleString()} FCFA
+                {fcfa(promo.min_order_amount)}
               </p>
             </div>
           )}
@@ -76,7 +73,7 @@ export const SpecialModal = ({
           <div className="flex items-center justify-between text-sm text-gray-600 pt-4 border-t">
             <span>Valide du {formatDate(promo.start_date)}</span>
             <span className="text-right">
-              au {formatDate(promo.expiration_date)}
+              au {formatDate(dernierJourValable(promo.expiration_date).toISOString())}
             </span>
           </div>
         </div>

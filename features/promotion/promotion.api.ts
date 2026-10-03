@@ -1,22 +1,19 @@
 import { api } from "@/lib/api";
 import { PaginatedResponse } from "@/types/api.type";
-import { IPromotion, IPromotionParams, PromotionStatus } from "./promotion.type";
+import { IPromotionPublique } from "./promotion.type";
 
 export interface IPromotionAPI {
-    obtenirPromotionsActives(params: IPromotionParams): Promise<PaginatedResponse<IPromotion>>;
+    obtenirPromotionsActives(params: { limit?: number }): Promise<PaginatedResponse<IPromotionPublique>>;
 }
 
 export const promotionAPI: IPromotionAPI = {
-    obtenirPromotionsActives(params: IPromotionParams) {
+    // Route publique : `GET /fidelity/promotions` est réservée au personnel
+    // (401 pour un visiteur, la section ne s'affichait plus).
+    obtenirPromotionsActives(params: { limit?: number }) {
         return api.request({
-            endpoint: `/fidelity/promotions`,
+            endpoint: `/fidelity/promotions/public`,
             method: "GET",
-            searchParams: {
-                ...params,
-                status: PromotionStatus.ACTIVE,
-                page: params.page || 1,
-                limit: params.limit || 10,
-            },
+            searchParams: { limit: params.limit || 12 },
             service: "public"
         });
     },

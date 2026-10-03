@@ -1,5 +1,8 @@
 import { formatImageUrl } from "@/utils/formatImageUrl";
 import Image from "next/image";
+// Montants formatés pareil sur le serveur et dans le navigateur (sinon erreur d'hydratation).
+import { fcfa } from "@/features/commande/utils/panier.utils";
+import { datePromotion, dernierJourValable } from "@/features/promotion/promotion.utils";
 
 export const SpecialCard = ({
   promo,
@@ -31,21 +34,13 @@ export const SpecialCard = ({
 
   const statusInfo = getStatusInfo();
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("fr-FR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
+  const formatDate = (dateString: string) => (dateString ? datePromotion(dateString) : "");
 
   const getDiscountDisplay = () => {
     if (promo.discount_type === "PERCENTAGE") {
       return `-${promo.discount_value}%`;
     } else if (promo.discount_type === "FIXED_AMOUNT") {
-      return `-${promo.discount_value} FCFA`;
+      return `-${fcfa(promo.discount_value)}`;
     } else if (promo.discount_type === "BUY_X_GET_Y") {
       return "Offre spéciale";
     }
@@ -122,7 +117,7 @@ export const SpecialCard = ({
               className="mt-3 text-xs font-medium opacity-80"
               style={{ color: promo.text_color || "#FFFFFF" }}
             >
-              Minimum: {promo.min_order_amount.toLocaleString()} FCFA
+              Minimum : {fcfa(promo.min_order_amount)}
             </div>
           )}
         </div>
@@ -135,7 +130,7 @@ export const SpecialCard = ({
               className="text-xs font-semibold opacity-75 bg-black/20 px-3 py-1.5 rounded-full"
               style={{ color: promo.text_color || "#FFFFFF" }}
             >
-              Jusqu'au {formatDate(promo.expiration_date)}
+              Jusqu'au {formatDate(dernierJourValable(promo.expiration_date).toISOString())}
             </div>
           )}
         </div>

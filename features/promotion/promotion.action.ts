@@ -3,8 +3,8 @@
 import { ActionResponse, PaginatedResponse } from "@/types/api.type";
 import { promotionAPI } from "./promotion.api";
 import { handleServerActionError } from "@/utils/handleServerActionError";
-import { IPromotion } from "./promotion.type";
-export const obtenirPromotionsActivesAction = async (params: ObtenirCommentairesParams): Promise<ActionResponse<PaginatedResponse<IPromotion>>> => {
+import { IPromotionPublique } from "./promotion.type";
+export const obtenirPromotionsActivesAction = async (params: { limit?: number }): Promise<ActionResponse<PaginatedResponse<IPromotionPublique>>> => {
     try {
         const data = await promotionAPI.obtenirPromotionsActives(params);
         return {

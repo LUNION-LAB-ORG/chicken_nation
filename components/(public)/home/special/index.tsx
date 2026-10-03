@@ -7,7 +7,6 @@ import { obtenirPromotionsActivesAction } from "@/features/promotion/promotion.a
 
 export default async function Special() {
   const { data: promotions } = await obtenirPromotionsActivesAction({
-    page: 1,
     limit: 12,
   });
 

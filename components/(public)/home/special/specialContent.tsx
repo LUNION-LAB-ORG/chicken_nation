@@ -1,12 +1,12 @@
 "use client";
 
-import { IPromotion } from "@/features/promotion/promotion.type";
+import { IPromotionPublique } from "@/features/promotion/promotion.type";
 import { useEffect, useState } from "react";
 import { SpecialCard } from "./specialCard";
 import { SpecialModal } from "./specialModal";
 import { Pagination } from "@heroui/pagination";
 
-export function SpecialContent({ promos }: { promos: IPromotion[] }) {
+export function SpecialContent({ promos }: { promos: IPromotionPublique[] }) {
   const [selectedPromo, setSelectedPromo] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(2);

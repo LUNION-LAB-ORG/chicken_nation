@@ -68,6 +68,30 @@ export interface IPromotion {
   updated_at: string;
 }
 
+/**
+ * Promotion telle que la renvoie la route publique `GET /fidelity/promotions/public`
+ * (section « Offres du moment ») : actives, publiques, en cours, et seulement les
+ * champs de la carte.
+ */
+export type IPromotionPublique = Pick<
+  IPromotion,
+  | "id"
+  | "title"
+  | "description"
+  | "discount_type"
+  | "discount_value"
+  | "min_order_amount"
+  | "max_discount_amount"
+  | "max_usage_per_user"
+  | "start_date"
+  | "expiration_date"
+  | "status"
+  | "coupon_image_url"
+  | "background_color"
+  | "text_color"
+  | "expiration_color"
+>;
+
 export interface IPromotionParams {
   title?: string;
   discount_type?: PromotionType;
