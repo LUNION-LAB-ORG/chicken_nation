@@ -4,6 +4,7 @@ import { useAppClickMutation } from "@/features/marketing/app-mobile/queries/app
 import { appSchema } from "@/config/api";
 import { useDishOneMutation } from "@/features/menus/queries/dish.mutation";
 import { useCategoryOneMutation } from "@/features/menus/queries/category/category.mutation";
+import { lienAppli, libelleSuivi, lireCibleDeepLink, lireCodeParrainage } from "@/features/marketing/app-mobile/utils/deep-link.utils";
 
 export const useDeepLinkRedirect = () => {
     const searchParams = useSearchParams();
@@ -25,15 +26,12 @@ export const useDeepLinkRedirect = () => {
             const isAndroid = userAgent.includes("android");
             const isIOS = /iphone|ipad|ipod/.test(userAgent);
 
-            // 1. Construction de la route mobile
-            let appPath = "home"; // Route par défaut
-            const category = searchParams.get("category");
-            const product = searchParams.get("product");
-            const order = searchParams.get("order");
-            const voucher = searchParams.get("voucher");
-            const loyalty = searchParams.get("loyalty");
-            const nationCard = searchParams.get("nation-card");
+            // 1. Construction de la route mobile (paramètres lus et contrôlés
+            // dans deep-link.utils : liste blanche pour `to`, forme du code `ref`)
+            const cible = lireCibleDeepLink(searchParams);
+            const codeParrainage = lireCodeParrainage(searchParams.get("ref"));
 
+            let appPath = "home"; // Route par défaut
             // Métadonnées de tracking (résolues en même temps que appPath/itemName)
             let clickType = "home";
             let clickTargetId: string | undefined = undefined;
@@ -41,45 +39,30 @@ export const useDeepLinkRedirect = () => {
 
             try {
                 // 💡 Utilisation de await avec mutateAsync
-                if (category) {
+                if (cible.genre === "categorie") {
                     setStatus("Recherche de la catégorie...");
-                    const categoryData = await getCategoryAsync(category);
+                    const categoryData = await getCategoryAsync(cible.id);
                     setItemName(categoryData.name);
                     appPath = `category/${categoryData.id}`;
                     clickType = "category";
-                    clickTargetId = category;
+                    clickTargetId = cible.id;
                     clickTargetLabel = categoryData.name;
 
-                } else if (product) {
+                } else if (cible.genre === "plat") {
                     setStatus("Recherche du plat...");
-                    const productData = await getDishAsync(product);
+                    const productData = await getDishAsync(cible.id);
                     setItemName(productData.name);
                     appPath = `menu/${productData.id}`;
                     clickType = "dish";
-                    clickTargetId = product;
+                    clickTargetId = cible.id;
                     clickTargetLabel = productData.name;
 
-                } else if (order) {
-                    setItemName(`Commande ${order}`);
-                    appPath = `order/${order}`;
-                    clickType = "order";
-                    clickTargetId = order;
-                    clickTargetLabel = `Commande ${order}`;
-                } else if (voucher) {
-                    setItemName("Bons et Codes Promo");
-                    appPath = `vouchers`;
-                    clickType = "voucher";
-                    clickTargetLabel = "Bons et Codes Promo";
-                } else if (loyalty) {
-                    setItemName("Club de Fidélité");
-                    appPath = `loyalty`;
-                    clickType = "loyalty";
-                    clickTargetLabel = "Club de Fidélité";
-                } else if (nationCard) {
-                    setItemName("Carte de la Nation");
-                    appPath = `nation-card`;
-                    clickType = "nation_card";
-                    clickTargetLabel = "Carte de la Nation";
+                } else {
+                    if (cible.nom) setItemName(cible.nom);
+                    appPath = cible.chemin;
+                    clickType = cible.type;
+                    clickTargetId = cible.idSuivi;
+                    clickTargetLabel = cible.libelle;
                 }
             } catch (error) {
                 console.error("Élément introuvable en base de données :", error);
@@ -93,11 +76,14 @@ export const useDeepLinkRedirect = () => {
                 userAgent,
                 type: clickType,
                 targetId: clickTargetId,
-                targetLabel: clickTargetLabel,
+                targetLabel: libelleSuivi(clickTargetLabel, codeParrainage),
             });
 
-            // 3. Lancement de la redirection vers l'application
-            const deepLink = `${appSchema}://${appPath}`;
+            // 3. Lancement de la redirection vers l'application. Le code de
+            // parrainage suit (?ref=) : l'appli le garde jusqu'à l'inscription.
+            // ⚠️ Appli absente : le passage par le store le perd, le filleul
+            // doit saisir le code lui-même (il figure dans le message partagé).
+            const deepLink = lienAppli(appSchema, appPath, codeParrainage);
             setStatus("Ouverture de l'application...");
             window.location.href = deepLink;
 
@@ -129,7 +115,9 @@ export const useDeepLinkRedirect = () => {
         searchParams.get("order"),
         searchParams.get("voucher"),
         searchParams.get("loyalty"),
-        searchParams.get("nation-card")]);
+        searchParams.get("nation-card"),
+        searchParams.get("to"),
+        searchParams.get("ref")]);
 
     return { status, itemName };
 };
