@@ -1,10 +1,9 @@
-import { Api } from "ak-api-http";
+import { Api, ApiConfig } from "ak-api-http";
 import { baseURL } from "@/config/api";
-import { logout } from "@/features/auth/actions/auth.action";
-import { auth } from "./auth";
-import { User } from "next-auth";
 
-export const api = new Api({
+// Réglages communs au client public (ci-dessous) et aux clients du personnel
+// (lib/api.server.ts).
+export const reglagesApi = {
   baseUrl: baseURL, // Base URL de l'API
   timeout: 10000, // Timeout de la requête
   headers: {
@@ -12,22 +11,26 @@ export const api = new Api({
   },
   maxRetries: 3, // Nombre de tentatives de re tentative
   retryDelay: 1000, // Delais entre les tentatives
-  enableAuth: true, // Authentification activée
-  getSession: async () => {
-    const session = await auth();
-    const user = session?.user as User;
-
-    if (user) {
-      return {
-        accessToken: user.accessToken ?? "",
-      }
-    }
-    return {
-      accessToken: "",
-    }
-  },// Récupération du token
-  signOut: async () => {
-    await logout()
-  }, // Déconnexion automatique si la requête échoue avec un code 401
   debug: process.env.NODE_ENV === "development", // Debug seulement en développement : il journalise les jetons
+} satisfies Partial<ApiConfig>;
+
+/**
+ * Client des routes PUBLIQUES (accueil, promotions, avis, connexion), partagé
+ * par tout le processus serveur : il n'envoie JAMAIS de jeton.
+ *
+ * ak-api-http garde le premier jeton obtenu dans l'instance et le réutilise
+ * ensuite pour toutes les requêtes privées : sur un serveur, c'était le jeton
+ * du premier membre du personnel connecté, prêté à tous les appelants suivants.
+ * Ici la session vaut toujours `null` : rien à garder, et un appel privé passé
+ * par erreur avec ce client part sans jeton (refusé par l'API). Les routes
+ * privées passent par `exigerSessionPersonnel()` (lib/api.server.ts).
+ */
+export const api = new Api({
+  ...reglagesApi,
+  // Laissée active pour garder les intercepteurs de la bibliothèque (message
+  // d'erreur de l'API, nouvelles tentatives sur les erreurs 5xx).
+  enableAuth: true,
+  getSession: async () => null,
+  // Un 401 sur une route publique ne déconnecte personne.
+  signOut: async () => {},
 });

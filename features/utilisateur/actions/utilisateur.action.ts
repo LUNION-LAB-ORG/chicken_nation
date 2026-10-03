@@ -5,10 +5,17 @@ import { utilisateurAPI } from "../apis/utilisateur.api";
 import { UtilisateurAddDTO, UtilisateurUpdateDTO } from "../schema/utilisateur.schema";
 import { IUtilisateur, IUtilisateurDeleteResponse, IUtilisateursParams } from "../types/utilisateur.type";
 import { handleServerActionError } from "@/utils/handleServerActionError";
+import { exigerSessionPersonnel } from "@/lib/api.server";
+
+// Chaque action commence par exigerSessionPersonnel() : une action serveur
+// s'appelle par POST direct, sans passer par la page protégée. Sans session,
+// refus immédiat, aucun appel à l'API.
 
 export const obtenirTousUtilisateursAction = async (params: IUtilisateursParams): Promise<ActionResponse<PaginatedResponse<IUtilisateur>>> => {
+    const session = await exigerSessionPersonnel();
+    if (!session.ok) return session.refus;
     try {
-        const data = await utilisateurAPI.obtenirTousUtilisateurs(params);
+        const data = await utilisateurAPI.obtenirTousUtilisateurs(session.client, params);
         return {
             success: true,
             data: data,
@@ -20,8 +27,10 @@ export const obtenirTousUtilisateursAction = async (params: IUtilisateursParams)
 }
 
 export const obtenirUnUtilisateurAction = async (id: string): Promise<ActionResponse<IUtilisateur>> => {
+    const session = await exigerSessionPersonnel();
+    if (!session.ok) return session.refus;
     try {
-        const data = await utilisateurAPI.obtenirUtilisateur(id);
+        const data = await utilisateurAPI.obtenirUtilisateur(session.client, id);
         return {
             success: true,
             data: data,
@@ -33,8 +42,10 @@ export const obtenirUnUtilisateurAction = async (id: string): Promise<ActionResp
 }
 
 export const ajouterUtilisateurAction = async (formdata: UtilisateurAddDTO): Promise<ActionResponse<IUtilisateur>> => {
+    const session = await exigerSessionPersonnel();
+    if (!session.ok) return session.refus;
     try {
-        const data = await utilisateurAPI.ajouterUtilisateur(formdata);
+        const data = await utilisateurAPI.ajouterUtilisateur(session.client, formdata);
         return {
             success: true,
             data: data,
@@ -46,8 +57,10 @@ export const ajouterUtilisateurAction = async (formdata: UtilisateurAddDTO): Pro
 }
 
 export const modifierProfilAction = async (id: string, formdata: UtilisateurUpdateDTO): Promise<ActionResponse<IUtilisateur>> => {
+    const session = await exigerSessionPersonnel();
+    if (!session.ok) return session.refus;
     try {
-        const data = await utilisateurAPI.modifierProfil(id, formdata);
+        const data = await utilisateurAPI.modifierProfil(session.client, id, formdata);
         return {
             success: true,
             data: data,
@@ -59,8 +72,10 @@ export const modifierProfilAction = async (id: string, formdata: UtilisateurUpda
 }
 
 export const supprimerUtilisateurAction = async (id: string): Promise<ActionResponse<IUtilisateurDeleteResponse>> => {
+    const session = await exigerSessionPersonnel();
+    if (!session.ok) return session.refus;
     try {
-        const data = await utilisateurAPI.supprimerUtilisateur(id);
+        const data = await utilisateurAPI.supprimerUtilisateur(session.client, id);
         return {
             success: true,
             data: data,
