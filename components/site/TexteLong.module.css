@@ -1,0 +1,97 @@
+/* Texte long des pages secondaires (conditions, confidentialité, suppression
+   du compte) : intertitres, listes et liens, sans classes dans le contenu. */
+
+.texte {
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--color-encre);
+  overflow-wrap: break-word;
+}
+
+.texte > * + * {
+  margin-top: 0.9em;
+}
+
+.texte > :first-child {
+  margin-top: 0;
+}
+
+.texte h2 {
+  margin-top: 2em;
+  font-size: clamp(19px, 2.6vw, 22px);
+  font-weight: 700;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.texte h3 {
+  margin-top: 1.4em;
+  font-size: 16.5px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.texte h2 + *,
+.texte h3 + * {
+  margin-top: 0.5em;
+}
+
+.texte ul,
+.texte ol {
+  padding-left: 1.35em;
+}
+
+.texte ul {
+  list-style: disc;
+}
+
+.texte ol {
+  list-style: decimal;
+}
+
+.texte li + li {
+  margin-top: 0.35em;
+}
+
+.texte li::marker {
+  color: var(--color-orange-texte);
+  font-weight: 700;
+}
+
+.texte strong {
+  font-weight: 700;
+}
+
+.texte a {
+  font-weight: 600;
+  color: var(--color-orange-texte);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+.texte a:hover {
+  color: var(--color-encre);
+}
+
+/* Encadré (note importante, aide) : mêmes règles à l'intérieur. */
+.encadre > * + * {
+  margin-top: 0.5em;
+}
+
+.encadre > :first-child {
+  margin-top: 0;
+}
+
+.texte .encadre + *,
+.texte * + .encadre {
+  margin-top: 1.4em;
+}
+
+/* Titre d'un encadré : plus petit que les intertitres, collé au haut. */
+.texte .encadre > :is(h2, h3) {
+  margin-top: 0;
+  font-size: 16.5px;
+  line-height: 1.3;
+}

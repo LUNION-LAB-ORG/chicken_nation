@@ -1,36 +1,34 @@
-import { Benefits } from "@/components/(public)/mobile/benefits";
-import { BentoGrid } from "@/components/(public)/mobile/bento";
-import { FeatureHighlight } from "@/components/(public)/mobile/feature-highlight";
-import { FeatureScroll } from "@/components/(public)/mobile/feature-scroll";
-import { Features } from "@/components/(public)/mobile/features";
-import { Hero } from "@/components/(public)/mobile/hero";
-import Testimonials from "@/components/(public)/home/testimonials";
-import { pageMetadata } from "../../meta";
 import { setRequestLocale } from "next-intl/server";
 
-// Statique, reconstruite au plus toutes les heures (avis lus dans l'API).
+import { pageMetadata } from "../../meta";
+
+import { PageAppli } from "@/components/site/appli/PageAppli";
+import { obtenirAvisPublics } from "@/features/client/commentaire.api";
+import { obtenirConfigFidelite } from "@/features/fidelite/fidelite.api";
+
+// Statique, reconstruite au plus toutes les heures (avis et règles de fidélité
+// lus dans l'API, gardés une heure eux aussi).
 export const revalidate = 3600;
 
 export const metadata = pageMetadata({
   chemin: "/app-mobile",
-  titre: "Application mobile",
+  titre: "Application mobile, Android et iPhone",
   description:
-    "Commandez CHICKEN NATION depuis votre téléphone : paiement en ligne, suivi de la livraison en direct et avantages fidélité. Sur iPhone et Android.",
+    "Commandez, suivez votre livraison, grattez vos cartes Gratte et Gagne et jouez au Combo Mystère dans l'application, sur Google Play et l'App Store.",
 });
 
-export default async function AppMobile({ params }: { params: Promise<{ locale: string }> }) {
+export default async function AppMobile({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
-  setRequestLocale(locale);
 
-  return (
-    <>
-      <Hero />
-      <FeatureScroll />
-      <FeatureHighlight />
-      <BentoGrid />
-      <Benefits />
-      <Features />
-      <Testimonials />
-    </>
-  );
+  setRequestLocale(locale);
+  const [fidelite, avis] = await Promise.all([
+    obtenirConfigFidelite(),
+    obtenirAvisPublics(12),
+  ]);
+
+  return <PageAppli avis={avis} fidelite={fidelite} />;
 }

@@ -16,7 +16,7 @@ export const useDeepLinkRedirect = () => {
     const { mutateAsync: getDishAsync } = useDishOneMutation();
     const { mutateAsync: getCategoryAsync } = useCategoryOneMutation();
 
-    const [status, setStatus] = useState("Préparation de la redirection...");
+    const [status, setStatus] = useState("Préparation de la redirection…");
     const [itemName, setItemName] = useState("");
 
     useEffect(() => {
@@ -40,7 +40,7 @@ export const useDeepLinkRedirect = () => {
             try {
                 // 💡 Utilisation de await avec mutateAsync
                 if (cible.genre === "categorie") {
-                    setStatus("Recherche de la catégorie...");
+                    setStatus("Recherche de la catégorie…");
                     const categoryData = await getCategoryAsync(cible.id);
                     setItemName(categoryData.name);
                     appPath = `category/${categoryData.id}`;
@@ -49,7 +49,7 @@ export const useDeepLinkRedirect = () => {
                     clickTargetLabel = categoryData.name;
 
                 } else if (cible.genre === "plat") {
-                    setStatus("Recherche du plat...");
+                    setStatus("Recherche du plat…");
                     const productData = await getDishAsync(cible.id);
                     setItemName(productData.name);
                     appPath = `menu/${productData.id}`;
@@ -84,7 +84,7 @@ export const useDeepLinkRedirect = () => {
             // ⚠️ Appli absente : le passage par le store le perd, le filleul
             // doit saisir le code lui-même (il figure dans le message partagé).
             const deepLink = lienAppli(appSchema, appPath, codeParrainage);
-            setStatus("Ouverture de l'application...");
+            setStatus("Ouverture de l'application…");
             window.location.href = deepLink;
 
             // 4. Fallback vers les stores (Le timer démarre ICI, après l'API)
@@ -93,7 +93,7 @@ export const useDeepLinkRedirect = () => {
                     return; // L'app s'est ouverte avec succès
                 }
 
-                setStatus("Redirection vers le store...");
+                setStatus("Redirection vers le téléchargement de l'application…");
 
                 if (isAndroid) {
                     window.location.href = process.env.NEXT_PUBLIC_PLAY_STORE_LINK || "https://play.google.com/store/apps/details?id=com.chickennation.app";

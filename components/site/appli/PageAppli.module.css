@@ -1,0 +1,264 @@
+/* Page Application : en-tête orange avec trois écrans de l'appli en éventail,
+   tuiles de ce qu'on y fait, Carte de la Nation. */
+
+.tete {
+  overflow: hidden;
+  padding-top: 28px;
+}
+
+.teteGrille {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 22px;
+}
+
+.teteTexte {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* Police d'affiche : seule l'apostrophe, absente de Balbeer, est en Poppins. */
+.titre {
+  font-family: var(--font-affiche);
+  font-size: clamp(38px, 7.6vw, 74px);
+  font-weight: 400;
+  line-height: 0.95;
+  text-transform: uppercase;
+  text-wrap: balance;
+  font-synthesis: none;
+  color: #fff;
+  text-shadow: 3px 3px 0 var(--color-encre);
+}
+
+.apostrophe {
+  font-family: var(--font-texte);
+  font-weight: 800;
+}
+
+.intro {
+  max-width: 34em;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.telecharger {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 4px;
+}
+
+.lienSite {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.lienSite a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 700;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+.lienSite a:hover {
+  text-decoration-thickness: 3px;
+}
+
+/* Trois écrans en éventail, posés sur le bas de l'en-tête. */
+.telephones {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  margin-bottom: -18%;
+}
+
+.telephone {
+  position: relative;
+  flex: none;
+  width: 34%;
+  max-width: 230px;
+  filter: drop-shadow(0 18px 28px rgba(42, 22, 8, 0.32));
+}
+
+.telephone img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.telephone:nth-child(1) {
+  z-index: 1;
+  transform: translate(22%, -2%) rotate(-8deg);
+}
+
+.telephone:nth-child(2) {
+  z-index: 2;
+  width: 40%;
+  max-width: 270px;
+}
+
+.telephone:nth-child(3) {
+  z-index: 1;
+  transform: translate(-22%, -2%) rotate(8deg);
+}
+
+/* On ne scanne pas son propre écran : pas de QR code sur téléphone. */
+@media (width < 720px) {
+  .qr {
+    display: none;
+  }
+}
+
+@media (width >= 900px) {
+  .tete {
+    padding-top: 0;
+  }
+
+  .teteGrille {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    align-items: end;
+    gap: 28px;
+  }
+
+  .teteTexte {
+    padding-block: 52px 64px;
+  }
+
+  .telephones {
+    margin-top: 40px;
+    margin-bottom: -12%;
+  }
+}
+
+/* Tuiles « ce que vous faites dans l'application ». */
+.tuiles {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+.tuile {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  grid-template-areas:
+    "icone titre"
+    "texte texte";
+  align-items: center;
+  gap: 10px 12px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--color-trait);
+  border-radius: var(--radius-carte);
+  background: #fff;
+  box-shadow: var(--shadow-1);
+}
+
+.tuile h3 {
+  grid-area: titre;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.tuile > :not(.icone, h3) {
+  grid-column: 1 / -1;
+}
+
+.icone {
+  grid-area: icone;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-jaune);
+  color: var(--color-encre);
+}
+
+.tuile p {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-encre-doux);
+}
+
+@media (width >= 600px) {
+  .tuiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tuile {
+    align-content: start;
+  }
+}
+
+@media (width >= 960px) {
+  .tuiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+/* Carte de la Nation : la carte dessinée à côté de son texte. */
+.nation {
+  display: grid;
+  gap: 22px;
+  margin-top: 28px;
+  padding: 24px 20px;
+  border-radius: var(--radius-panneau);
+  background: var(--color-encre);
+  color: #fff;
+  --focus: var(--color-jaune);
+}
+
+.nationCarte {
+  width: min(290px, 82%);
+  margin: 4px auto 10px;
+}
+
+.nationTexte {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+
+.nationTexte h3 {
+  font-size: clamp(21px, 3vw, 26px);
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--color-jaune);
+}
+
+.nationTexte p {
+  max-width: 36em;
+  font-size: 15px;
+  color: var(--color-sur-encre-doux);
+}
+
+.nationTexte .note {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #fff;
+}
+
+@media (width >= 720px) {
+  .nation {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: center;
+    gap: 32px;
+    padding: 32px;
+  }
+
+  .nationCarte {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+}
