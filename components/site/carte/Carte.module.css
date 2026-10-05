@@ -1,0 +1,174 @@
+/* Carte et pages plats (maquette, CSS 881-952 ; retouche 5). */
+
+/* ---------- En-tête photo de la carte (CSS 892-902) ---------- */
+
+.tete {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  min-height: 220px;
+  padding-block: 28px 22px;
+  background: var(--color-encre);
+  color: #fff;
+  --focus: var(--color-jaune);
+}
+
+.teteFond {
+  z-index: -2;
+  object-fit: cover;
+  object-position: 50% 60%;
+}
+
+/* Voile sombre sous le titre jaune. */
+.tete::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    180deg,
+    rgba(20, 11, 5, 0.12) 0%,
+    rgba(20, 11, 5, 0.6) 52%,
+    rgba(20, 11, 5, 0.8) 100%
+  );
+}
+
+.teteInt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px 28px;
+}
+
+.teteInt p {
+  max-width: 34em;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+/* Autocollants « 100 % Halal » et « 100 % Local », dès 900 px. */
+.collants {
+  display: none;
+  flex: none;
+  align-items: center;
+  gap: 18px;
+  padding-right: 8px;
+}
+
+@media (width >= 720px) {
+  .tete {
+    min-height: clamp(280px, 30vw, 420px);
+    padding-block: 36px 30px;
+  }
+}
+
+@media (width >= 900px) {
+  .collants {
+    display: flex;
+  }
+}
+
+/* ---------- Pastilles de catégorie collantes (CSS 905-923) ---------- */
+
+.pastilles {
+  position: sticky;
+  /* Sous l'en-tête collant (sa hauteur et sa bordure de 1 px). */
+  top: calc(env(safe-area-inset-top, 0px) + var(--h-entete) + 1px);
+  z-index: 30;
+  background: var(--color-papier);
+  border-bottom: 1px solid var(--color-trait);
+}
+
+/* Rangée qui défile au doigt jusqu'aux bords de l'écran. */
+.defile {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  margin-inline: calc(var(--gouttiere) * -1);
+  padding: 10px var(--gouttiere);
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.defile::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------- Sections et grilles de plats (CSS 924-952) ---------- */
+
+.section {
+  padding-top: 30px;
+  /* Le titre visé par une pastille reste visible sous l'en-tête et les pastilles. */
+  scroll-margin-top: calc(var(--h-entete) + 72px);
+}
+
+/* Au plus 4 cartes par rangée ; une seule colonne (liste) sous 600 px. */
+.grille {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+@media (width >= 600px) {
+  .grille {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (width >= 800px) {
+  .grille {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (width >= 1100px) {
+  .grille {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+  }
+}
+
+/* Carte et ligne du créneau horaire, dans la même case de la grille. */
+.case {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.case > article {
+  flex: 1;
+}
+
+/* ---------- Page d'un plat : photo à sa taille (retouche 5) ---------- */
+
+/* Zone au ratio de la photo, toute la largeur, entre 200 et 300 px de haut
+   sur téléphone ; à côté du texte dès 900 px, 440 px de haut au plus. La
+   photo est en contain sur la couleur de son fond : jamais coupée, et le
+   vide éventuel se confond avec la photo. */
+.photo {
+  width: 100%;
+  aspect-ratio: var(--ratio);
+  min-height: 200px;
+  max-height: 300px;
+}
+
+@media (width >= 600px) {
+  .photo {
+    max-height: 380px;
+  }
+}
+
+@media (width >= 900px) {
+  .photo {
+    width: min(100%, calc(440px * var(--ratio)));
+    min-height: 260px;
+    max-height: 440px;
+    margin-inline: auto;
+  }
+}

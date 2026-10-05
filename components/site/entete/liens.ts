@@ -94,8 +94,6 @@ export function sansBarrePanier(chemin: string | null | undefined) {
   const ici = cheminPropre(chemin);
 
   if (ici === CHEMIN_CAISSE) return true;
-  if (ici.startsWith(`${CHEMIN_CAISSE}/`)) return ici !== CHEMIN_MES_COMMANDES;
 
-  // Provisoire : l'ancienne carte a encore sa propre barre (lot L7 la remplace).
-  return ici === "/fr/restaurants/nos-menus";
+  return ici.startsWith(`${CHEMIN_CAISSE}/`) && ici !== CHEMIN_MES_COMMANDES;
 }
