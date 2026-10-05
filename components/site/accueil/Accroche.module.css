@@ -1,0 +1,217 @@
+/* Accroche de l'accueil (maquette, CSS 261-368).
+   Le bas laisse la place du bandeau d'infos posé en travers (marge négative). */
+
+.accroche {
+  padding-block: 22px 70px;
+}
+
+.grille {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 30px;
+}
+
+/* ---------- Texte ---------- */
+
+/* Les deux lignes remplissent la colonne : leur taille suit la largeur du
+   titre (unités cqi), jamais de retour à la ligne. */
+.titre {
+  container-type: inline-size;
+  margin-top: 16px;
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.titre span {
+  display: block;
+  white-space: nowrap;
+}
+
+.ligne1 {
+  font-size: clamp(44px, 13.5vw, 112px);
+  font-size: min(16.2cqi, 136px);
+  color: #fff;
+  text-shadow: 3px 3px 0 var(--color-encre);
+}
+
+.ligne2 {
+  margin-top: 0.04em;
+  font-size: clamp(38px, 11.5vw, 98px);
+  font-size: min(14.1cqi, 118px);
+  color: var(--color-encre);
+}
+
+.sous {
+  max-width: 32em;
+  margin-top: 18px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 24px;
+  margin-top: 22px;
+}
+
+/* Le lien couvre les deux lignes : cible de 44 px au moins. */
+.tel {
+  display: grid;
+  align-content: center;
+  min-height: 44px;
+  color: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-decoration: none;
+}
+
+.tel strong {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.tel:hover strong {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------- Visuel ---------- */
+
+.visuel {
+  position: relative;
+  justify-self: center;
+  width: 100%;
+  max-width: 460px;
+}
+
+/* Tuile paysage : fond ardoise du site actuel et seau au centre. */
+.tuile {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  border: 6px solid #fff;
+  border-radius: var(--radius-panneau);
+  background: #3a3a3a;
+  box-shadow: var(--shadow-photo);
+  transform: rotate(2deg);
+}
+
+.fond {
+  object-fit: cover;
+}
+
+.seau {
+  position: absolute;
+  left: 50%;
+  bottom: 7%;
+  display: block;
+  width: auto;
+  height: 84%;
+  max-width: none;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 16px 16px rgba(0, 0, 0, 0.5));
+}
+
+/* Téléphone : tampon en haut à gauche, éclat en bas à gauche. */
+.tampon {
+  position: absolute;
+  top: -16px;
+  left: -6px;
+}
+
+.eclat {
+  position: absolute;
+  bottom: 22px;
+  left: -8px;
+}
+
+.etiquette {
+  margin: -42px -2px 0 auto;
+}
+
+@media (width >= 720px) {
+  .accroche {
+    padding-block: 28px 70px;
+  }
+
+  .grille {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    align-items: center;
+    gap: 36px;
+  }
+
+  .visuel {
+    max-width: 300px;
+  }
+
+  .tuile {
+    aspect-ratio: 16 / 10;
+  }
+
+  .tampon {
+    left: -8px;
+  }
+
+  .eclat {
+    top: 34%;
+    right: -6px;
+    bottom: auto;
+    left: auto;
+  }
+
+  .etiquette {
+    margin: -50px -4px 0 auto;
+  }
+}
+
+@media (width >= 900px) {
+  .accroche {
+    padding-block: 56px 100px;
+  }
+
+  .grille {
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+    gap: 56px;
+  }
+
+  .sous {
+    font-size: 18px;
+  }
+
+  .visuel {
+    max-width: 480px;
+  }
+
+  .tampon {
+    top: -26px;
+    left: -30px;
+  }
+
+  .eclat {
+    right: -16px;
+  }
+
+  .etiquette {
+    margin-right: -16px;
+  }
+}
+
+@media (width >= 1240px) {
+  .eclat {
+    right: -34px;
+  }
+
+  .etiquette {
+    margin-right: -28px;
+  }
+}

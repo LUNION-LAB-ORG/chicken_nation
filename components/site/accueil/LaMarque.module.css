@@ -1,0 +1,213 @@
+/* « Chicken Nation, c'est… » et sa vidéo (maquette, CSS 585-631). */
+
+.tete {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  max-width: 46em;
+  margin: 0 auto 26px;
+  text-align: center;
+}
+
+.tete > p {
+  color: var(--color-encre-doux);
+}
+
+.scene {
+  position: relative;
+}
+
+/* ---------- Cadre de la vidéo ---------- */
+
+.cadre {
+  position: relative;
+  z-index: 1;
+  aspect-ratio: 16 / 9;
+  max-width: 760px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 6px solid #fff;
+  border-radius: var(--radius-panneau);
+  background: var(--color-encre);
+  box-shadow: var(--shadow-photo);
+}
+
+.cadre video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.collant {
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  left: 12px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  background: var(--color-jaune);
+  color: var(--color-encre);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-bouton);
+  transform: rotate(-3deg);
+}
+
+.grandBouton {
+  --focus: #fff;
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  margin: -38px 0 0 -38px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-orange);
+  color: var(--color-encre);
+  box-shadow: var(--shadow-photo);
+}
+
+.grandBouton:hover {
+  background: var(--color-orange-appui);
+}
+
+.grandBouton svg {
+  width: 34px;
+  height: 34px;
+  margin-left: 4px;
+}
+
+.cadre[data-etat="lecture"] .grandBouton {
+  display: none;
+}
+
+.barre {
+  position: absolute;
+  z-index: 2;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.boutonVideo {
+  --focus: var(--color-jaune);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px 0 10px;
+  border: 0;
+  border-radius: var(--radius-pilule);
+  background: var(--color-voile-photo);
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+.boutonVideo:hover {
+  background: var(--color-encre-forte);
+}
+
+.boutonVideo svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Description textuelle de la vidéo (aucune parole à sous-titrer). */
+.legende {
+  max-width: 46em;
+  margin: 14px auto 0;
+  color: var(--color-encre-doux);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Dessins du site actuel, de part et d'autre de la vidéo. */
+.deco {
+  display: none;
+}
+
+/* Très petits téléphones : le grand bouton chevaucherait la barre ; « Lire la
+   vidéo » reste dans la barre. */
+@media (width < 360px) {
+  .grandBouton {
+    display: none;
+  }
+}
+
+/* Petits téléphones : cadre plus fin, boutons resserrés (cibles de 44 px). */
+@media (width < 420px) {
+  .cadre {
+    border-width: 4px;
+  }
+
+  .boutonVideo {
+    padding: 0 12px 0 8px;
+    font-size: 12.5px;
+  }
+
+  .grandBouton {
+    width: 64px;
+    height: 64px;
+    margin: -32px 0 0 -32px;
+  }
+}
+
+@media (width >= 1024px) {
+  .cadre {
+    max-width: 580px;
+  }
+
+  .deco {
+    position: absolute;
+    z-index: 0;
+    top: 50%;
+    display: block;
+    height: auto;
+    max-width: none;
+    pointer-events: none;
+  }
+
+  .seau {
+    right: calc(50% + 260px);
+    width: 260px;
+    transform: translateY(-50%) scaleX(-1);
+  }
+
+  .cuisse {
+    left: calc(50% + 270px);
+    width: 210px;
+    transform: translateY(-50%) rotate(10deg);
+  }
+}
+
+@media (width >= 1240px) {
+  .cadre {
+    max-width: 760px;
+  }
+
+  .seau {
+    right: calc(50% + 340px);
+    width: 340px;
+  }
+
+  .cuisse {
+    left: calc(50% + 350px);
+    width: 280px;
+  }
+}

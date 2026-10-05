@@ -1,0 +1,123 @@
+/* « Commander en ligne » (maquette, CSS 556-583) : icônes et boîte dessinée
+   du site actuel, bord déchiré retourné en bas. */
+
+.bloc {
+  padding-block: 48px calc(max(100px, 7.2vw) + 6px);
+}
+
+.grille {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 22px;
+}
+
+.intro {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.intro > p {
+  max-width: 30em;
+  color: var(--color-encre-doux);
+}
+
+.etapes {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.etape {
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-carte);
+  background: #fff;
+  box-shadow: var(--shadow-1);
+}
+
+.icone {
+  display: block;
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.etape h3 {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.numero {
+  flex: none;
+  font-family: var(--police-balbeer), "Poppins", sans-serif;
+  font-size: 30px;
+  font-synthesis: none;
+  line-height: 0.8;
+  color: var(--color-orange);
+  text-shadow: 2px 2px 0 var(--color-encre);
+}
+
+.etape p {
+  max-width: 34em;
+  font-size: 14px;
+  color: var(--color-encre-doux);
+}
+
+.boite {
+  display: none;
+}
+
+@media (width >= 720px) {
+  .etape {
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 18px;
+    padding: 16px 22px;
+  }
+
+  .icone {
+    width: 76px;
+    height: 76px;
+  }
+}
+
+@media (width >= 1024px) {
+  .bloc {
+    padding-block: 64px calc(max(100px, 7.2vw) + 30px);
+  }
+
+  .grille {
+    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+    align-items: start;
+    gap: 48px;
+  }
+
+  .boite {
+    position: absolute;
+    z-index: 0;
+    left: 0;
+    bottom: 0;
+    display: block;
+    width: 220px;
+    height: auto;
+    max-width: none;
+    pointer-events: none;
+  }
+}
+
+@media (width >= 1240px) {
+  .boite {
+    width: 250px;
+  }
+}
