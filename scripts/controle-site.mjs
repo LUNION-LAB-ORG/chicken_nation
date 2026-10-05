@@ -182,11 +182,21 @@ function tolerePourPage(motif, chemin) {
   return motif.sauf.some((sauf) => chemin === sauf || chemin.startsWith(`${sauf}/`));
 }
 
+// Fichiers de la construction d'une page : page.html, page.rsc, page.meta,
+// dossier page.segments/ (et page.body pour une route). Le nom de la page
+// s'y lit sans ces suffixes.
+const SUFFIXES_CONSTRUCTION = /\.(?:html|rsc|meta|body|segments)$/;
+
 function tolerePourFichier(motif, relatif) {
   return motif.sauf.some((sauf) => {
     const dernier = sauf.split("/").filter(Boolean).pop();
 
-    return dernier && relatif.split(path.sep).includes(dernier);
+    return (
+      dernier &&
+      relatif
+        .split(path.sep)
+        .some((morceau) => morceau.replace(SUFFIXES_CONSTRUCTION, "") === dernier)
+    );
   });
 }
 
