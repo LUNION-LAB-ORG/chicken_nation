@@ -85,12 +85,17 @@ COPY --from=builder /app/public ./public
 # Code du serveur à root, en lecture seule pour l'utilisateur qui le fait
 # tourner : un intrus ne peut ni le modifier ni y déposer un programme
 # (incident du 19/09). Seuls les dossiers où Next écrit en marche lui
-# appartiennent : .next/server/app (pages refaites toutes les N minutes) et
-# .next/cache (données et images optimisées, volume de compose.yml).
+# appartiennent :
+# - .next/server/route-cache : pages refaites toutes les N minutes. Next
+#   16.3.8 les écrit là, et non dans .next/server/app : ce dossier ne contient
+#   que le code des pages et reste donc à root. Sans route-cache modifiable,
+#   chaque rafraîchissement échoue (« Failed to update prerender cache »,
+#   EACCES) et la page n'est gardée qu'en mémoire ;
+# - .next/cache : données et images optimisées (volume de compose.yml).
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
-RUN mkdir -p .next/cache/images \
-    && chown -R nextjs:nodejs .next/cache .next/server/app
+RUN mkdir -p .next/cache/images .next/server/route-cache \
+    && chown -R nextjs:nodejs .next/cache .next/server/route-cache
 
 USER nextjs
 
