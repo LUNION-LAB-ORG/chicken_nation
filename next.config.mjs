@@ -17,6 +17,12 @@ const enTetesSecurite = [
   { key: "Content-Security-Policy", value: "frame-ancestors 'self'; base-uri 'self'; object-src 'none'" },
 ];
 
+// Liens universels de l'appli iOS (public/.well-known/apple-app-site-association
+// et sa copie à la racine) : fichier sans extension, que Next servirait en
+// application/octet-stream ; Apple attend du JSON. Exclus de proxy.ts : aucune
+// redirection vers /fr.
+const enTetesLiensAppli = [{ key: "Content-Type", value: "application/json" }];
+
 // La carte /fr/carte remplace /fr/restaurants/nos-menus. Tant que sa page
 // n'existe pas, l'ancienne carte reste servie : la rediriger vers une 404
 // couperait la commande en ligne. Lu à la construction (et au démarrage du
@@ -49,7 +55,11 @@ const nextConfig = {
   output: "standalone",
   poweredByHeader: false,
   async headers() {
-    return [{ source: "/:path*", headers: enTetesSecurite }];
+    return [
+      { source: "/:path*", headers: enTetesSecurite },
+      { source: "/.well-known/apple-app-site-association", headers: enTetesLiensAppli },
+      { source: "/apple-app-site-association", headers: enTetesLiensAppli },
+    ];
   },
   async redirects() {
     return redirections;

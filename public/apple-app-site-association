@@ -1,0 +1,16 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["9KR55K67TG.com.chickennation.app"],
+        "components": [
+          { "/": "/app-mobile/*", "comment": "Liens vers l'appli, sans langue" },
+          { "/": "/fr/app-mobile/*", "comment": "Liens vers l'appli du site (QR codes, parrainage, partages)" }
+        ],
+        "appID": "9KR55K67TG.com.chickennation.app",
+        "paths": ["/app-mobile/*", "/fr/app-mobile/*"]
+      }
+    ]
+  }
+}

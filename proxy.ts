@@ -15,6 +15,9 @@ export default createIntlMiddleware(routing);
 
 export const config = {
   matcher: [
-    "/((?!.+\\.[\\w]+$|_next|_vercel|api|trpc).*)", // → match tout sauf fichiers statiques, _next, vercel, api et trpc.
+    // → match tout sauf fichiers statiques, _next, vercel, api et trpc, et les
+    // fichiers des liens vers l'appli (/.well-known/…, /apple-app-site-association) :
+    // Apple et Android les lisent tels quels, sans suivre de redirection vers /fr.
+    "/((?!.+\\.[\\w]+$|_next|_vercel|api|trpc|\\.well-known/|apple-app-site-association).*)",
   ],
 };
