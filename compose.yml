@@ -4,14 +4,17 @@ services:
       - .env
     build:
       context: .
+      # Valeurs de production par défaut : le .env n'entre plus dans l'image,
+      # une variable absente du .env du serveur donnerait sinon une chaîne vide
+      # (API vide : construction en échec ; CloudFront vide : images cassées).
       args:
-        NEXT_PUBLIC_URL: ${NEXT_PUBLIC_URL}
-        NEXT_PUBLIC_API_BACKEND_URL: ${NEXT_PUBLIC_API_BACKEND_URL}
-        NEXT_PUBLIC_API_FILE_URL: ${NEXT_PUBLIC_API_FILE_URL}
-        NEXT_PUBLIC_CLOUDFRONT_URL: ${NEXT_PUBLIC_CLOUDFRONT_URL}
-        NEXT_PUBLIC_PLAY_STORE_LINK: ${NEXT_PUBLIC_PLAY_STORE_LINK}
-        NEXT_PUBLIC_APP_STORE_LINK: ${NEXT_PUBLIC_APP_STORE_LINK}
-        NEXT_PUBLIC_APP_SCHEMA: ${NEXT_PUBLIC_APP_SCHEMA}
+        NEXT_PUBLIC_URL: ${NEXT_PUBLIC_URL:-https://www.chicken-nation.com}
+        NEXT_PUBLIC_API_BACKEND_URL: ${NEXT_PUBLIC_API_BACKEND_URL:-https://api-private.chicken-nation.com/api/v1}
+        NEXT_PUBLIC_API_FILE_URL: ${NEXT_PUBLIC_API_FILE_URL:-https://api-private.chicken-nation.com}
+        NEXT_PUBLIC_CLOUDFRONT_URL: ${NEXT_PUBLIC_CLOUDFRONT_URL:-dvsxt5681pvqm.cloudfront.net}
+        NEXT_PUBLIC_PLAY_STORE_LINK: ${NEXT_PUBLIC_PLAY_STORE_LINK:-https://play.google.com/store/apps/details?id=com.chickennation.app}
+        NEXT_PUBLIC_APP_STORE_LINK: ${NEXT_PUBLIC_APP_STORE_LINK:-https://apps.apple.com/ci/app/chicken-nation/id6745905607}
+        NEXT_PUBLIC_APP_SCHEMA: ${NEXT_PUBLIC_APP_SCHEMA:-chickennation}
         # Clé fixe des actions serveur (cf. Dockerfile), lue dans .env.
         NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${NEXT_SERVER_ACTIONS_ENCRYPTION_KEY}
     image: chicken-nation-web-prod

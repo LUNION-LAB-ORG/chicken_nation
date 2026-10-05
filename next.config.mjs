@@ -121,6 +121,9 @@ const redirections = [
   { source: "/:langue(fr|en|ar)?/franchise", destination: "/fr/histoire#franchise", permanent: true },
   // Carte de la Nation : la seule page est l'adhésion.
   { source: "/:langue(fr|en|ar)?/carte-nation", destination: "/fr/carte-nation/adhesion", permanent: true },
+  // Ancienne page « Termes et conditions » : un modèle d'un autre site (en
+  // euros), jamais rempli. Elle mène à la vraie politique de confidentialité.
+  { source: "/:langue(fr|en|ar)?/politique", destination: "/fr/privacy-rules", permanent: true },
   ...(carteLivree
     ? [{ source: "/:langue(fr|en|ar)?/restaurants/nos-menus", destination: "/fr/carte", permanent: true }]
     : []),
