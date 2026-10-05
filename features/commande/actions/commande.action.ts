@@ -39,6 +39,7 @@ import {
 } from "../utils/panier.utils";
 import {
   IMAGE_PAR_DEFAUT,
+  messageCodeRefuse,
   modesDeVente,
   versAdresseEnregistree,
   versConditionsCommande,
@@ -473,12 +474,12 @@ export async function verifierCodeReductionAction(
       },
     };
   }
-  const message = !promo.ok
-    ? promo.message
-    : (promo.data.message as string) ||
-      "Ce code n'est pas valable pour ce panier.";
+  const refus = (r: typeof promo) =>
+    r.ok
+      ? { message: String(r.data.message ?? ""), statut: 400 }
+      : { message: r.message, statut: r.statut };
 
-  return { ok: false, message };
+  return { ok: false, message: messageCodeRefuse(refus(promo), refus(bon)) };
 }
 
 // ── Fidélité : points et cadeaux ──────────────────────────────────────────

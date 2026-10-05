@@ -10,11 +10,13 @@ import {
   AVANTAGES_VIDES,
   avantagesAtom,
   caisseAtom,
+  codeAReverifierAtom,
   etapeAtom,
   etapeVueAtom,
   heureRetraitAtom,
   lireCaisseGardee,
   modeAtom,
+  oublierAdresseAtom,
   oublierAvantagesAtom,
   restaurantIdAtom,
 } from "./caisse.store";
@@ -92,6 +94,25 @@ describe("choix gardés (cn-caisse)", () => {
     });
   });
 
+  it("déconnexion : l'adresse et son repère partent, le mode et le restaurant restent (recette 9)", () => {
+    const s = createStore();
+
+    s.set(adresseAtom, {
+      libelle: "Angré",
+      latitude: 5.39,
+      longitude: -3.98,
+      repere: "Immeuble jaune, 2e étage",
+    });
+    s.set(modeAtom, "PICKUP");
+    s.set(restaurantIdAtom, "r1");
+    s.set(oublierAdresseAtom);
+    expect(s.get(caisseAtom)).toEqual({
+      mode: "PICKUP",
+      adresse: null,
+      restaurantId: "r1",
+    });
+  });
+
   it("changer de restaurant remet l'heure à « dès que possible »", () => {
     const s = createStore();
 
@@ -127,6 +148,24 @@ describe("avantages en mémoire", () => {
     });
     s.set(panierAtom, [ligne("box", 2)]);
     expect(s.get(avantagesAtom).code).toBeNull();
+  });
+
+  it("panier changé après un code : le code est signalé à revérifier (recette 8)", () => {
+    const s = createStore();
+
+    s.set(panierAtom, [ligne("box")]);
+    expect(s.get(codeAReverifierAtom)).toBeNull();
+    s.set(avantagesAtom, { code: { code: "RECETTE5", remise: 2900 } });
+    expect(s.get(codeAReverifierAtom)).toBeNull();
+    s.set(panierAtom, [ligne("box"), ligne("wings")]);
+    expect(s.get(codeAReverifierAtom)).toBe("RECETTE5");
+    // Revérifié sur le nouveau panier : plus rien en attente.
+    s.set(avantagesAtom, { code: { code: "RECETTE5", remise: 3500 } });
+    expect(s.get(codeAReverifierAtom)).toBeNull();
+    // Panier vidé : rien à revérifier.
+    s.set(panierAtom, [ligne("box", 2)]);
+    s.set(panierAtom, []);
+    expect(s.get(codeAReverifierAtom)).toBeNull();
   });
 
   it("points et cadeaux restent quand le panier change, tout part quand il se vide", () => {

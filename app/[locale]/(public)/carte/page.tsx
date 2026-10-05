@@ -104,6 +104,7 @@ export default async function PageCarte({
             <Suspense fallback={null}>
               <RetraitDemande
                 restaurants={restaurants.map((r) => ({
+                  id: r.id,
                   slug: r.slug,
                   nom: r.nomAffiche,
                   schedule: r.schedule,

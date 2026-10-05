@@ -376,9 +376,11 @@ describe("Mes commandes", () => {
     );
     const t = texte(html);
 
-    expect(t).toContain("Payer 16 870 FCFA Modifier ma commande");
+    // « Payer » n'ouvre pas le module ici : le suivi s'ouvre avec « Payer »
+    // prêt et sous le focus (recette 12).
+    expect(t).toContain("16 870 FCFA Voir et payer Modifier ma commande");
     expect(html).toContain(
-      'href="/fr/commander/c0ffee00-0000-4000-8000-000000000004"',
+      'href="/fr/commander/c0ffee00-0000-4000-8000-000000000004?payer=1"',
     );
     expect(t).toContain("Suivre la commande");
     expect(t).toContain("Recommander Voir le détail");

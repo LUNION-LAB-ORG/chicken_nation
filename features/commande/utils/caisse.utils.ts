@@ -1,6 +1,7 @@
 import type {
   IAdresseLivraison,
   ICreationCommande,
+  ILignePanier,
   ModeCommande,
 } from "../types/commande.types";
 
@@ -185,4 +186,23 @@ export function decisionPaiement(
   if (!enAttente) return "creer";
 
   return enAttente.signature === signature ? "reutiliser" : "remplacer";
+}
+
+/**
+ * Le panier est-il encore celui de la commande dont voici la signature
+ * (signatureCommande) ? Sert à vider le panier quand cette commande est
+ * payée hors de la caisse (page de suivi), sans toucher à un panier refait
+ * depuis. Signature illisible (autre version du site) : non.
+ */
+export function panierDeLaCommande(
+  signature: string,
+  lignes: ILignePanier[],
+): boolean {
+  try {
+    const panier = (JSON.parse(signature) as { panier?: unknown }).panier;
+
+    return typeof panier === "string" && panier === signaturePanier(lignes);
+  } catch {
+    return false;
+  }
 }

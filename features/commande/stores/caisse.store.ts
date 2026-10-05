@@ -99,6 +99,16 @@ export const adresseAtom = atom(
     set(caisseGardeeAtom, { ...get(caisseAtom), adresse }),
 );
 
+/**
+ * Déconnexion (« Se déconnecter », « Changer de compte », « Changer de
+ * numéro ») : l'adresse et son repère sont des données du client, ils ne
+ * restent pas sur un appareil partagé. Le mode et le restaurant de retrait,
+ * eux, ne disent rien de lui.
+ */
+export const oublierAdresseAtom = atom(null, (get, set) =>
+  set(caisseGardeeAtom, { ...get(caisseAtom), adresse: null }),
+);
+
 /** Heure de retrait (ISO d'un créneau), null = dès que possible. En mémoire seulement. */
 export const heureRetraitAtom = atom<string | null>(null);
 
@@ -186,6 +196,23 @@ export const avantagesAtom = atom(
     set(avantagesBrutsAtom, { ...actuels, ...maj, panierDuCode: signature });
   },
 );
+
+/**
+ * Code vérifié pour un panier qui a changé depuis : il ne vaut plus (la
+ * remise dépend des plats). La caisse le revérifie aussitôt sur le nouveau
+ * panier et dit ce qu'il en est, au lieu de le retirer en silence. null si
+ * aucun code n'est en attente.
+ */
+export const codeAReverifierAtom = atom((get) => {
+  const brut = get(avantagesBrutsAtom);
+  const lignes = get(panierAtom);
+
+  return brut.code &&
+    lignesACommander(lignes).length > 0 &&
+    brut.panierDuCode !== signaturePanier(lignes)
+    ? brut.code.code
+    : null;
+});
 
 /** Autre client ou déconnexion : rien du précédent ne doit rester. */
 export const oublierAvantagesAtom = atom(null, (_get, set) => {

@@ -69,40 +69,89 @@ export function oublierPanierCommande(commandeId: string) {
 /**
  * La caisse crée la commande au clic « Payer » (étape 5), puis ouvre le module
  * de paiement. Si le client le ferme sans payer et clique de nouveau, c'est la
- * MÊME commande qui doit être payée, pas une seconde. On garde donc, le temps
- * de l'onglet, la commande créée et la signature de ce qu'elle contient
- * (caisse.utils, signatureCommande). Clé à part des autres, pour l'onglet.
+ * MÊME commande qui doit être payée, pas une seconde. On garde donc la
+ * commande créée et la signature de ce qu'elle contient (caisse.utils,
+ * signatureCommande).
+ *
+ * Gardée dans localStorage, et non plus le temps de l'onglet : un second
+ * onglet, ou un onglet rouvert, retrouve la commande non payée au lieu d'en
+ * créer une seconde identique (qui partait dans « À relancer »). Elle porte
+ * le client qui l'a créée (jamais proposée à un autre compte du même
+ * appareil) et vaut 2 h au plus. Une ancienne valeur de sessionStorage
+ * (avant ce changement) est encore lue, puis rangée au même endroit.
  */
 export interface ICommandeEnAttente {
   id: string;
   reference: string;
   signature: string;
+  /** Client qui a créé la commande (absent dans une ancienne valeur). */
+  client?: string;
+  /** Moment où elle a été notée (absent dans une ancienne valeur). */
+  notee?: number;
 }
 
 const CLE_EN_ATTENTE = "cn-commande-en-attente";
 
-export function noterCommandeEnAttente(c: ICommandeEnAttente) {
-  ecrire(session, CLE_EN_ATTENTE, JSON.stringify(c));
+/** Au-delà, la commande non payée n'est plus reprise : panier, frais et créneau ont pu changer. */
+export const DUREE_EN_ATTENTE_MS = 2 * 60 * 60 * 1000;
+
+export function noterCommandeEnAttente(
+  c: ICommandeEnAttente,
+  maintenant = Date.now(),
+) {
+  ecrire(local, CLE_EN_ATTENTE, JSON.stringify({ ...c, notee: maintenant }));
+  ecrire(session, CLE_EN_ATTENTE, null);
 }
 
-export function lireCommandeEnAttente(): ICommandeEnAttente | null {
-  try {
-    const c = JSON.parse(
-      lire(session, CLE_EN_ATTENTE) ?? "null",
-    ) as ICommandeEnAttente | null;
+const valide = (c: unknown): c is ICommandeEnAttente => {
+  const x = c as ICommandeEnAttente | null;
 
-    return c &&
-      typeof c.id === "string" &&
-      typeof c.reference === "string" &&
-      typeof c.signature === "string"
-      ? c
-      : null;
-  } catch {
+  return (
+    !!x &&
+    typeof x.id === "string" &&
+    typeof x.reference === "string" &&
+    typeof x.signature === "string" &&
+    (x.client === undefined || typeof x.client === "string") &&
+    (x.notee === undefined || typeof x.notee === "number")
+  );
+};
+
+/**
+ * Commande non payée de ce navigateur, ou null.
+ * `clientId` : client connecté ; une commande d'un autre compte est ignorée
+ * (sans être effacée : elle reste à son client).
+ */
+export function lireCommandeEnAttente(
+  clientId?: string | null,
+  maintenant = Date.now(),
+): ICommandeEnAttente | null {
+  const lue = (zone: () => Storage) => {
+    try {
+      const c = JSON.parse(lire(zone, CLE_EN_ATTENTE) ?? "null");
+
+      return valide(c) ? c : null;
+    } catch {
+      return null;
+    }
+  };
+  const c = lue(local) ?? lue(session);
+
+  if (!c) return null;
+  if (
+    typeof c.notee === "number" &&
+    maintenant - c.notee > DUREE_EN_ATTENTE_MS
+  ) {
+    oublierCommandeEnAttente();
+
     return null;
   }
+  if (clientId && c.client && c.client !== clientId) return null;
+
+  return c;
 }
 
 export function oublierCommandeEnAttente() {
+  ecrire(local, CLE_EN_ATTENTE, null);
   ecrire(session, CLE_EN_ATTENTE, null);
 }
 

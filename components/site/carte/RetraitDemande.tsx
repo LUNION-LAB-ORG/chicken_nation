@@ -1,6 +1,6 @@
 "use client";
 
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -17,12 +17,18 @@ import {
   oublierRetraitDemande,
 } from "./retrait-demande";
 
+import {
+  modeAtom,
+  restaurantIdAtom,
+} from "@/features/commande/stores/caisse.store";
 import { panierAtom } from "@/features/commande/stores/panier.store";
 import { nombreArticles } from "@/features/commande/utils/panier.utils";
 import { etatOuverture } from "@/features/restaurants/horaires";
 import { trouverRestaurant } from "@/features/restaurants/restaurants.site";
 
 export interface IRestaurantRetrait {
+  /** Identifiant de l'API : le tiroir et la caisse passent en retrait sur ce restaurant. */
+  id: string;
   slug: string;
   /** Nom affiché (« Angré »). */
   nom: string;
@@ -42,7 +48,8 @@ export function messageRetrait(r: IRestaurantRetrait, maintenant = new Date()) {
 /**
  * Lecture de `?retrait=<slug>` (« Retirer ici » d'un restaurant, panier vide).
  * Le choix est gardé le temps de l'onglet pour la caisse (retrait-demande.ts),
- * annoncé par un message, puis le paramètre est retiré de l'adresse.
+ * le tiroir passe en retrait sur ce restaurant, le choix est annoncé par un
+ * message, puis le paramètre est retiré de l'adresse.
  * Un bandeau le rappelle en tête de la carte, avec l'état d'ouverture du
  * restaurant et, dès qu'un plat est au panier, « Passer commande », qui mène
  * à la caisse en retrait sur ce restaurant. Un slug inconnu est ignoré.
@@ -59,13 +66,21 @@ export function RetraitDemande({
   const demande = parametres.get("retrait");
   const lignes = useAtomValue(panierAtom);
   const [choix, setChoix] = useState<IRestaurantRetrait | null>(null);
+  const setMode = useSetAtom(modeAtom);
+  const setRestaurantId = useSetAtom(restaurantIdAtom);
 
   useEffect(() => {
     let arrivee: IRestaurantRetrait | null = null;
 
     if (demande !== null) {
       arrivee = trouverRestaurant(restaurants, demande);
-      if (arrivee) memoriserRetraitDemande(arrivee.slug);
+      if (arrivee) {
+        memoriserRetraitDemande(arrivee.slug);
+        // Le tiroir du panier suit tout de suite : « Retrait » coché sur ce
+        // restaurant, sans alerte « livraison impossible » pour un plat à emporter.
+        setMode("PICKUP");
+        setRestaurantId(arrivee.id);
+      }
       const url = new URL(window.location.href);
 
       url.searchParams.delete("retrait");
@@ -86,7 +101,7 @@ export function RetraitDemande({
     const minuteur = setTimeout(() => afficherMessage(texte), 0);
 
     return () => clearTimeout(minuteur);
-  }, [demande, restaurants]);
+  }, [demande, restaurants, setMode, setRestaurantId]);
 
   if (!choix) return null;
   const panierVide = nombreArticles(lignes) === 0;

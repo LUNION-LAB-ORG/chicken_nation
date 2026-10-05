@@ -37,10 +37,12 @@ import {
   adresseAtom,
   allerEtapeAtom,
   avantagesAtom,
+  codeAReverifierAtom,
   etapeAtom,
   etapeVueAtom,
   heureRetraitAtom,
   modeAtom,
+  oublierAdresseAtom,
   oublierAvantagesAtom,
   restaurantIdAtom,
 } from "../../stores/caisse.store";
@@ -59,6 +61,7 @@ import {
   etapeAccessible,
   etapeMaximale,
   obstacleLivraison,
+  panierDeLaCommande,
 } from "../../utils/caisse.utils";
 import { articleDeLigne } from "../../utils/analytique.utils";
 import { messageErreurAction } from "../../utils/erreur-action.utils";
@@ -212,6 +215,8 @@ export function Caisse({
   const allerEtape = useSetAtom(allerEtapeAtom);
   const [avantages, setAvantages] = useAtom(avantagesAtom);
   const oublierAvantages = useSetAtom(oublierAvantagesAtom);
+  const oublierAdresse = useSetAtom(oublierAdresseAtom);
+  const codeAReverifier = useAtomValue(codeAReverifierAtom);
   const setBarre = useSetAtom(barreCaisseAtom);
   const etapeDemandee = useAtomValue(etapeDemandeeAtom);
   const ficheBranchee = useAtomValue(ficheBrancheeAtom);
@@ -285,24 +290,20 @@ export function Caisse({
     quitter("Ouverture du paiement…", `/fr/commander/${id}?payer=1`);
 
   /**
-   * Retour sur la caisse avec une commande créée dans cet onglet (rechargement
-   * pendant le paiement, retour de l'application Mobile Money) : payée, elle
-   * mène au suivi ; annulée ou illisible, elle est oubliée.
+   * Retour sur la caisse avec une commande non payée créée dans ce navigateur
+   * (rechargement pendant le paiement, retour de l'application Mobile Money,
+   * second onglet) : payée, elle mène au suivi ; annulée ou illisible, elle
+   * est oubliée.
    */
   useEffect(() => {
     if (!monte) return;
-    const attente = lireCommandeEnAttente();
+    const attente = lireCommandeEnAttente(clientInitial?.id);
 
     if (!attente) return;
-    let panierDeLaCommande = false;
+    // Signature d'une autre version : faux, on relit la commande.
+    const memePanier = panierDeLaCommande(attente.signature, lignes);
 
-    try {
-      panierDeLaCommande =
-        JSON.parse(attente.signature).panier === signaturePanier(lignes);
-    } catch {
-      /* signature d'une autre version : on relit la commande */
-    }
-    if (lireMarquePaiement(attente.reference)?.succesA && panierDeLaCommande)
+    if (lireMarquePaiement(attente.reference)?.succesA && memePanier)
       return terminerPaye(attente.id);
     let actif = true;
 
@@ -310,7 +311,7 @@ export function Caisse({
       .then((res) => {
         if (!actif) return;
         if (res.ok && res.data.commande.paied) {
-          if (panierDeLaCommande || !lignes.length) terminerPaye(attente.id);
+          if (memePanier || !lignes.length) terminerPaye(attente.id);
           else oublierCommandeEnAttente();
         } else if (
           !res.ok ? res.statut !== undefined : !aPayer(res.data.commande)
@@ -893,6 +894,23 @@ export function Caisse({
   const erreurDe = (n: number) =>
     erreurEtape && erreurEtape.etape === n ? erreurEtape.message : null;
 
+  /**
+   * Message d'une étape bloquante tenu à jour : il disparaît dès que l'obstacle
+   * est levé (frais de livraison enfin connus, relecture du panier finie), et
+   * suit l'obstacle s'il a changé. Sinon « Les frais … ne sont pas encore
+   * connus » restait affiché sous des frais bien calculés.
+   */
+  const raisonAffichee = erreurEtape
+    ? raison(erreurEtape.etape as EtapeCaisse)
+    : null;
+
+  useEffect(() => {
+    if (!erreurEtape || raisonAffichee === null) return;
+    if (!raisonAffichee) setErreurEtape(null);
+    else if (raisonAffichee !== erreurEtape.message)
+      setErreurEtape({ etape: erreurEtape.etape, message: raisonAffichee });
+  }, [raisonAffichee]);
+
   const pied = (n: EtapeCaisse, bouton: ReactNode) => (
     <PiedEtape
       libelleTotal={texteTotal}
@@ -948,6 +966,7 @@ export function Caisse({
     setDeconnexion(true);
     try {
       await deconnexionAction();
+      oublierAdresse();
       setClient(null);
       afficherMessage("Vous êtes déconnecté.");
     } catch (e) {
@@ -980,6 +999,50 @@ export function Caisse({
       return messageErreurAction(e);
     }
   };
+
+  /**
+   * Le panier a changé après un code : la remise dépend des plats, le code est
+   * revérifié aussitôt sur le nouveau panier. Toujours valable, il reste
+   * (nouvelle remise) ; sinon il part, et le client le sait (bloc du code et
+   * annonce), au lieu de voir le total monter sans explication.
+   */
+  const signatureDuPanier = signaturePanier(lignes);
+
+  useEffect(() => {
+    if (!monte || !codeAReverifier) return;
+    let actif = true;
+    const code = codeAReverifier;
+
+    verifierCodeReductionAction(code, lignes, total)
+      .then((res) => {
+        if (!actif) return;
+        if (res.ok) {
+          setAvantages({ code: res.data });
+          afficherMessage(
+            `Panier modifié${INSECABLE}: code ${res.data.code} appliqué de nouveau, remise de ${fcfa(res.data.remise)}.`,
+          );
+
+          return;
+        }
+        setAvantages({ code: null });
+        const texte = `Le panier a changé${INSECABLE}: le code ${code} ne s'applique plus. ${res.message}`;
+
+        setAvisCumul({ ou: "code", texte });
+        afficherMessage(texte);
+      })
+      .catch(() => {
+        if (!actif) return;
+        setAvantages({ code: null });
+        const texte = `Le panier a changé${INSECABLE}: appliquez de nouveau votre code ${code}.`;
+
+        setAvisCumul({ ou: "code", texte });
+        afficherMessage(texte);
+      });
+
+    return () => {
+      actif = false;
+    };
+  }, [monte, codeAReverifier, signatureDuPanier]);
 
   const creation: ICreationCommande = {
     mode,
@@ -1067,11 +1130,17 @@ export function Caisse({
   let contenu: ReactNode;
 
   if (!monte || redirection) {
+    // Panneau d'attente au moins aussi haut que l'écran : l'étape qui le
+    // remplace ne pousse plus le pied de page visible (CLS de 0,11 mesuré à
+    // 375 px, recette vitesse D4).
     contenu = (
       <section
         aria-busy="true"
         aria-label="Votre commande"
-        className={cn(classePanneau, "min-h-[280px] content-center")}
+        className={cn(
+          classePanneau,
+          "min-h-[max(280px,calc(100svh-var(--h-entete)))] content-center",
+        )}
       >
         <p
           className="flex items-center gap-2.5 text-sm text-encre-doux"
@@ -1318,7 +1387,13 @@ export function Caisse({
   return (
     <div className="mx-auto grid w-full max-w-(--largeur) grid-cols-1 items-start gap-5 px-(--gouttiere-caisse) pt-6 pb-12 min-[1000px]:grid-cols-[minmax(0,1fr)_380px] min-[1000px]:gap-7 min-[1000px]:pt-8 min-[1000px]:pb-16">
       <div className="grid min-w-0 content-start gap-4">
-        {recapVisible ? <Recapitulatif recap={recap} variante="volet" /> : null}
+        {recapVisible ? (
+          <Recapitulatif recap={recap} variante="volet" />
+        ) : !monte ? (
+          // Place du volet du récapitulatif (téléphone) réservée pendant le
+          // chargement : il apparaît sans décaler l'étape.
+          <div aria-hidden="true" className="h-[54px] min-[1000px]:hidden" />
+        ) : null}
         {contenu}
       </div>
       {recapVisible ? <Recapitulatif recap={recap} variante="colonne" /> : null}

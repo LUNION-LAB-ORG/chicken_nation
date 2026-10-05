@@ -35,6 +35,10 @@ export function ChampCode({
   longueur?: number;
   legende?: string;
   erreur?: string | null;
+  /**
+   * Vérification en cours : cases en lecture seule, mais JAMAIS désactivées
+   * (une case désactivée perd le focus, et le clavier du téléphone se ferme).
+   */
   desactive?: boolean;
   /** Met le focus sur la première case à l'affichage (étape du code). */
   focusAuDebut?: boolean;
@@ -57,6 +61,7 @@ export function ChampCode({
 
   /** Écrit `saisie` à partir de la case `depart` et passe à la suite. */
   const ecrire = (depart: number, saisie: string) => {
+    if (desactive) return;
     const nouveaux = [...chiffres];
     const recus = saisie.replace(/\D/g, "").slice(0, longueur - depart);
 
@@ -75,6 +80,7 @@ export function ChampCode({
   };
 
   const surTouche = (i: number, e: KeyboardEvent<HTMLInputElement>) => {
+    if (desactive && e.key === "Backspace") return e.preventDefault();
     if (e.key === "Backspace" && !chiffres[i] && i > 0) {
       e.preventDefault();
       const nouveaux = [...chiffres];
@@ -106,15 +112,16 @@ export function ChampCode({
             ref={(el) => {
               cases.current[i] = el;
             }}
+            aria-busy={desactive || undefined}
             aria-describedby={erreur ? `${id}-erreur` : undefined}
             aria-invalid={erreur ? true : undefined}
             aria-label={`Chiffre ${i + 1} sur ${longueur}`}
             autoComplete={i === 0 ? "one-time-code" : "off"}
-            className="h-16 w-[clamp(48px,15vw,58px)] rounded-[14px] border-[1.5px] border-trait-fort bg-white p-0 text-center text-[26px] font-bold tabular-nums focus:border-encre focus-visible:outline-offset-1 aria-invalid:border-rouge disabled:bg-surface"
-            disabled={desactive}
+            className="h-16 w-[clamp(48px,15vw,58px)] rounded-[14px] border-[1.5px] border-trait-fort bg-white p-0 text-center text-[26px] font-bold tabular-nums read-only:bg-surface focus:border-encre focus-visible:outline-offset-1 aria-invalid:border-rouge"
             id={i === 0 ? id : `${id}-${i}`}
             inputMode="numeric"
             pattern="[0-9]*"
+            readOnly={desactive}
             type="text"
             value={chiffre}
             onChange={(e) => {

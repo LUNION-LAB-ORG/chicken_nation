@@ -157,9 +157,10 @@ export function signatureLigne(
  *
  * Les suppléments comptent pour la ligne entière, pas pour chaque plat : deux
  * ajouts de « Burger + 1 Coca » donnent 2 burgers et 2 Coca, il faut donc
- * additionner aussi les suppléments. Leur quantité entre dans la clé : la
- * ligne fusionnée change de clé et peut, à son tour, rejoindre une autre ligne
- * (l'appel se termine, le panier perd une ligne à chaque tour).
+ * additionner aussi les suppléments. La ligne fusionnée GARDE sa clé et sa
+ * place : un troisième « Burger + 1 Coca » la rejoint encore (3 burgers,
+ * 3 Coca) au lieu de faire une seconde ligne, et « Recommander » ne la
+ * renvoie pas en fin de panier.
  */
 export function ajouterLigne(
   lignes: ILignePanier[],
@@ -176,27 +177,15 @@ export function ajouterLigne(
       quantite: (parId.get(s.id)?.quantite ?? 0) + s.quantite,
     });
   }
-  const supplements = Array.from(parId.values());
   // Les données du plat de la nouvelle ligne sont les plus fraîches.
   const fusion: ILignePanier = {
     ...nouvelle,
     quantite: existante.quantite + nouvelle.quantite,
-    supplements,
-    cle: signatureLigne(
-      nouvelle.dish_id,
-      nouvelle.epice,
-      nouvelle.options,
-      supplements,
-    ),
+    supplements: Array.from(parId.values()),
+    cle: existante.cle,
   };
 
-  if (fusion.cle === existante.cle)
-    return lignes.map((l) => (l.cle === existante.cle ? fusion : l));
-
-  return ajouterLigne(
-    lignes.filter((l) => l.cle !== existante.cle),
-    fusion,
-  );
+  return lignes.map((l) => (l === existante ? fusion : l));
 }
 
 /**
@@ -271,7 +260,9 @@ export interface IChoixFiche {
 /**
  * Ligne de panier tirée d'un plat relu au catalogue et des choix du client.
  * Quantités ramenées dans leurs bornes (plat 1 à 50, supplément 0 à 20).
- * Un supplément absent du plat est ignoré.
+ * Un supplément absent du plat est ignoré. Les choix sont rangés dans
+ * l'ordre de la fiche (groupe, puis choix), pas dans l'ordre des clics :
+ * la caisse et le suivi les écrivent alors de la même façon.
  */
 export function construireLigne(
   plat: IPlatDetail,
@@ -279,6 +270,16 @@ export function construireLigne(
 ): ILignePanier {
   const borne = (n: number, min: number, max: number) =>
     Number.isFinite(n) ? Math.max(min, Math.min(max, Math.floor(n))) : min;
+  const rang = new Map(
+    plat.groupes.flatMap((g, ig) =>
+      g.items.map((it, ii) => [it.id, ig * 10_000 + ii] as const),
+    ),
+  );
+  const options = [...choix.options].sort(
+    (a, b) =>
+      (rang.get(a.item_id) ?? Number.MAX_SAFE_INTEGER) -
+      (rang.get(b.item_id) ?? Number.MAX_SAFE_INTEGER),
+  );
   const supplements: ISupplementChoisi[] = plat.supplements
     .map((s) => ({
       s,
@@ -294,13 +295,13 @@ export function construireLigne(
     }));
 
   return {
-    cle: signatureLigne(plat.id, choix.epice, choix.options, supplements),
+    cle: signatureLigne(plat.id, choix.epice, options, supplements),
     dish_id: plat.id,
     nom: plat.name,
     image: plat.image,
     prixUnitaire: plat.prix,
     epice: choix.epice,
-    options: choix.options,
+    options,
     supplements,
     quantite: borne(choix.quantite, 1, QUANTITE_MAX),
     available_order_types: plat.available_order_types,

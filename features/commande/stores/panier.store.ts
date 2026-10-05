@@ -97,6 +97,21 @@ export const panierAtom = atomWithStorage<ILignePanier[]>(
   stockageNavigateur<ILignePanier[]>(),
 );
 
+/**
+ * Panier tel qu'il est gardé dans le navigateur, lu directement : l'atome ne
+ * lit le stockage qu'une fois monté, une décision prise juste au chargement
+ * de la page (commande payée sur le suivi) doit voir le vrai panier.
+ */
+export function lirePanierGarde(): ILignePanier[] {
+  try {
+    const lignes = JSON.parse(window.localStorage.getItem("cn-panier") ?? "[]");
+
+    return Array.isArray(lignes) ? (lignes as ILignePanier[]) : [];
+  } catch {
+    return [];
+  }
+}
+
 export const ajouterAuPanierAtom = atom(
   null,
   (get, set, ligne: ILignePanier) => {

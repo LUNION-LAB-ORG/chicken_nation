@@ -11,6 +11,7 @@ import type {
 
 import { normaliserGroupes } from "./panier.utils";
 
+import { fcfa, typo } from "@/lib/typo";
 import { formatImageUrl } from "@/utils/formatImageUrl";
 
 /**
@@ -261,4 +262,63 @@ export function fraisServiceEstimes(
   if (taux === null || !Number.isFinite(taux) || taux < 0) return null;
 
   return Math.ceil((Math.max(0, sousTotal) * taux) / 10) * 10;
+}
+
+// ── Messages du serveur ───────────────────────────────────────────────────
+
+/**
+ * Message d'erreur du serveur rendu lisible : montants écrits « 50 000 FCFA »
+ * (le serveur écrit « 50000 FCFA »), insécables, point final.
+ */
+export function messageServeur(message: string): string {
+  let m = String(message ?? "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  m = m.replace(
+    /(\d+(?:[ \u00a0\u202f]\d{3})*)\s*(?:F ?CFA|XOF)\b/gi,
+    (_, n: string) => fcfa(Number(n.replace(/\D/g, ""))),
+  );
+  m = typo(m);
+  if (m && !/[.!?…]$/.test(m)) m += ".";
+
+  return m;
+}
+
+/** Ni code promo ni bon d'achat ne porte ce nom (ou il a été supprimé). */
+export const CODE_INCONNU = "Ce code n'existe pas ou n'est plus valable.";
+
+/** Refus d'une vérification : message et statut HTTP (absent : réseau). */
+interface IRefus {
+  message: string;
+  statut?: number;
+}
+
+/**
+ * Message montré quand un code est refusé. Le site essaie d'abord le code
+ * promo, puis le bon d'achat (le client tape l'un ou l'autre au même
+ * endroit) :
+ *  - aucun des deux n'existe : message neutre, au lieu de « Code promo
+ *    introuvable » pour un bon d'achat mal tapé ;
+ *  - le code promo existe mais ne vaut pas pour ce panier : sa raison
+ *    (montant minimum, plats visés…) ;
+ *  - le bon existe mais ne vaut plus : sa raison, avec le bon mot.
+ * `bon` est null quand il n'a pas été vérifié.
+ */
+export function messageCodeRefuse(promo: IRefus, bon: IRefus | null): string {
+  const reseau = (r: IRefus) => r.statut === undefined || r.statut >= 429;
+
+  if (promo.statut !== 404) {
+    return reseau(promo)
+      ? promo.message
+      : messageServeur(promo.message) ||
+          "Ce code n'est pas valable pour ce panier.";
+  }
+  if (!bon || bon.statut === 404) return CODE_INCONNU;
+  if (reseau(bon)) return bon.message;
+
+  return (
+    messageServeur(bon.message.replace(/code promo/gi, "bon d'achat")) ||
+    CODE_INCONNU
+  );
 }

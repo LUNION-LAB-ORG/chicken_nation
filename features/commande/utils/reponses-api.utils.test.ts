@@ -2,7 +2,10 @@
 import { describe, expect, it } from "bun:test";
 
 import {
+  CODE_INCONNU,
   fraisServiceEstimes,
+  messageCodeRefuse,
+  messageServeur,
   versAdresseEnregistree,
   versConditionsCommande,
   versFrais,
@@ -333,5 +336,57 @@ describe("conditions de la commande", () => {
     expect(fraisServiceEstimes(4500, 0.05)).toBe(230);
     expect(fraisServiceEstimes(0, 0.01)).toBe(0);
     expect(fraisServiceEstimes(13500, null)).toBeNull();
+  });
+});
+
+describe("messages du serveur (recette 10)", () => {
+  const N = "\u00a0";
+
+  it("montants écrits à la française, point final", () => {
+    expect(
+      messageServeur("Le montant minimum de commande est de 50000 FCFA"),
+    ).toBe(`Le montant minimum de commande est de 50${N}000${N}FCFA.`);
+    expect(messageServeur("Ce code promo a expiré.")).toBe(
+      "Ce code promo a expiré.",
+    );
+  });
+
+  it("code inconnu (ni code promo ni bon) : message neutre", () => {
+    expect(
+      messageCodeRefuse(
+        { message: "Code promo introuvable", statut: 404 },
+        { message: "Code promo invalide ou introuvable", statut: 404 },
+      ),
+    ).toBe(CODE_INCONNU);
+  });
+
+  it("code promo qui existe : sa raison ; bon qui existe : la sienne, avec le bon mot", () => {
+    expect(
+      messageCodeRefuse(
+        {
+          message: "Le montant minimum de commande est de 50000 FCFA",
+          statut: 400,
+        },
+        { message: "Code promo invalide ou introuvable", statut: 404 },
+      ),
+    ).toBe(`Le montant minimum de commande est de 50${N}000${N}FCFA.`);
+    expect(
+      messageCodeRefuse(
+        { message: "Code promo introuvable", statut: 404 },
+        { message: "Ce code promo a expiré", statut: 400 },
+      ),
+    ).toBe("Ce bon d'achat a expiré.");
+  });
+
+  it("réseau ou trop de demandes : message tel quel", () => {
+    expect(
+      messageCodeRefuse({ message: "Le service est indisponible." }, null),
+    ).toBe("Le service est indisponible.");
+    expect(
+      messageCodeRefuse(
+        { message: "Code promo introuvable", statut: 404 },
+        { message: "Trop de demandes.", statut: 429 },
+      ),
+    ).toBe("Trop de demandes.");
   });
 });

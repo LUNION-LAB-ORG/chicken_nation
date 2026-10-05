@@ -275,6 +275,81 @@ describe("RecapitulatifPhotos", () => {
     ).toEqual([]);
   });
 
+  it("supplément offert sur la ligne choisie par le serveur, pas toujours la première (recette 4)", () => {
+    const avecCoca = {
+      ...LIGNE,
+      cle: "babatche",
+      dish_id: "babatche",
+      nom: "BABATCHÊ",
+      supplements: [
+        {
+          id: "coca",
+          nom: "COCA",
+          prix: 1000,
+          quantite: 1,
+          available_order_types: [],
+        },
+      ],
+    };
+    const box = {
+      ...LIGNE,
+      cle: "box",
+      dish_id: "box",
+      nom: "BOX 2K26 PRO",
+      supplements: [],
+    };
+    const lignes = lignesRecapDuPanier(
+      [avecCoca, box],
+      [
+        {
+          id: "r2",
+          type: "SUPPLEMENT",
+          articleId: "coca",
+          nom: "COCA",
+          image: "",
+        },
+      ],
+    );
+
+    expect(lignes.map((l) => [l.nom, l.offerts])).toEqual([
+      ["BABATCHÊ", []],
+      ["BOX 2K26 PRO", ["+ 1 Coca offert"]],
+    ]);
+  });
+
+  it("commande enregistrée : « Non épicé » quand le client avait le choix, comme la caisse (recette 13)", () => {
+    const commande = versCommande({
+      id: "c2",
+      order_items: [
+        {
+          dish_id: "big",
+          quantity: 1,
+          unit_price: 8000,
+          line_total: 8000,
+          epice: false,
+          options: [],
+          supplements: [],
+          dish: { name: "BIG CHICKEN", price: 8000, spice_level: "OPTIONAL" },
+        },
+        {
+          dish_id: "coca",
+          quantity: 1,
+          unit_price: 1000,
+          line_total: 1000,
+          epice: false,
+          options: [],
+          supplements: [],
+          dish: { name: "COCA", price: 1000, spice_level: "NEVER" },
+        },
+      ],
+    });
+
+    expect(lignesRecapDeCommande(commande).map((l) => l.choix)).toEqual([
+      "Non épicé",
+      "",
+    ]);
+  });
+
   it("commande enregistrée : cadeaux repérés, suppléments payants seuls en clair", () => {
     const commande = versCommande({
       id: "c1",

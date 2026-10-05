@@ -2,6 +2,7 @@
 
 import type { IClient } from "../types/commande.types";
 
+import { useSetAtom } from "jotai";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -10,6 +11,7 @@ import {
   demanderCodeAction,
   verifierCodeAction,
 } from "../actions/connexion.action";
+import { oublierAdresseAtom } from "../stores/caisse.store";
 import { messageErreurAction } from "../utils/erreur-action.utils";
 import { telephoneLisible } from "../utils/panier.utils";
 
@@ -61,6 +63,7 @@ export default function Connexion({
   const [attente, setAttente] = useState(0);
   // Numéro vérifié pendant cette visite (et non profil repris d'une visite précédente).
   const [verifie, setVerifie] = useState(false);
+  const oublierAdresse = useSetAtom(oublierAdresseAtom);
 
   /**
    * Le focus va au premier champ quand l'étape change par un geste du client,
@@ -82,6 +85,14 @@ export default function Connexion({
 
     return () => clearTimeout(t);
   }, [attente]);
+
+  /**
+   * Après une erreur, le focus revient au champ à corriger (jamais perdu sur
+   * la page) : le message lui est relié par aria-describedby.
+   */
+  const focaliser = (id: string) => {
+    requestAnimationFrame(() => document.getElementById(id)?.focus());
+  };
 
   const allerA = (suivante: EtapeConnexion) => {
     geste.current = true;
@@ -109,12 +120,19 @@ export default function Connexion({
         etape === "telephone" ? saisie : telephone,
       );
 
-      if (!res.ok) return setErreur(res.message);
+      if (!res.ok) {
+        setErreur(res.message);
+
+        return focaliser(etape === "telephone" ? "cx-tel" : "cx-code");
+      }
       setTelephone(res.data.telephone);
       setCode("");
       setAttente(RENVOI_S);
       if (etape === "code") {
         afficherMessage("Nouveau code envoyé sur WhatsApp.");
+        // « Renvoyer le code » se désactive (attente de 30 s) : le focus
+        // passe aux cases du code au lieu d'être perdu.
+        focaliser("cx-code");
       } else {
         allerA("code");
         afficherMessage(
@@ -125,11 +143,21 @@ export default function Connexion({
 
   const verifier = (saisi: string = code) =>
     appeler(async () => {
-      if (!/^\d{4}$/.test(saisi.trim()))
-        return setErreur("Entrez les 4 chiffres reçus sur WhatsApp.");
+      if (!/^\d{4}$/.test(saisi.trim())) {
+        setErreur("Entrez les 4 chiffres reçus sur WhatsApp.");
+
+        return focaliser("cx-code");
+      }
       const res = await verifierCodeAction(telephone, saisi.trim());
 
-      if (!res.ok) return setErreur(res.message);
+      if (!res.ok) {
+        // Code faux : les cases se vident et le focus revient à la première,
+        // sinon le code faux repartait au premier chiffre corrigé.
+        setCode("");
+        setErreur(res.message);
+
+        return focaliser("cx-code");
+      }
       if (!res.data.first_name || !res.data.last_name) {
         setVerifie(true);
 
@@ -145,7 +173,11 @@ export default function Connexion({
     appeler(async () => {
       const res = await completerProfilAction(prenom, nom);
 
-      if (!res.ok) return setErreur(res.message);
+      if (!res.ok) {
+        setErreur(res.message);
+
+        return focaliser(prenom.trim() ? "cx-nom" : "cx-prenom");
+      }
       afficherMessage(`Bienvenue, ${res.data.first_name}${INSECABLE}!`);
       onConnecte(res.data);
     });
@@ -154,6 +186,7 @@ export default function Connexion({
   const changerDeNumero = () =>
     appeler(async () => {
       await deconnexionAction();
+      oublierAdresse();
       setSaisie("");
       allerA("telephone");
     });
@@ -205,8 +238,8 @@ export default function Connexion({
         <Bouton
           bloc
           aria-busy={chargement || undefined}
+          aria-disabled={chargement || undefined}
           className="gap-1.5 px-2.5 text-[length:clamp(12.5px,calc((100cqw_-_44px)/17.4),16px)]"
-          disabled={chargement}
           icone="whatsapp"
           taille="grand"
           type="submit"
@@ -249,7 +282,7 @@ export default function Connexion({
         <Bouton
           bloc
           aria-busy={chargement || undefined}
-          disabled={chargement}
+          aria-disabled={chargement || undefined}
           taille="grand"
           type="submit"
         >
@@ -312,7 +345,7 @@ export default function Connexion({
         <Bouton
           bloc
           aria-busy={chargement || undefined}
-          disabled={chargement}
+          aria-disabled={chargement || undefined}
           taille="grand"
           type="submit"
         >

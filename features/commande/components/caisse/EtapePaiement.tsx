@@ -72,9 +72,9 @@ export interface ILigneResume {
  *
  *  1. KKiaPay se charge dès l'arrivée sur l'étape ; « Payer » reste
  *     désactivé tant qu'il n'est pas prêt (sinon fenêtre vide).
- *  2. Au clic, la commande est créée (canal web), sauf si cet onglet en a
- *     déjà une non payée pour le MÊME contenu : c'est alors celle-ci qui est
- *     payée (aucune seconde commande). Contenu changé : l'ancienne est
+ *  2. Au clic, la commande est créée (canal web), sauf si ce navigateur en a
+ *     déjà une non payée pour le MÊME contenu (cet onglet ou un autre) :
+ *     c'est alors celle-ci qui est payée (aucune seconde commande). Contenu changé : l'ancienne est
  *     annulée avant d'en créer une nouvelle (règle du site).
  *  3. Le module s'ouvre avec le montant renvoyé par le serveur.
  *  4. Succès : panier vidé, suivi de la commande. Fermeture ou échec : on
@@ -194,7 +194,8 @@ export function EtapePaiement({
     setEtat("creation");
     try {
       let commande: ICommandeOuverte | null = null;
-      const attente = lireCommandeEnAttente();
+      // Commande non payée de ce client, créée ici ou dans un autre onglet.
+      const attente = lireCommandeEnAttente(client.id);
       const decision = decisionPaiement(attente, signature);
 
       if (attente && decision !== "creer") {
@@ -247,6 +248,7 @@ export function EtapePaiement({
           id: res.data.id,
           reference: res.data.reference,
           signature,
+          client: client.id,
         });
         // Gardé le temps de l'onglet : « Modifier ma commande » du suivi le remet.
         sauverPanierCommande(res.data.id, aCommander);

@@ -70,6 +70,9 @@ function versLigne(i: Brut): ILigneCommande {
     ),
     supplementsChoisis,
     epice: !!i.epice,
+    ...(["ALWAYS", "OPTIONAL", "NEVER"].includes(String(plat.spice_level))
+      ? { spice_level: plat.spice_level as ILigneCommande["spice_level"] }
+      : {}),
     offert: i.unit_price === 0 && nombre(plat.price) > 0,
   };
 }

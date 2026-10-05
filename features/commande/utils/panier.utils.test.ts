@@ -190,7 +190,33 @@ describe("ajouterLigne", () => {
     expect(panier).toHaveLength(1);
     expect(panier[0].quantite).toBe(2);
     expect(panier[0].supplements[0].quantite).toBe(2);
-    expect(panier[0].cle).toBe(signatureLigne("plat-a", false, [], [coca(2)]));
+    // La ligne garde sa clé : un nouvel ajout identique la retrouve.
+    expect(panier[0].cle).toBe(a.cle);
+  });
+
+  it("trois ajouts identiques font une seule ligne, à sa place (recette 6)", () => {
+    const burger = () =>
+      ligne({
+        dish_id: "big-chicken",
+        epice: true,
+        supplements: [coca(1)],
+        cle: signatureLigne("big-chicken", true, [], [coca(1)]),
+      });
+    const box = ligne({
+      dish_id: "box",
+      cle: signatureLigne("box", false, [], []),
+    });
+    let panier = ajouterLigne([], burger());
+
+    panier = ajouterLigne(panier, box);
+    panier = ajouterLigne(panier, burger());
+    panier = ajouterLigne(panier, burger());
+
+    expect(panier.map((l) => `${l.dish_id}×${l.quantite}`)).toEqual([
+      "big-chicken×3",
+      "box×1",
+    ]);
+    expect(panier[0].supplements[0].quantite).toBe(3);
   });
 
   it("garde deux lignes quand l'épicé diffère", () => {
@@ -441,6 +467,31 @@ describe("fiche plat", () => {
 
     expect(borne.quantite).toBe(1);
     expect(borne.supplements[0].quantite).toBe(QUANTITE_SUPPLEMENT_MAX);
+  });
+
+  it("construireLigne range les choix dans l'ordre de la fiche, pas des clics (recette 13)", () => {
+    const opt = (item_id, group_id, label) => ({
+      item_id,
+      group_id,
+      label,
+      price_delta: 0,
+    });
+    const l = construireLigne(PLAT, {
+      epice: false,
+      options: [
+        opt("frites", "g-acc", "Frites"),
+        opt("coleslaw", "g-acc", "Coleslaw"),
+        opt("bbq", "g-sauce", "Barbecue"),
+      ],
+      supplements: {},
+      quantite: 1,
+    });
+
+    expect(l.options.map((o) => o.label)).toEqual([
+      "Barbecue",
+      "Coleslaw",
+      "Frites",
+    ]);
   });
 
   it("detailsLigne : choix, « Non épicé » seulement si le client a choisi, suppléments", () => {

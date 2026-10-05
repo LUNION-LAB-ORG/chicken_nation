@@ -3,11 +3,13 @@
 import type { ICommande } from "../types/commande.types";
 import type { ReactNode } from "react";
 
+import { useSetAtom } from "jotai";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { deconnexionAction } from "../actions/connexion.action";
 import { useActionsCommande } from "../hooks/useActionsCommande";
+import { oublierAdresseAtom } from "../stores/caisse.store";
 import { messageErreurAction } from "../utils/erreur-action.utils";
 
 import { Bouton } from "@/components/site/Bouton";
@@ -62,13 +64,23 @@ export function ConfirmationModifier({
             panier. Vous paierez ensuite la nouvelle commande.
           </p>
           <div className="flex flex-wrap gap-2">
-            <Bouton ref={oui} disabled={enCours} onClick={onConfirmer}>
+            {/* aria-disabled et non disabled : un bouton désactivé sous le
+                focus le perd (retour en haut de page au clavier). */}
+            <Bouton
+              ref={oui}
+              aria-disabled={enCours || undefined}
+              onClick={() => {
+                if (!enCours) onConfirmer();
+              }}
+            >
               {enCours ? "Annulation…" : "Oui, modifier"}
             </Bouton>
             <Bouton
-              disabled={enCours}
+              aria-disabled={enCours || undefined}
               variante="secondaire"
-              onClick={() => basculer(false)}
+              onClick={() => {
+                if (!enCours) basculer(false);
+              }}
             >
               Non
             </Bouton>
@@ -106,9 +118,11 @@ export function BoutonRecommander({
   return (
     <>
       <Bouton
-        disabled={enCours !== null}
+        aria-disabled={enCours !== null || undefined}
         variante={variante}
-        onClick={() => recommander(commande)}
+        onClick={() => {
+          if (enCours === null) recommander(commande);
+        }}
       >
         {enCours === "recommander" ? "Ajout au panier…" : "Recommander"}
       </Bouton>
@@ -161,17 +175,20 @@ export function BoutonDeconnexion() {
   const router = useRouter();
   const [enCours, setEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
+  const oublierAdresse = useSetAtom(oublierAdresseAtom);
 
   return (
     <>
       <Bouton
-        disabled={enCours}
+        aria-disabled={enCours || undefined}
         variante="secondaire"
         onClick={async () => {
+          if (enCours) return;
           setErreur(null);
           setEnCours(true);
           try {
             await deconnexionAction();
+            oublierAdresse();
             router.refresh();
           } catch (e) {
             setEnCours(false);

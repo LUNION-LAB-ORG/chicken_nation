@@ -8,6 +8,7 @@ import {
   etapeMaximale,
   livraisonPrete,
   obstacleLivraison,
+  panierDeLaCommande,
   signatureCommande,
 } from "./caisse.utils";
 import { signatureLigne } from "./panier.utils";
@@ -180,6 +181,16 @@ describe("commande créée, pas encore payée", () => {
     expect(
       signatureCommande({ ...BASE, mode: "PICKUP", restaurantId: "r" }),
     ).not.toBe(s);
+  });
+
+  it("panier de la commande payée sur le suivi : vidé seulement s'il n'a pas changé (recette 1)", () => {
+    const s = signatureCommande(BASE);
+
+    expect(panierDeLaCommande(s, [ligne()])).toBe(true);
+    // Plat ajouté depuis : ce panier-là reste.
+    expect(panierDeLaCommande(s, [ligne(2)])).toBe(false);
+    expect(panierDeLaCommande(s, [])).toBe(false);
+    expect(panierDeLaCommande("pas du json", [ligne()])).toBe(false);
   });
 
   it("au clic « Payer » : réutiliser, remplacer ou créer", () => {

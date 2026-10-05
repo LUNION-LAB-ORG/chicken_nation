@@ -7,11 +7,14 @@ import type {
   Resultat,
 } from "../types/commande.types";
 
+import { useSetAtom } from "jotai";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { obtenirCommandeAction } from "../actions/commande.action";
 import { useActionsCommande } from "../hooks/useActionsCommande";
 import { usePaiementCommande } from "../hooks/usePaiementCommande";
+import { lirePanierGarde, viderPanierAtom } from "../stores/panier.store";
+import { panierDeLaCommande } from "../utils/caisse.utils";
 import {
   actionPerimee,
   messageErreurAction,
@@ -21,8 +24,10 @@ import { pointsLisibles } from "../utils/fidelite.utils";
 import {
   etatPaiement,
   type IEcartPoints,
+  lireCommandeEnAttente,
   lireEcartPoints,
   lireMarquePaiement,
+  oublierCommandeEnAttente,
   oublierEcartPoints,
   oublierPanierCommande,
 } from "../utils/memoire-navigateur.utils";
@@ -182,6 +187,11 @@ export default function SuiviCommande({
   // réponse « payée » réaffichait le bouton « Payer » (marque déjà effacée).
   const lectures = useRef({ envoyees: 0, appliquee: 0 });
   const { modifier, enCours, erreur: erreurModif } = useActionsCommande();
+  const viderPanier = useSetAtom(viderPanierAtom);
+  // « Voir et payer » de Mes commandes (?payer=1) : le bouton « Payer »
+  // reçoit le focus dès qu'il est prêt, une seule fois.
+  const boutonPayer = useRef<HTMLButtonElement>(null);
+  const focusPayer = useRef(ouvrirPaiement);
 
   /**
    * Relecture tolérante : une coupure réseau ou un redéploiement du site
@@ -301,7 +311,17 @@ export default function SuiviCommande({
     oublierPanierCommande(id);
     oublierEcartPoints(id);
     setEcartPoints(null);
-  }, [paye, reference, id, oublierMarque]);
+    // Commande créée à la caisse puis payée ici : le panier qui l'a faite
+    // part avec elle (sinon ses plats, déjà payés, restaient au panier et
+    // pouvaient être payés une seconde fois). Un panier refait depuis reste.
+    const attente = lireCommandeEnAttente();
+
+    if (attente?.id === id) {
+      if (panierDeLaCommande(attente.signature, lirePanierGarde()))
+        viderPanier();
+      oublierCommandeEnAttente();
+    }
+  }, [paye, reference, id, oublierMarque, viderPanier]);
 
   // Le titre « Paiement accepté » reçoit le focus : il est lu tout de suite.
   useEffect(() => {
@@ -310,6 +330,23 @@ export default function SuiviCommande({
 
   const etat =
     commande && aPayer(commande) ? etatPaiement(marque, horloge) : "libre";
+  const payable =
+    !!commande && aPayer(commande) && etat === "libre" && pret && !!paiement;
+
+  useEffect(() => {
+    if (!payable || !focusPayer.current) return;
+    focusPayer.current = false;
+    const b = boutonPayer.current;
+
+    if (!b) return;
+    b.focus({ preventScroll: true });
+    b.scrollIntoView({
+      block: "center",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+    });
+  }, [payable]);
   const termine = !!commande && estTerminee(commande);
   // Relecture rapide les 3 premières minutes après le succès annoncé, puis lente.
   const rapide = etat === "confirmation";
@@ -418,6 +455,8 @@ export default function SuiviCommande({
   const textePoints = textePointsCredites(points);
   const tranche = texteTranche(pointsParFranc);
   const restaurant = restaurantDeCommande(commande);
+  // « Paiement accepté, part en cuisine » : seulement tant qu'elle est en cours.
+  const blocPaye = justePaye && !annulee && !servie;
   const creneau = creneauRetrait(commande);
   const lieu = lieuCommande(commande);
   const payantes = commande.lignes.filter((l) => !l.offert);
@@ -441,7 +480,7 @@ export default function SuiviCommande({
         <div className="grid min-w-0 gap-4">
           {bandeauErreur}
 
-          {justePaye ? (
+          {blocPaye ? (
             <section
               aria-labelledby="t-paye"
               className={cn(PANNEAU, "justify-items-center gap-3 text-center")}
@@ -562,6 +601,7 @@ export default function SuiviCommande({
                     </>
                   ) : (
                     <Bouton
+                      ref={boutonPayer}
                       bloc
                       disabled={!pret || !paiement || enCours === "modifier"}
                       icone="cadenas"
@@ -646,7 +686,7 @@ export default function SuiviCommande({
             </section>
           ) : null}
 
-          {textePoints && !justePaye ? (
+          {textePoints && !blocPaye ? (
             <section
               aria-labelledby="t-gain"
               className={cn(

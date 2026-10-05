@@ -165,7 +165,10 @@ function actionsDe(c: ICommande) {
       <ActionsCommande
         action="modifier"
         avant={
-          <LienBouton href={lien}>Payer {fcfa(Math.ceil(c.amount))}</LienBouton>
+          // Le module de paiement ne s'ouvre jamais seul (il ignore un appel
+          // fait avant d'être prêt) : le suivi s'ouvre avec « Payer » prêt
+          // et sous le focus (?payer=1). Le libellé le dit.
+          <LienBouton href={`${lien}?payer=1`}>Voir et payer</LienBouton>
         }
         commande={pourClient}
       />

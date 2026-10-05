@@ -38,18 +38,34 @@ export interface ILigneRecap {
 
 /**
  * Lignes du récapitulatif tirées du panier et des cadeaux choisis (maquette,
- * JS 1222-1243) : plats offerts en lignes à 0 F, suppléments offerts sur la
- * première ligne payante, comme le serveur les place.
+ * JS 1222-1243) : plats offerts en lignes à 0 F, chaque supplément offert sur
+ * la ligne où le serveur le placera, la première ligne payante qui n'a pas
+ * déjà ce supplément (même règle que fidelite.utils, articlesAvecCadeaux).
  */
 export function lignesRecapDuPanier(
   lignes: ILignePanier[],
   cadeaux: (Pick<ICadeau, "id" | "type" | "articleId" | "nom" | "image"> &
     Pick<CadeauChoisi, "epice">)[] = [],
 ): ILigneRecap[] {
-  const offertsSurPremiere = cadeaux
-    .filter((c) => c.type === "SUPPLEMENT")
-    .map((c) => `+ 1 ${joli(c.nom)} offert`);
-  const payantes = lignesACommander(lignes).map((l, i) => {
+  const aCommander = lignesACommander(lignes);
+  // Suppléments de chaque ligne, cadeaux déjà posés compris.
+  const portes = aCommander.map(
+    (l) =>
+      new Set(l.supplements.filter((s) => s.quantite > 0).map((s) => s.id)),
+  );
+  const offerts: string[][] = aCommander.map(() => []);
+  const vus = new Set<string>();
+
+  for (const c of cadeaux) {
+    if (c.type !== "SUPPLEMENT" || vus.has(c.id)) continue;
+    vus.add(c.id);
+    const i = portes.findIndex((p) => !p.has(c.articleId));
+
+    if (i === -1) continue;
+    portes[i].add(c.articleId);
+    offerts[i].push(`+ 1 ${joli(c.nom)} offert`);
+  }
+  const payantes = aCommander.map((l, i) => {
     const d = detailsLigne(l);
 
     return {
@@ -61,7 +77,7 @@ export function lignesRecapDuPanier(
       choix: d.choix,
       supplements: d.supplements,
       montant: totalLigne(l),
-      offerts: i === 0 ? offertsSurPremiere : [],
+      offerts: offerts[i],
     };
   });
   const platsOfferts = payantes.length
@@ -98,7 +114,11 @@ export function lignesRecapDeCommande(
       image: l.image,
       nom: l.nom,
       quantite: l.quantite,
-      choix: [...l.options, l.epice ? "Épicé" : null]
+      // Comme la caisse (detailsLigne) : « Non épicé » quand le client avait le choix.
+      choix: [
+        ...l.options,
+        l.epice ? "Épicé" : l.spice_level === "OPTIONAL" ? "Non épicé" : null,
+      ]
         .filter(Boolean)
         .join(" · "),
       supplements: payants.length

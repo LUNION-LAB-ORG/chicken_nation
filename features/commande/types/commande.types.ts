@@ -221,6 +221,8 @@ export interface ILigneCommande {
   /** Suppléments détaillés, pour « Recommander ». */
   supplementsChoisis: ISupplementCommande[];
   epice: boolean;
+  /** Épicé imposé ou au choix (plat lu avec la commande) ; absent si l'API ne le donne pas. */
+  spice_level?: NiveauEpice;
   /** Plat offert (cadeau à 0 F) : jamais recommandé. */
   offert: boolean;
 }

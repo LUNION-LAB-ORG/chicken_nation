@@ -231,7 +231,7 @@ export default function AdresseLivraison({
   };
 
   const enregistrer = async () => {
-    if (!adresse) return;
+    if (!adresse || envoiCarnet) return;
     setErreurCarnet(null);
     setEnvoiCarnet(true);
     try {
@@ -335,7 +335,11 @@ export default function AdresseLivraison({
               value={titre}
               onChange={(e) => setTitre(e.target.value)}
             />
-            <Bouton disabled={envoiCarnet} type="submit" variante="sombre">
+            <Bouton
+              aria-disabled={envoiCarnet || undefined}
+              type="submit"
+              variante="sombre"
+            >
               Enregistrer
             </Bouton>
             <Lien onClick={() => setNommer(false)}>Annuler</Lien>

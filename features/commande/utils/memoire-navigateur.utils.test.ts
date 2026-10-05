@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import {
   DELAI_CONFIRMATION_MS,
   DELAI_PROTECTION_MS,
+  DUREE_EN_ATTENTE_MS,
   ecrireMarquePaiement,
   etatPaiement,
   lireCommandeEnAttente,
@@ -76,26 +77,74 @@ describe("tentative de paiement", () => {
 });
 
 describe("commande en attente de paiement (étape 5)", () => {
-  it("gardée le temps de l'onglet, relue, oubliée", () => {
+  it("gardée dans localStorage (tous les onglets), relue, oubliée", () => {
+    const t = 1_000_000;
+
     expect(lireCommandeEnAttente()).toBeNull();
-    noterCommandeEnAttente({ id: "c1", reference: "ORD-1", signature: "s" });
-    expect(session.cles()).toEqual(["cn-commande-en-attente"]);
-    expect(lireCommandeEnAttente()).toEqual({
+    noterCommandeEnAttente(
+      { id: "c1", reference: "ORD-1", signature: "s", client: "k1" },
+      t,
+    );
+    expect(local.cles()).toEqual(["cn-commande-en-attente"]);
+    expect(session.cles()).toEqual([]);
+    expect(lireCommandeEnAttente("k1", t + 1000)).toEqual({
       id: "c1",
       reference: "ORD-1",
       signature: "s",
+      client: "k1",
+      notee: t,
     });
     oublierCommandeEnAttente();
     expect(lireCommandeEnAttente()).toBeNull();
   });
 
+  it("un second onglet (même stockage local) retrouve la commande du premier (recette 2)", () => {
+    noterCommandeEnAttente({
+      id: "c1",
+      reference: "ORD-1",
+      signature: "s",
+      client: "k1",
+    });
+    // Second onglet : sessionStorage neuf, localStorage partagé.
+    session = stockage();
+    globalThis.window = { localStorage: local, sessionStorage: session };
+    expect(lireCommandeEnAttente("k1")?.id).toBe("c1");
+  });
+
+  it("jamais proposée à un autre compte, ni au-delà de 2 h", () => {
+    const t = 5_000_000;
+
+    noterCommandeEnAttente(
+      { id: "c1", reference: "ORD-1", signature: "s", client: "k1" },
+      t,
+    );
+    expect(lireCommandeEnAttente("k2", t)).toBeNull();
+    // Gardée pour son client.
+    expect(lireCommandeEnAttente("k1", t)?.id).toBe("c1");
+    expect(lireCommandeEnAttente("k1", t + DUREE_EN_ATTENTE_MS + 1)).toBeNull();
+    expect(local.cles()).toEqual([]);
+  });
+
+  it("une ancienne valeur de sessionStorage (avant le 05/10) est encore lue", () => {
+    session.setItem(
+      "cn-commande-en-attente",
+      JSON.stringify({ id: "c0", reference: "ORD-0", signature: "s" }),
+    );
+    expect(lireCommandeEnAttente("k1")?.id).toBe("c0");
+    oublierCommandeEnAttente();
+    expect(session.cles()).toEqual([]);
+  });
+
   it("valeur abîmée ou stockage bloqué : rien, sans erreur", () => {
-    session.setItem("cn-commande-en-attente", "{pas du json");
+    local.setItem("cn-commande-en-attente", "{pas du json");
     expect(lireCommandeEnAttente()).toBeNull();
-    session.setItem("cn-commande-en-attente", JSON.stringify({ id: "c1" }));
+    local.setItem("cn-commande-en-attente", JSON.stringify({ id: "c1" }));
     expect(lireCommandeEnAttente()).toBeNull();
     globalThis.window = {
       get sessionStorage() {
+        throw new Error("bloqué");
+      },
+      get localStorage() {
         throw new Error("bloqué");
       },
     };
