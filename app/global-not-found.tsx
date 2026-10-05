@@ -2,7 +2,6 @@ import "@/styles/globals.css";
 
 import type { Metadata } from "next";
 
-import { NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 
 import PublicLayout from "./[locale]/(public)/layout";
@@ -37,11 +36,9 @@ export default function GlobalNotFound() {
   return (
     <html className={classesPolices} lang="fr">
       <body className="min-h-screen bg-papier font-texte text-encre antialiased">
-        <NextIntlClientProvider locale={routing.defaultLocale} messages={null}>
-          <PublicLayout>
-            <PageIntrouvable />
-          </PublicLayout>
-        </NextIntlClientProvider>
+        <PublicLayout>
+          <PageIntrouvable />
+        </PublicLayout>
       </body>
     </html>
   );

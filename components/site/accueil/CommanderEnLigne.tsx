@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+import Image from "../Image";
 import { BordDechire } from "../BordDechire";
 import { LienBouton } from "../Bouton";
 import { Conteneur, Section } from "../Section";

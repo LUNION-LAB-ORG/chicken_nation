@@ -1,8 +1,7 @@
 import type { IConfigFidelite } from "@/features/fidelite/fidelite.api";
 import type { IPromotionPublique } from "@/features/promotion/promotion.type";
 
-import Image from "next/image";
-
+import Image from "../Image";
 import { BadgesStores } from "../BadgesStores";
 import { LienBouton } from "../Bouton";
 import { Niveau } from "../Etiquettes";

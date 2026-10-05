@@ -3,6 +3,7 @@
 import type { ICommande } from "../types/commande.types";
 import type { ReactNode } from "react";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { deconnexionAction } from "../actions/connexion.action";
@@ -10,7 +11,6 @@ import { useActionsCommande } from "../hooks/useActionsCommande";
 import { messageErreurAction } from "../utils/erreur-action.utils";
 
 import { Bouton } from "@/components/site/Bouton";
-import { useRouter } from "@/i18n/navigation";
 
 /**
  * « Modifier ma commande » avec sa confirmation sur place : la commande non

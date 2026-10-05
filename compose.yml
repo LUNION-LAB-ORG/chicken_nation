@@ -18,3 +18,10 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:${DOCKER_PORT}:3000"
+    volumes:
+      # Images optimisées par next/image gardées d'un déploiement à l'autre :
+      # sinon chaque mise en ligne les refait toutes à la première visite.
+      - cache-images:/app/.next/cache/images
+
+volumes:
+  cache-images:

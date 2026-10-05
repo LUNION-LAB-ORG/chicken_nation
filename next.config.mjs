@@ -1,4 +1,5 @@
-import { existsSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import createNextIntlPlugin from "next-intl/plugin";
@@ -23,13 +24,28 @@ const enTetesSecurite = [
 // redirection vers /fr.
 const enTetesLiensAppli = [{ key: "Content-Type", value: "application/json" }];
 
+// Fichiers statiques de public/ (images, vidéo, badges des stores) gardés 30
+// jours par le navigateur, puis encore un jour pendant leur revérification.
+// Règle : un fichier modifié change de nom (ou de paramètre ?v=, voir le sprite
+// des icônes plus bas). Les images optimisées (/_next/image) suivent déjà
+// `images.minimumCacheTTL` ; /_next/static est géré par Next (un an).
+const enTetesCacheLong = [
+  { key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=86400" },
+];
+
 // La carte /fr/carte remplace /fr/restaurants/nos-menus. Tant que sa page
 // n'existe pas, l'ancienne carte reste servie : la rediriger vers une 404
 // couperait la commande en ligne. Lu à la construction (et au démarrage du
 // serveur de développement, à relancer après la création de la page).
-const carteLivree = existsSync(
-  path.join(path.dirname(fileURLToPath(import.meta.url)), "app", "[locale]", "(public)", "carte", "page.tsx"),
-);
+const racine = path.dirname(fileURLToPath(import.meta.url));
+const carteLivree = existsSync(path.join(racine, "app", "[locale]", "(public)", "carte", "page.tsx"));
+
+// Empreinte du sprite des icônes (components/site/Icone.tsx) : son adresse
+// change avec son contenu, malgré le cache long des fichiers statiques.
+const versionIcones = createHash("sha256")
+  .update(readFileSync(path.join(racine, "public", "assets", "site", "icones.svg")))
+  .digest("hex")
+  .slice(0, 10);
 
 /**
  * Redirections permanentes (308), traitées avant proxy.ts. Les anciennes
@@ -54,9 +70,13 @@ const redirections = [
 const nextConfig = {
   output: "standalone",
   poweredByHeader: false,
+  // Écrit dans le code à la construction (serveur et navigateur).
+  env: { VERSION_ICONES: versionIcones },
   async headers() {
     return [
       { source: "/:path*", headers: enTetesSecurite },
+      { source: "/assets/:chemin*", headers: enTetesCacheLong },
+      { source: "/:badge(download-[^/]+)", headers: enTetesCacheLong },
       { source: "/.well-known/apple-app-site-association", headers: enTetesLiensAppli },
       { source: "/apple-app-site-association", headers: enTetesLiensAppli },
     ];

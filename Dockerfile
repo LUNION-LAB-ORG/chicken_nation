@@ -74,6 +74,9 @@ COPY --from=builder /app/public ./public
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# Cache des images optimisées (volume de compose.yml) : le dossier existe dans
+# l'image avec le bon propriétaire, le volume en hérite à sa création.
+RUN mkdir -p .next/cache/images && chown -R nextjs:nodejs .next/cache
 
 USER nextjs
 

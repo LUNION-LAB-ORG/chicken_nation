@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+import Image from "../Image";
 import { BadgesStores } from "../BadgesStores";
 import { QrAppli } from "../QrAppli";
 import { Section } from "../Section";

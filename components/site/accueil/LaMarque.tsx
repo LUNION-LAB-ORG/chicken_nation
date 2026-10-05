@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+import Image from "../Image";
 import { Ruban } from "../Autocollants";
 import { LienFleche } from "../Lien";
 import { Section } from "../Section";

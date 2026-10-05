@@ -26,6 +26,7 @@ import {
   panierAtom,
   remplacerLigneAtom,
 } from "../stores/panier.store";
+import { articleDeLigne } from "../utils/analytique.utils";
 import { messageErreurAction } from "../utils/erreur-action.utils";
 import {
   aideMaximum,
@@ -67,6 +68,7 @@ import { afficherMessage, annoncer } from "@/components/site/MessageFlottant";
 import { PhotoPlat } from "@/components/site/PhotoPlat";
 import { PrixPlat } from "@/components/site/plats/CartePlat";
 import { photoPlat } from "@/features/menus/photo-plat";
+import { evenementCommerce } from "@/lib/analytique";
 import { fcfa, INSECABLE, joli, nombre, phrase, typo } from "@/lib/typo";
 import { cn } from "@/lib/utils";
 
@@ -611,6 +613,24 @@ export default function FichePlat() {
     titreRef.current?.focus({ preventScroll: true });
   }, [demande, pret]);
 
+  // Mesure d'audience (GA4) : fiche d'un plat vue, hors « Modifier ».
+  const platVu = etat.statut === "pret" ? etat.fiche : null;
+
+  useEffect(() => {
+    if (!demande || !platVu || demande.indexLigne !== undefined) return;
+    const { plat, categorie } = platVu;
+
+    evenementCommerce("view_item", [
+      {
+        item_id: plat.id,
+        item_name: plat.name,
+        price: plat.prix,
+        quantity: 1,
+        ...(categorie ? { item_category: categorie } : {}),
+      },
+    ]);
+  }, [demande, platVu]);
+
   const fermer = () => {
     const depuis = demande?.depuis;
 
@@ -675,6 +695,9 @@ export default function FichePlat() {
       messageApresFermeture(`Ligne mise à jour${INSECABLE}: ${plat.name}`);
     } else {
       ajouter(ligne);
+      evenementCommerce("add_to_cart", [
+        articleDeLigne(ligne, etat.fiche.categorie),
+      ]);
       messageApresFermeture(
         `Ajouté au panier${INSECABLE}: ${ligne.quantite}${INSECABLE}×${INSECABLE}${plat.name}`,
       );

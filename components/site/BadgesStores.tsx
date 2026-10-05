@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+import Image from "./Image";
 import { Ancre } from "./Ancre";
 
 import { liensStores } from "@/config/site";

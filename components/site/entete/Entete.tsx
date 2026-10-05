@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 
+import Image from "../Image";
 import { Conteneur } from "../Section";
 
 import { BoutonCommander } from "./BoutonCommander";
@@ -28,6 +28,10 @@ export function Entete() {
           aria-label="Chicken Nation, accueil"
           className="mr-auto flex shrink-0 items-center gap-2 rounded-lg text-encre no-underline xl:mr-[18px]"
           href={CHEMIN_ACCUEIL}
+          // Pas de préchargement de l'accueil depuis chaque page : il
+          // téléchargeait ses images principales et sa CSS pour rien
+          // (données mobiles payantes). Voir Ancre.tsx.
+          prefetch={false}
         >
           {/* Chargé tout de suite mais sans préchargement : seule l'image
               principale de la page est préchargée. */}

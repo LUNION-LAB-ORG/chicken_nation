@@ -1,7 +1,6 @@
 import type { IRestaurantSite } from "@/features/restaurants/restaurants.site";
 
-import Image from "next/image";
-
+import Image from "../Image";
 import { Icone } from "../Icone";
 import { Section } from "../Section";
 import { TitreAffiche } from "../TitreAffiche";

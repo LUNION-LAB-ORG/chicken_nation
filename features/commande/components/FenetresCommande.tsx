@@ -1,9 +1,8 @@
 "use client";
 
 import { useAtom, useSetAtom } from "jotai";
-import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 
 import {
   ficheBrancheeAtom,
@@ -15,10 +14,13 @@ import {
 // Chargées à la première demande seulement : une page qu'on ne fait que lire
 // n'embarque ni la fiche ni le tiroir. Le téléchargement anticipé (à
 // l'intention, plus bas) vise les mêmes modules : le rendu le réutilise.
+// React.lazy plutôt que next/dynamic : les fenêtres ne sont jamais rendues
+// par le serveur (montées après une action), et le chargeur de Next pesait
+// quelques ko de plus sur chaque page.
 const chargerFiche = () => import("./FichePlat");
 const chargerTiroir = () => import("./TiroirPanier");
-const FichePlat = dynamic(() => import("./FichePlat"), { ssr: false });
-const TiroirPanier = dynamic(() => import("./TiroirPanier"), { ssr: false });
+const FichePlat = lazy(chargerFiche);
+const TiroirPanier = lazy(chargerTiroir);
 
 /** Élément qui ouvre une fenêtre (« Ajouter », panier de l'en-tête, barre du panier). */
 const OUVRE_FENETRE = '[aria-haspopup="dialog"]';
@@ -128,8 +130,16 @@ export function FenetresCommande() {
 
   return (
     <>
-      {ficheUtilisee ? <FichePlat /> : null}
-      {tiroirUtilise ? <TiroirPanier /> : null}
+      {ficheUtilisee ? (
+        <Suspense fallback={null}>
+          <FichePlat />
+        </Suspense>
+      ) : null}
+      {tiroirUtilise ? (
+        <Suspense fallback={null}>
+          <TiroirPanier />
+        </Suspense>
+      ) : null}
     </>
   );
 }

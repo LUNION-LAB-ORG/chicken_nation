@@ -60,6 +60,7 @@ import {
   etapeMaximale,
   obstacleLivraison,
 } from "../../utils/caisse.utils";
+import { articleDeLigne } from "../../utils/analytique.utils";
 import { messageErreurAction } from "../../utils/erreur-action.utils";
 import {
   articlesAvecCadeaux,
@@ -126,6 +127,7 @@ import {
   adresseCourte,
   trouverRestaurant,
 } from "@/features/restaurants/restaurants.site";
+import { evenementCommerce } from "@/lib/analytique";
 import { fcfa, INSECABLE, joli, kmTexte, nombre, pluriel } from "@/lib/typo";
 import { cn } from "@/lib/utils";
 import { formatImageUrl } from "@/utils/formatImageUrl";
@@ -338,6 +340,11 @@ export function Caisse({
     if (!monte || relecture.current) return;
     if (!lignes.length) return setRelu(true);
     relecture.current = true;
+    // Mesure d'audience (GA4) : caisse ouverte avec un panier, une fois.
+    evenementCommerce(
+      "begin_checkout",
+      lignesACommander(lignes).map((l) => articleDeLigne(l)),
+    );
     setRevalidation(true);
     revaliderPanierAction(lignes.map((l) => l.dish_id))
       .then((plats) => setPrixMisAJour(rafraichir(plats)))

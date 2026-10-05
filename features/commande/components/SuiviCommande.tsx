@@ -16,6 +16,7 @@ import {
   actionPerimee,
   messageErreurAction,
 } from "../utils/erreur-action.utils";
+import { articlesDeCommande } from "../utils/analytique.utils";
 import { pointsLisibles } from "../utils/fidelite.utils";
 import {
   etatPaiement,
@@ -53,6 +54,7 @@ import { Bouton, LienBouton } from "@/components/site/Bouton";
 import { Icone } from "@/components/site/Icone";
 import { Lien } from "@/components/site/Lien";
 import { Conteneur } from "@/components/site/Section";
+import { evenementCommerce } from "@/lib/analytique";
 import { fcfa, INSECABLE, joli, TELEPHONE, telLien } from "@/lib/typo";
 import { cn } from "@/lib/utils";
 
@@ -267,6 +269,14 @@ export default function SuiviCommande({
     apresEchec: () => relire(),
   });
 
+  // Dernière lecture de la commande, pour la mesure de l'achat ci-dessous
+  // (sans relancer cet effet à chaque relecture).
+  const commandeLue = useRef(commande);
+
+  useEffect(() => {
+    commandeLue.current = commande;
+  }, [commande]);
+
   // Payée : la tentative et le panier gardé ne servent plus. Une tentative
   // récente de ce navigateur (module ouvert ou succès annoncé, ici ou à la
   // caisse) veut dire que le client vient de payer : « Paiement accepté ».
@@ -275,8 +285,18 @@ export default function SuiviCommande({
     const m = lireMarquePaiement(reference);
     const derniere = Math.max(m?.succesA ?? 0, m?.ouvertA ?? 0);
 
-    if (derniere && Date.now() - derniere < DELAI_PAIEMENT_RECENT_MS)
+    if (derniere && Date.now() - derniere < DELAI_PAIEMENT_RECENT_MS) {
       setJustePaye(true);
+      // Mesure d'audience (GA4) : achat compté une seule fois, la marque de
+      // paiement étant effacée juste après.
+      const payee = commandeLue.current;
+
+      if (payee)
+        evenementCommerce("purchase", articlesDeCommande(payee), {
+          transaction_id: reference,
+          value: payee.amount,
+        });
+    }
     oublierMarque(reference);
     oublierPanierCommande(id);
     oublierEcartPoints(id);

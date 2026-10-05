@@ -1,8 +1,9 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import Connexion from "./Connexion";
 
-import { useRouter } from "@/i18n/navigation";
 import { INSECABLE } from "@/lib/typo";
 
 const TEXTES = {

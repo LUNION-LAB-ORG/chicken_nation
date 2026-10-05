@@ -1,9 +1,9 @@
 import type { IRestaurantSite } from "@/features/restaurants/restaurants.site";
 import type { CSSProperties } from "react";
 
-import Image from "next/image";
 import Link from "next/link";
 
+import Image from "../Image";
 import { Tampon } from "../Autocollants";
 import { LienBouton } from "../Bouton";
 import { Icone } from "../Icone";
@@ -74,10 +74,14 @@ export function PageRestaurant({
         <nav aria-label="Fil d'Ariane" className={styles.ariane}>
           <ol>
             <li>
-              <Link href="/fr">Accueil</Link>
+              <Link href="/fr" prefetch={false}>
+                Accueil
+              </Link>
             </li>
             <li>
-              <Link href="/fr/restaurants">Nos restaurants</Link>
+              <Link href="/fr/restaurants" prefetch={false}>
+                Nos restaurants
+              </Link>
             </li>
             <li aria-current="page">{r.nomAffiche}</li>
           </ol>

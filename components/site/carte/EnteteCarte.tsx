@@ -1,7 +1,6 @@
 import type { ICategorieCarte } from "@/features/menus/types/carte.types";
 
-import Image from "next/image";
-
+import Image from "../Image";
 import { Eclat, Tampon } from "../Autocollants";
 import { Conteneur } from "../Section";
 import { TitreAffiche } from "../TitreAffiche";

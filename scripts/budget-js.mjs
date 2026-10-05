@@ -218,8 +218,15 @@ async function principal() {
     const js = new Set(communs);
     const css = new Set();
 
-    for (const liste of Object.values(manifeste.entryJSFiles ?? {})) liste.forEach((f) => js.add(relatifStatique(f)));
-    for (const liste of Object.values(manifeste.entryCSSFiles ?? {})) {
+    // La 404 globale (app/global-not-found.tsx) a son propre document : ses
+    // fichiers figurent dans le manifeste de chaque page mais ne sont chargés
+    // que pour une adresse inconnue (vérifié dans le HTML servi).
+    for (const [entree, liste] of Object.entries(manifeste.entryJSFiles ?? {})) {
+      if (entree.endsWith("/app/global-not-found")) continue;
+      liste.forEach((f) => js.add(relatifStatique(f)));
+    }
+    for (const [entree, liste] of Object.entries(manifeste.entryCSSFiles ?? {})) {
+      if (entree.endsWith("/app/global-not-found")) continue;
       liste.forEach((f) => css.add(relatifStatique(typeof f === "string" ? f : f.path)));
     }
 

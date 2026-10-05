@@ -6,10 +6,13 @@ import { describe, expect, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 
 // Hors de Next, le routeur n'existe pas : les boutons qui naviguent reçoivent
-// un routeur factice (rien n'est cliqué dans ces tests de rendu).
-mock.module("@/i18n/navigation", () => ({
-  useRouter: () => ({ push() {}, refresh() {}, replace() {} }),
-  Link: (p) => p.children,
+// un routeur factice (rien n'est cliqué dans ces tests de rendu). Le reste du
+// module (usePathname...) reste le vrai.
+const navigation = await import("next/navigation");
+
+mock.module("next/navigation", () => ({
+  ...navigation,
+  useRouter: () => ({ push() {}, refresh() {}, replace() {}, prefetch() {} }),
 }));
 
 const { versCommande } = await import("../utils/commande.utils");

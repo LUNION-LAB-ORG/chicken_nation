@@ -70,6 +70,8 @@ export function MenuMobile() {
                   aria-current={lienCourant(lien.href, chemin)}
                   className="flex min-h-13 items-center justify-between border-b border-trait text-[17px] font-semibold text-encre no-underline"
                   href={lien.href}
+                  // Ouvrir le menu ne télécharge pas les huit pages.
+                  prefetch={false}
                   onClick={() => setOuvertSur(null)}
                 >
                   {lien.libelle}

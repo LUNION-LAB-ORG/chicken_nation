@@ -1,7 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 
-import Image from "next/image";
-
+import Image from "./Image";
 import styles from "./PhotoPlat.module.css";
 
 import { cn } from "@/lib/utils";

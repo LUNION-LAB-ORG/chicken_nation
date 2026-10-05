@@ -1,7 +1,6 @@
 import type { IPlatCarte } from "@/features/menus/types/carte.types";
 
-import Image from "next/image";
-
+import Image from "../Image";
 import { Eclat, EtiquettePromo, Ruban, Tampon } from "../Autocollants";
 import { LienBouton, styleBouton } from "../Bouton";
 import { Icone } from "../Icone";

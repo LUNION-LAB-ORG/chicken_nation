@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+import Image from "../Image";
 import { Eclat, Tampon } from "../Autocollants";
 import { LienBouton } from "../Bouton";
 import { Conteneur } from "../Section";

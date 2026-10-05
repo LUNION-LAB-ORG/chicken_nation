@@ -29,6 +29,7 @@ export function NavPrincipale() {
             lien.des1100 && "max-[1100px]:hidden",
           )}
           href={lien.href}
+          prefetch={false}
         >
           {lien.libelle}
         </Link>

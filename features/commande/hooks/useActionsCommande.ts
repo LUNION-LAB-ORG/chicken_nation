@@ -3,6 +3,7 @@
 import type { ICommande } from "../types/commande.types";
 
 import { useAtomValue, useSetAtom } from "jotai";
+import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
 import {
@@ -32,7 +33,6 @@ import {
 } from "../utils/suivi.utils";
 
 import { afficherMessage } from "@/components/site/MessageFlottant";
-import { useRouter } from "@/i18n/navigation";
 import { INSECABLE } from "@/lib/typo";
 
 type CommandeActionnable = Pick<ICommande, "id" | "reference" | "lignes">;
@@ -115,7 +115,7 @@ export function useActionsCommande() {
             .filter(Boolean)
             .join(" "),
         );
-        router.push("/commander");
+        router.push("/fr/commander");
       } catch (e) {
         setEnCours(null);
         setErreur(messageErreurAction(e));
@@ -148,7 +148,7 @@ export function useActionsCommande() {
         setEnCours(null);
         // Tiroir du panier s'il est monté dans la page (lot L11b), sinon la caisse.
         if (tiroirBranche) ouvrirTiroir(true);
-        else router.push("/commander");
+        else router.push("/fr/commander");
       } catch (e) {
         setEnCours(null);
         setErreur(messageErreurAction(e));

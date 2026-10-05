@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 
+import Image from "../Image";
 import { Ancre } from "../Ancre";
 import { BordDechire } from "../BordDechire";
 import { Icone } from "../Icone";

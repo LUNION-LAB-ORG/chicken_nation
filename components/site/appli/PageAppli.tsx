@@ -1,8 +1,7 @@
 import type { ReactNode } from "react";
 import type { IConfigFidelite } from "@/features/fidelite/fidelite.api";
 
-import Image from "next/image";
-
+import Image from "../Image";
 import { Ancre } from "../Ancre";
 import { Ruban } from "../Autocollants";
 import { BlocAvis } from "../avis/BlocAvis";

@@ -40,8 +40,12 @@ export const NOMS_ICONES = [
 
 export type NomIcone = (typeof NOMS_ICONES)[number];
 
-// Un seul fichier pour toutes les icônes, gardé en cache par le navigateur.
-const SPRITE = "/assets/site/icones.svg";
+// Un seul fichier pour toutes les icônes, gardé en cache par le navigateur
+// (30 jours) : son empreinte (next.config.mjs) change son adresse à chaque
+// modification. Absente hors de Next (tests).
+const SPRITE = process.env.VERSION_ICONES
+  ? `/assets/site/icones.svg?v=${process.env.VERSION_ICONES}`
+  : "/assets/site/icones.svg";
 
 /**
  * Icône décorative (masquée aux lecteurs d'écran), couleur du texte.

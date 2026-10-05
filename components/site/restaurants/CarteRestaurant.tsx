@@ -1,7 +1,8 @@
 import type { IRestaurantSite } from "@/features/restaurants/restaurants.site";
 
-import Image from "next/image";
 import Link from "next/link";
+
+import Image from "../Image";
 
 import { BulleHoraires } from "./BulleHoraires";
 import { EtatOuverture } from "./EtatOuverture";
@@ -68,7 +69,9 @@ export function CarteRestaurant({
             />
           </span>
           {lienPage ? (
-            <Link href={cheminRestaurant(r)}>{r.nomAffiche}</Link>
+            <Link href={cheminRestaurant(r)} prefetch={false}>
+              {r.nomAffiche}
+            </Link>
           ) : (
             <span>{r.nomAffiche}</span>
           )}
