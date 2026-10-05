@@ -1,39 +1,59 @@
-import About from "@/components/(public)/history/about";
-import Asset from "@/components/(public)/history/asset";
-import Partener from "@/components/(public)/history/partener";
-import Quality from "@/components/(public)/history/quality";
-import Skill from "@/components/(public)/history/skill";
-import Team from "@/components/(public)/history/team";
-import OderFood from "@/components/(public)/home/oder-food";
-import HeroSection from "@/components/(public)/common/hero-section";
-import { pageMetadata } from "../../meta";
 import { setRequestLocale } from "next-intl/server";
+
+import { pageMetadata } from "../../meta";
+
+import { AppelCarte } from "@/components/site/histoire/AppelCarte";
+import { Atouts } from "@/components/site/histoire/Atouts";
+import { EnteteHistoire } from "@/components/site/histoire/EnteteHistoire";
+import { Equipe } from "@/components/site/histoire/Equipe";
+import { Franchise } from "@/components/site/histoire/Franchise";
+import { Origine } from "@/components/site/histoire/Origine";
+import { SavoirFaire } from "@/components/site/histoire/SavoirFaire";
+import { Valeurs } from "@/components/site/histoire/Valeurs";
+import { filArianeSchemaOrg } from "@/lib/seo/fil-ariane";
+import { jsonLd } from "@/lib/seo/commun";
+import { INSECABLE } from "@/lib/typo";
 
 export const metadata = pageMetadata({
   chemin: "/histoire",
-  titre: "Notre histoire",
-  description:
-    "L'histoire de CHICKEN NATION : un poulet 100% local, élevé dans nos propres fermes en Côte d'Ivoire et servi croustillant ou grillé à Abidjan.",
+  titre: "Notre histoire et la franchise",
+  description: `Née de la passion du poulet de qualité, CHICKEN NATION sert un poulet 100${INSECABLE}% local et halal à Abidjan. Notre histoire, nos valeurs et la franchise.`,
 });
 
-export default async function History({ params }: { params: Promise<{ locale: string }> }) {
+/**
+ * Notre histoire, avec la franchise (section #franchise, cible de l'ancienne
+ * adresse /fr/franchise). Page statique, sans donnée de l'API ; seul le
+ * formulaire de demande de franchise est un îlot client.
+ */
+export default async function PageHistoire({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
+
   setRequestLocale(locale);
 
   return (
     <>
-      <HeroSection
-        title="HISTOIRE"
-        src="/assets/videos/video.mp4"
-        type="video"
+      <script
+        dangerouslySetInnerHTML={{
+          __html: jsonLd(
+            filArianeSchemaOrg([
+              { nom: "Notre histoire", chemin: "/fr/histoire" },
+            ]),
+          ),
+        }}
+        type="application/ld+json"
       />
-      <About />
-      <Quality />
-      <Partener />
-      <OderFood />
-      <Skill />
-      <Team />
-      <Asset />
+      <EnteteHistoire />
+      <Origine />
+      <Valeurs />
+      <SavoirFaire />
+      <Equipe />
+      <Atouts />
+      <Franchise />
+      <AppelCarte />
     </>
   );
 }

@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import { z } from 'zod';
 import { adresseIpVisiteur } from '@/features/commande/utils/adresse-ip.utils';
+import { INSECABLE } from '@/lib/typo';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -10,9 +11,23 @@ const contactSchema = z.object({
   email: z.string().trim().email().max(160),
   telephone: z.string().trim().min(6).max(30).regex(/^[0-9+().\s-]+$/),
   message: z.string().trim().min(2).max(3000),
+  // Formulaire d'origine : page Contact ou section franchise de Notre histoire.
+  sujet: z.enum(['contact', 'franchise']).default('contact'),
   // Champ piège : invisible pour un humain, rempli par les robots.
   site_web: z.string().optional(),
 });
+
+/** Objet du courriel reçu par l'équipe, selon le formulaire d'origine. */
+const OBJETS = {
+  contact: 'Message du site',
+  franchise: 'Demande de franchise',
+} as const;
+
+/** Objet de l'accusé de réception envoyé au visiteur. */
+const ACCUSES = {
+  contact: 'Nous avons bien reçu votre message',
+  franchise: 'Nous avons bien reçu votre demande de franchise',
+} as const;
 
 // Limite d'envoi en mémoire (un seul conteneur en prod) : par adresse IP
 // et au total, pour qu'un robot ne puisse pas vider le quota Resend.
@@ -50,7 +65,7 @@ export async function POST(req: Request) {
     return Response.json({ success: false }, { status: 400 });
   }
 
-  const { nom, prenom, email, telephone, message, site_web } = parsed.data;
+  const { nom, prenom, email, telephone, message, sujet, site_web } = parsed.data;
 
   // Robot détecté : on répond comme si tout allait bien, sans rien envoyer.
   if (site_web) {
@@ -79,9 +94,11 @@ export async function POST(req: Request) {
     const versAdmin = await resend.emails.send({
       from: `Chicken Nation <${process.env.EMAIL_FROM}>`,
       to: [process.env.EMAIL_ADMIN!],
-      subject: `Nouveau message de ${prenom} ${nom}`.replace(/[\r\n]+/g, ' '),
+      // Insécable avant le deux-points ; aucun retour à la ligne venu du formulaire.
+      subject: `${OBJETS[sujet]}${INSECABLE}: ${prenom} ${nom}`.replace(/[\r\n]+/g, ' '),
       replyTo: email,
       html: `
+        <p><strong>Objet :</strong> ${OBJETS[sujet]}</p>
         <p><strong>Nom :</strong> ${e.nom}</p>
         <p><strong>Prénom :</strong> ${e.prenom}</p>
         <p><strong>Email :</strong> ${e.email}</p>
@@ -98,7 +115,7 @@ export async function POST(req: Request) {
     await resend.emails.send({
       from: `Chicken Nation <${process.env.EMAIL_FROM}>`,
       to: [email],
-      subject: 'Nous avons bien reçu votre message',
+      subject: ACCUSES[sujet],
       replyTo: process.env.EMAIL_ADMIN,
       html: `
         <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
