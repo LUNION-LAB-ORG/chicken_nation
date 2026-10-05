@@ -2,6 +2,7 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { processAndValidateFormData } from "ak-zod-form-kit";
+
 import { adhesionAPI } from "../adhesion.api";
 import { adhesionSchema, AdhesionDTO } from "../adhesion.schema";
 import { normalizePhoneCI } from "../utils/phone";
@@ -16,7 +17,11 @@ import { AdhesionResponse } from "../adhesion.types";
  * s'appliquent avant la validation Zod (le schéma accepte les deux formats).
  */
 export const useAdhesionMutation = () => {
-  return useMutation<AdhesionResponse, Error, { data: AdhesionDTO; photo: File | null }>({
+  return useMutation<
+    AdhesionResponse,
+    Error,
+    { data: AdhesionDTO; photo: File | null }
+  >({
     mutationFn: async ({ data, photo }) => {
       const validation = processAndValidateFormData(adhesionSchema, data, {
         outputFormat: "object",
@@ -29,6 +34,7 @@ export const useAdhesionMutation = () => {
           // PAS envoyé au backend (undefined → droppé par la sérialisation JSON).
           establishment: (value: string | undefined) => {
             const trimmed = (value ?? "").trim();
+
             return trimmed.length > 0 ? trimmed : undefined;
           },
         },

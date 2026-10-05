@@ -31,10 +31,34 @@ export type CibleDeepLink =
   | { genre: "plat"; id: string }
   | CibleFixe;
 
-const ACCUEIL: CibleFixe = { genre: "fixe", chemin: "home", type: "home", libelle: "Accueil", nom: "" };
-const BONS: CibleFixe = { genre: "fixe", chemin: "vouchers", type: "voucher", libelle: "Bons et Codes Promo", nom: "Bons et Codes Promo" };
-const FIDELITE: CibleFixe = { genre: "fixe", chemin: "loyalty", type: "loyalty", libelle: "Club de Fidélité", nom: "Club de Fidélité" };
-const CARTE_NATION: CibleFixe = { genre: "fixe", chemin: "nation-card", type: "nation_card", libelle: "Carte de la Nation", nom: "Carte de la Nation" };
+const ACCUEIL: CibleFixe = {
+  genre: "fixe",
+  chemin: "home",
+  type: "home",
+  libelle: "Accueil",
+  nom: "",
+};
+const BONS: CibleFixe = {
+  genre: "fixe",
+  chemin: "vouchers",
+  type: "voucher",
+  libelle: "Bons et Codes Promo",
+  nom: "Bons et Codes Promo",
+};
+const FIDELITE: CibleFixe = {
+  genre: "fixe",
+  chemin: "loyalty",
+  type: "loyalty",
+  libelle: "Club de Fidélité",
+  nom: "Club de Fidélité",
+};
+const CARTE_NATION: CibleFixe = {
+  genre: "fixe",
+  chemin: "nation-card",
+  type: "nation_card",
+  libelle: "Carte de la Nation",
+  nom: "Carte de la Nation",
+};
 
 /**
  * Valeurs admises pour `?to=`, sous les noms des gestionnaires de l'appli
@@ -59,15 +83,19 @@ const CIBLES_TO: Record<string, CibleFixe> = {
  */
 export function lireCodeParrainage(brut: string | null): string | null {
   const code = (brut ?? "").trim().toUpperCase();
+
   if (!/^[A-Z0-9]{4,20}$/.test(code)) return null;
   if (!isNaN(Number(code))) return null;
+
   return code;
 }
 
 const ID_COMMANDE = /^[A-Za-z0-9_-]{1,64}$/;
 
 /** Écran visé par le lien ; l'accueil si rien d'exploitable. */
-export function lireCibleDeepLink(params: { get(nom: string): string | null }): CibleDeepLink {
+export function lireCibleDeepLink(params: {
+  get(nom: string): string | null;
+}): CibleDeepLink {
   const category = params.get("category");
   const product = params.get("product");
   const order = params.get("order");
@@ -79,6 +107,7 @@ export function lireCibleDeepLink(params: { get(nom: string): string | null }): 
     // l'identifiant finit dans l'adresse de l'API côté appli (orders/ID/client),
     // qui ne l'encode pas.
     if (!ID_COMMANDE.test(order)) return ACCUEIL;
+
     return {
       genre: "fixe",
       chemin: `order/${order}`,
@@ -93,6 +122,7 @@ export function lireCibleDeepLink(params: { get(nom: string): string | null }): 
   if (params.get("nation-card")) return CARTE_NATION;
 
   const to = (params.get("to") ?? "").trim().toLowerCase();
+
   // hasOwnProperty : « constructor » ou « __proto__ » ne sont pas des cibles.
   if (Object.prototype.hasOwnProperty.call(CIBLES_TO, to)) return CIBLES_TO[to];
 
@@ -104,12 +134,22 @@ export function lireCibleDeepLink(params: { get(nom: string): string | null }): 
  * L'appli lit le chemin pour l'écran et `ref` pour pré-remplir le code à
  * l'inscription (DeepLinkManager.handle).
  */
-export function lienAppli(schema: string, chemin: string, codeParrainage: string | null): string {
+export function lienAppli(
+  schema: string,
+  chemin: string,
+  codeParrainage: string | null,
+): string {
   const lien = `${schema}://${chemin}`;
-  return codeParrainage ? `${lien}?ref=${encodeURIComponent(codeParrainage)}` : lien;
+
+  return codeParrainage
+    ? `${lien}?ref=${encodeURIComponent(codeParrainage)}`
+    : lien;
 }
 
 /** Libellé du clic : le code de parrainage s'y ajoute pour le retrouver au backoffice. */
-export function libelleSuivi(libelle: string, codeParrainage: string | null): string {
+export function libelleSuivi(
+  libelle: string,
+  codeParrainage: string | null,
+): string {
   return codeParrainage ? `${libelle} (parrainage ${codeParrainage})` : libelle;
 }

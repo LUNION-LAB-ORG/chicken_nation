@@ -20,7 +20,7 @@
  * Mieux vaut refuser à la saisie que d'enregistrer un numéro injoignable.
  */
 
-const INDICATIF_CI = '225';
+const INDICATIF_CI = "225";
 
 /** Dix chiffres ivoiriens : mobile (0…) ou fixe (2…). */
 function estNumeroLocalCI(digits: string): boolean {
@@ -40,16 +40,18 @@ export function normalizePhoneCI(raw: string): string | null {
   if (!raw) return null;
 
   // Espaces, points, tirets et parenthèses éventuels.
-  let cleaned = raw.replace(/[\s.\-()]/g, '');
+  let cleaned = raw.replace(/[\s.\-()]/g, "");
+
   // `00` international → `+`.
-  if (cleaned.startsWith('00')) cleaned = `+${cleaned.slice(2)}`;
-  const digits = cleaned.replace(/\D/g, '');
+  if (cleaned.startsWith("00")) cleaned = `+${cleaned.slice(2)}`;
+  const digits = cleaned.replace(/\D/g, "");
 
   if (!/^\d{8,15}$/.test(digits)) return null;
 
   // Indicatif ivoirien fourni, avec ou sans `+`.
   if (digits.startsWith(INDICATIF_CI)) {
     const local = digits.slice(INDICATIF_CI.length);
+
     return estNumeroLocalCI(local) ? `+${INDICATIF_CI}${local}` : null;
   }
 
@@ -59,7 +61,7 @@ export function normalizePhoneCI(raw: string): string | null {
   // Numéro étranger : l'indicatif fait partie de la saisie. Un indicatif ne
   // commence jamais par 0, donc `+0…` est forcément une saisie locale
   // incomplète et non un numéro international.
-  if (digits.startsWith('0')) return null;
+  if (digits.startsWith("0")) return null;
   // Neuf chiffres ou moins sans indicatif reconnaissable : trop court pour être
   // un numéro international complet.
   if (digits.length < 10) return null;

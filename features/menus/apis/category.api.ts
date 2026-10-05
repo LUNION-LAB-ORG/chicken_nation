@@ -1,6 +1,5 @@
 import { apiClient } from "@/lib/api.client";
-// Adresses CloudFront (`chicken-nation/...`) comprises ; utils/imageHelpers lit
-// NEXT_PUBLIC_API_URL, absente de l'environnement du site.
+// Adresses CloudFront (`chicken-nation/...`) comprises.
 import { formatImageUrl } from "@/utils/formatImageUrl";
 import { Category } from "@/features/menus/types/category.types";
 

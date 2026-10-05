@@ -295,7 +295,10 @@ export interface IFideliteClient {
  * `epice` : choix du client pour un plat offert qui le demande ; absent, le
  * plat part non épicé (comme avant le 05/10).
  */
-export type CadeauChoisi = Pick<ICadeau, "id" | "type" | "articleId" | "nom"> & { epice?: boolean };
+export type CadeauChoisi = Pick<
+  ICadeau,
+  "id" | "type" | "articleId" | "nom"
+> & { epice?: boolean };
 
 // ── Livraison, adresses, conditions ─────────────────────────────────────
 
@@ -367,4 +370,6 @@ export interface IArticleCommande {
 }
 
 /** `statut` : code HTTP de l'API quand elle a répondu en erreur. */
-export type Resultat<T> = { ok: true; data: T } | { ok: false; message: string; statut?: number };
+export type Resultat<T> =
+  | { ok: true; data: T }
+  | { ok: false; message: string; statut?: number };

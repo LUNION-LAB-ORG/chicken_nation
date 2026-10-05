@@ -12,7 +12,8 @@ import { unstable_isUnrecognizedActionError } from "next/navigation";
 export const MESSAGE_PAGE_PERIMEE = "La page a été mise à jour, rechargez-la.";
 export const MESSAGE_CONNEXION_PERDUE = "Connexion perdue. Réessayez.";
 
-export const actionPerimee = (e: unknown) => unstable_isUnrecognizedActionError(e);
+export const actionPerimee = (e: unknown) =>
+  unstable_isUnrecognizedActionError(e);
 
 export const messageErreurAction = (e: unknown) =>
   actionPerimee(e) ? MESSAGE_PAGE_PERIMEE : MESSAGE_CONNEXION_PERDUE;

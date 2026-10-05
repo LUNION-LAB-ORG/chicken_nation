@@ -1,5 +1,6 @@
-import { baseURL } from "@/config/api";
 import { AdhesionBody, AdhesionResponse } from "./adhesion.types";
+
+import { baseURL } from "@/config/api";
 
 export interface IAdhesionAPI {
   /**
@@ -9,22 +10,30 @@ export interface IAdhesionAPI {
    * `photo` : photo du titulaire (FACULTATIVE sur le site — sert à la
    * vérification backoffice, peut être fournie plus tard dans l'app).
    */
-  adherer: (data: AdhesionBody, photo: File | null) => Promise<AdhesionResponse>;
+  adherer: (
+    data: AdhesionBody,
+    photo: File | null,
+  ) => Promise<AdhesionResponse>;
 }
 
 export const adhesionAPI: IAdhesionAPI = {
-  async adherer(data: AdhesionBody, photo: File | null): Promise<AdhesionResponse> {
+  async adherer(
+    data: AdhesionBody,
+    photo: File | null,
+  ): Promise<AdhesionResponse> {
     // multipart/form-data via fetch natif : ak-api-http est JSON-only et ne gère
     // pas l'upload de fichier. Le navigateur pose lui-même le boundary (on NE fixe
     // donc PAS le Content-Type). Endpoint PUBLIC → aucun header d'auth.
     const formData = new FormData();
+
     // Champs EXPLICITES prénom/nom (le backend les prend en priorité — un
     // prénom composé n'est plus coupé par la découpe legacy de `name`).
     formData.append("first_name", data.first_name);
     formData.append("last_name", data.last_name);
     formData.append("phone", data.phone);
     if (data.profile_type) formData.append("profile_type", data.profile_type);
-    if (data.establishment) formData.append("establishment", data.establishment);
+    if (data.establishment)
+      formData.append("establishment", data.establishment);
     formData.append("whatsapp_opt_in", String(data.whatsapp_opt_in));
     if (photo) formData.append("photo", photo);
 
@@ -34,14 +43,17 @@ export const adhesionAPI: IAdhesionAPI = {
     });
 
     const json = await response.json().catch(() => ({}));
+
     if (!response.ok) {
       const message = Array.isArray(json?.message)
         ? json.message.join(", ")
         : json?.message;
+
       throw new Error(
         message || "Une erreur est survenue lors de l'envoi de votre demande.",
       );
     }
+
     return json as AdhesionResponse;
   },
 };

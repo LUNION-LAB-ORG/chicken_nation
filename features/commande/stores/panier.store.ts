@@ -1,16 +1,31 @@
 "use client";
 
+import type {
+  ILignePanier,
+  IPlatDetail,
+  ModeCommande,
+} from "../types/commande.types";
+
 import { atom } from "jotai";
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
-import type { ILignePanier, IPlatDetail, ModeCommande } from "../types/commande.types";
-import { ajouterLigne, rafraichirLigne, remplacerLigne, retirerArticlesHorsMode, totalLigne } from "../utils/panier.utils";
+
+import {
+  ajouterLigne,
+  rafraichirLigne,
+  remplacerLigne,
+  retirerArticlesHorsMode,
+  totalLigne,
+} from "../utils/panier.utils";
 
 /** Stockage texte au sens de jotai (son type n'est pas exporté). */
 interface StockageTexte {
   getItem: (cle: string) => string | null;
   setItem: (cle: string, valeur: string) => void;
   removeItem: (cle: string) => void;
-  subscribe: (cle: string, rappel: (valeur: string | null) => void) => () => void;
+  subscribe: (
+    cle: string,
+    rappel: (valeur: string | null) => void,
+  ) => () => void;
 }
 
 /**
@@ -63,7 +78,9 @@ export const stockageNavigateur = <T>() =>
                 }
                 rappel(e.key === null ? null : e.newValue);
               };
+
               window.addEventListener("storage", ecoute);
+
               return () => window.removeEventListener("storage", ecoute);
             },
           },
@@ -74,19 +91,32 @@ export const stockageNavigateur = <T>() =>
  * sur le téléphone. Les prix n'y sont qu'un souvenir d'affichage : le serveur
  * relit tout depuis sa base à la création de la commande.
  */
-export const panierAtom = atomWithStorage<ILignePanier[]>("cn-panier", [], stockageNavigateur<ILignePanier[]>());
+export const panierAtom = atomWithStorage<ILignePanier[]>(
+  "cn-panier",
+  [],
+  stockageNavigateur<ILignePanier[]>(),
+);
 
-export const ajouterAuPanierAtom = atom(null, (get, set, ligne: ILignePanier) => {
-  set(panierAtom, ajouterLigne(get(panierAtom), ligne));
-});
+export const ajouterAuPanierAtom = atom(
+  null,
+  (get, set, ligne: ILignePanier) => {
+    set(panierAtom, ajouterLigne(get(panierAtom), ligne));
+  },
+);
 
-export const changerQuantiteAtom = atom(null, (get, set, { cle, quantite }: { cle: string; quantite: number }) => {
-  const lignes = get(panierAtom);
-  set(
-    panierAtom,
-    quantite <= 0 ? lignes.filter((l) => l.cle !== cle) : lignes.map((l) => (l.cle === cle ? { ...l, quantite } : l)),
-  );
-});
+export const changerQuantiteAtom = atom(
+  null,
+  (get, set, { cle, quantite }: { cle: string; quantite: number }) => {
+    const lignes = get(panierAtom);
+
+    set(
+      panierAtom,
+      quantite <= 0
+        ? lignes.filter((l) => l.cle !== cle)
+        : lignes.map((l) => (l.cle === cle ? { ...l, quantite } : l)),
+    );
+  },
+);
 
 export const viderPanierAtom = atom(null, (_get, set) => set(panierAtom, []));
 
@@ -97,15 +127,26 @@ export const viderPanierAtom = atom(null, (_get, set) => set(panierAtom, []));
  */
 export const remplacerLigneAtom = atom(
   null,
-  (get, set, { index, ligne, cleAvant }: { index: number; ligne: ILignePanier; cleAvant?: string }) => {
+  (
+    get,
+    set,
+    {
+      index,
+      ligne,
+      cleAvant,
+    }: { index: number; ligne: ILignePanier; cleAvant?: string },
+  ) => {
     set(panierAtom, remplacerLigne(get(panierAtom), index, ligne, cleAvant));
   },
 );
 
 /** « Retirer ces articles » : ce qui ne se vend pas dans ce mode quitte le panier. */
-export const retirerHorsModeAtom = atom(null, (get, set, mode: ModeCommande) => {
-  set(panierAtom, retirerArticlesHorsMode(get(panierAtom), mode));
-});
+export const retirerHorsModeAtom = atom(
+  null,
+  (get, set, mode: ModeCommande) => {
+    set(panierAtom, retirerArticlesHorsMode(get(panierAtom), mode));
+  },
+);
 
 /**
  * Plats relus au catalogue à l'ouverture du panier, appliqués au panier TEL
@@ -113,17 +154,29 @@ export const retirerHorsModeAtom = atom(null, (get, set, mode: ModeCommande) => 
  * entre-temps). `null` = plat retiré du catalogue ; id absent = non relu.
  * Renvoie vrai si le prix d'une ligne encore proposée a changé.
  */
-export const rafraichirPanierAtom = atom(null, (get, set, plats: Record<string, IPlatDetail | null>) => {
-  const avant = get(panierAtom);
-  const apres = avant.map((l) => rafraichirLigne(l, l.dish_id in plats ? plats[l.dish_id] : undefined));
-  set(panierAtom, apres);
-  return apres.some((l, i) => !l.retire && totalLigne(l) !== totalLigne(avant[i]));
-});
+export const rafraichirPanierAtom = atom(
+  null,
+  (get, set, plats: Record<string, IPlatDetail | null>) => {
+    const avant = get(panierAtom);
+    const apres = avant.map((l) =>
+      rafraichirLigne(l, l.dish_id in plats ? plats[l.dish_id] : undefined),
+    );
+
+    set(panierAtom, apres);
+
+    return apres.some(
+      (l, i) => !l.retire && totalLigne(l) !== totalLigne(avant[i]),
+    );
+  },
+);
 
 /** Lignes d'une commande annulée pour être modifiée, remises dans le panier. */
-export const restaurerPanierAtom = atom(null, (get, set, lignes: ILignePanier[]) => {
-  set(
-    panierAtom,
-    lignes.reduce((panier, l) => ajouterLigne(panier, l), get(panierAtom)),
-  );
-});
+export const restaurerPanierAtom = atom(
+  null,
+  (get, set, lignes: ILignePanier[]) => {
+    set(
+      panierAtom,
+      lignes.reduce((panier, l) => ajouterLigne(panier, l), get(panierAtom)),
+    );
+  },
+);

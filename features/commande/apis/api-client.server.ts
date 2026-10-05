@@ -1,7 +1,10 @@
-import { cookies, headers } from "next/headers";
-import { baseURL } from "@/config/api";
 import type { Resultat } from "../types/commande.types";
+
+import { cookies, headers } from "next/headers";
+
 import { adresseIpVisiteur } from "../utils/adresse-ip.utils";
+
+import { baseURL } from "@/config/api";
 
 /**
  * Accès à l'API pour le compte du client connecté, CÔTÉ SERVEUR uniquement
@@ -42,9 +45,12 @@ export async function effacerJetonClient() {
 function messageErreur(corps: unknown, statut: number): string {
   const brut = (corps as { message?: unknown } | null)?.message;
   const message = Array.isArray(brut) ? brut[0] : brut;
+
   if (typeof message === "string" && message.trim()) return message;
   if (statut === 401) return "Votre session a expiré. Reconnectez-vous.";
-  if (statut === 429) return "Trop de demandes. Réessayez dans quelques minutes.";
+  if (statut === 429)
+    return "Trop de demandes. Réessayez dans quelques minutes.";
+
   return "Le service est momentanément indisponible. Réessayez dans un instant.";
 }
 
@@ -58,6 +64,7 @@ function messageErreur(corps: unknown, statut: number): string {
 async function adresseVisiteur(): Promise<string | null> {
   try {
     const h = await headers();
+
     return adresseIpVisiteur((nom) => h.get(nom));
   } catch {
     return null;
@@ -72,12 +79,18 @@ interface OptionsAppel {
   entetes?: Record<string, string>;
 }
 
-export async function appelApi<T>(chemin: string, options: OptionsAppel = {}): Promise<Resultat<T>> {
+export async function appelApi<T>(
+  chemin: string,
+  options: OptionsAppel = {},
+): Promise<Resultat<T>> {
   const jeton = options.public ? null : await lireJetonClient();
-  if (!options.public && !jeton) return { ok: false, message: "Connectez-vous pour continuer." };
+
+  if (!options.public && !jeton)
+    return { ok: false, message: "Connectez-vous pour continuer." };
 
   const estFormulaire = options.corps instanceof FormData;
   const ip = await adresseVisiteur();
+
   try {
     const res = await fetch(`${baseURL}${chemin}`, {
       method: options.methode ?? "GET",
@@ -85,7 +98,9 @@ export async function appelApi<T>(chemin: string, options: OptionsAppel = {}): P
       headers: {
         ...(jeton ? { Authorization: `Bearer ${jeton}` } : {}),
         ...(ip ? { "X-Forwarded-For": ip } : {}),
-        ...(options.corps && !estFormulaire ? { "Content-Type": "application/json" } : {}),
+        ...(options.corps && !estFormulaire
+          ? { "Content-Type": "application/json" }
+          : {}),
         ...options.entetes,
       },
       body: options.corps
@@ -96,11 +111,18 @@ export async function appelApi<T>(chemin: string, options: OptionsAppel = {}): P
     });
     const texte = await res.text();
     const corps = texte ? JSON.parse(texte) : null;
+
     if (!res.ok) {
       // Jeton refusé (expiré, compte supprimé) : on oublie la session.
       if (res.status === 401 && jeton) await effacerJetonClient();
-      return { ok: false, message: messageErreur(corps, res.status), statut: res.status };
+
+      return {
+        ok: false,
+        message: messageErreur(corps, res.status),
+        statut: res.status,
+      };
     }
+
     return { ok: true, data: corps as T };
   } catch {
     return { ok: false, message: messageErreur(null, 503) };

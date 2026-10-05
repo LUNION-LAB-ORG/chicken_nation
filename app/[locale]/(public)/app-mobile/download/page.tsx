@@ -10,7 +10,9 @@ export default async function AppMobileDownloadPage({
 }) {
   setRequestLocale((await params).locale);
   const parametres = await searchParams;
-  const queryString = new URLSearchParams(parametres as Record<string, string>).toString();
+  const queryString = new URLSearchParams(
+    parametres as Record<string, string>,
+  ).toString();
 
   const destination = queryString
     ? `/app-mobile/deep-link?${queryString}`

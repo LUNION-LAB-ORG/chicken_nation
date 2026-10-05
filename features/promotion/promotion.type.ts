@@ -1,5 +1,5 @@
 /**
- * Enum Type Promotion 
+ * Enum Type Promotion
  */
 export enum PromotionType {
   PERCENTAGE = "PERCENTAGE", // POURCENTAGE
@@ -8,7 +8,7 @@ export enum PromotionType {
 }
 
 /**
- * Enum Type Produit Cible 
+ * Enum Type Produit Cible
  */
 export enum PromotionTarget {
   ALL_PRODUCTS = "ALL_PRODUCTS", // TOUT LES PRODUITS
@@ -17,7 +17,7 @@ export enum PromotionTarget {
 }
 
 /**
- * Enum Statut Promotion 
+ * Enum Statut Promotion
  */
 export enum PromotionStatus {
   DRAFT = "DRAFT", // Brouillon
@@ -34,7 +34,6 @@ export enum PromotionVisibility {
   PUBLIC = "PUBLIC", // PUBLIC
   PRIVATE = "PRIVATE", // PRIVE
 }
-
 
 /**
  * Représente une promotion.

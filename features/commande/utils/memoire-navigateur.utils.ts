@@ -38,14 +38,23 @@ const local = () => window.localStorage;
  */
 const clePanier = (commandeId: string) => `cn-panier-commande-${commandeId}`;
 
-export function sauverPanierCommande(commandeId: string, lignes: ILignePanier[]) {
+export function sauverPanierCommande(
+  commandeId: string,
+  lignes: ILignePanier[],
+) {
   ecrire(session, clePanier(commandeId), JSON.stringify(lignes));
 }
 
 export function lirePanierCommande(commandeId: string): ILignePanier[] {
   try {
     const lignes = JSON.parse(lire(session, clePanier(commandeId)) ?? "[]");
-    return Array.isArray(lignes) ? lignes.filter((l) => l && typeof l.cle === "string" && typeof l.dish_id === "string") : [];
+
+    return Array.isArray(lignes)
+      ? lignes.filter(
+          (l) =>
+            l && typeof l.cle === "string" && typeof l.dish_id === "string",
+        )
+      : [];
   } catch {
     return [];
   }
@@ -78,8 +87,16 @@ export function noterCommandeEnAttente(c: ICommandeEnAttente) {
 
 export function lireCommandeEnAttente(): ICommandeEnAttente | null {
   try {
-    const c = JSON.parse(lire(session, CLE_EN_ATTENTE) ?? "null") as ICommandeEnAttente | null;
-    return c && typeof c.id === "string" && typeof c.reference === "string" && typeof c.signature === "string" ? c : null;
+    const c = JSON.parse(
+      lire(session, CLE_EN_ATTENTE) ?? "null",
+    ) as ICommandeEnAttente | null;
+
+    return c &&
+      typeof c.id === "string" &&
+      typeof c.reference === "string" &&
+      typeof c.signature === "string"
+      ? c
+      : null;
   } catch {
     return null;
   }
@@ -109,8 +126,16 @@ export function noterEcartPoints(commandeId: string, ecart: IEcartPoints) {
 
 export function lireEcartPoints(commandeId: string): IEcartPoints | null {
   try {
-    const e = JSON.parse(lire(session, cleEcart(commandeId)) ?? "null") as IEcartPoints | null;
-    return e && typeof e.estimee === "number" && typeof e.accordee === "number" && e.accordee < e.estimee ? e : null;
+    const e = JSON.parse(
+      lire(session, cleEcart(commandeId)) ?? "null",
+    ) as IEcartPoints | null;
+
+    return e &&
+      typeof e.estimee === "number" &&
+      typeof e.accordee === "number" &&
+      e.accordee < e.estimee
+      ? e
+      : null;
   } catch {
     return null;
   }
@@ -148,39 +173,65 @@ const DUREE_MARQUE_MS = 24 * 60 * 60 * 1000;
  * - `confirmation` : succès annoncé il y a moins de 3 min, relecture rapide ;
  * - `verification` : succès annoncé il y a 3 à 15 min, pas de « Payer ».
  */
-export type EtatPaiement = "libre" | "commence" | "confirmation" | "verification";
+export type EtatPaiement =
+  | "libre"
+  | "commence"
+  | "confirmation"
+  | "verification";
 
-export function etatPaiement(marque: IMarquePaiement | null, maintenant: number): EtatPaiement {
+export function etatPaiement(
+  marque: IMarquePaiement | null,
+  maintenant: number,
+): EtatPaiement {
   if (!marque) return "libre";
   if (typeof marque.succesA === "number") {
     const ecoule = maintenant - marque.succesA;
+
     if (ecoule < DELAI_CONFIRMATION_MS) return "confirmation";
     if (ecoule < DELAI_PROTECTION_MS) return "verification";
+
     return "commence";
   }
-  if (typeof marque.ouvertA === "number" && maintenant - marque.ouvertA < DELAI_PROTECTION_MS) return "commence";
+  if (
+    typeof marque.ouvertA === "number" &&
+    maintenant - marque.ouvertA < DELAI_PROTECTION_MS
+  )
+    return "commence";
+
   return "libre";
 }
 
 const cleMarque = (reference: string) => `cn-paiement-${reference}`;
 
-export function lireMarquePaiement(reference: string, maintenant = Date.now()): IMarquePaiement | null {
+export function lireMarquePaiement(
+  reference: string,
+  maintenant = Date.now(),
+): IMarquePaiement | null {
   try {
-    const m = JSON.parse(lire(local, cleMarque(reference)) ?? "null") as IMarquePaiement | null;
+    const m = JSON.parse(
+      lire(local, cleMarque(reference)) ?? "null",
+    ) as IMarquePaiement | null;
+
     if (!m || typeof m !== "object") return null;
     const derniere = Math.max(m.ouvertA ?? 0, m.succesA ?? 0);
+
     // Vieille marque : on fait le ménage.
     if (maintenant - derniere > DUREE_MARQUE_MS) {
       effacerMarquePaiement(reference);
+
       return null;
     }
+
     return m;
   } catch {
     return null;
   }
 }
 
-export function ecrireMarquePaiement(reference: string, marque: IMarquePaiement) {
+export function ecrireMarquePaiement(
+  reference: string,
+  marque: IMarquePaiement,
+) {
   ecrire(local, cleMarque(reference), JSON.stringify(marque));
 }
 

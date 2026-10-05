@@ -11,10 +11,16 @@
  * ⚠️ Le vhost nginx du site doit poser `proxy_set_header X-Real-IP
  * $remote_addr;` : sans lui, un visiteur peut envoyer son propre X-Real-IP.
  */
-export function adresseIpVisiteur(lire: (nom: string) => string | null | undefined): string | null {
-  const brute = lire("x-real-ip")?.trim() || lire("x-forwarded-for")?.split(",").pop()?.trim();
+export function adresseIpVisiteur(
+  lire: (nom: string) => string | null | undefined,
+): string | null {
+  const brute =
+    lire("x-real-ip")?.trim() ||
+    lire("x-forwarded-for")?.split(",").pop()?.trim();
   const ip = brute?.replace(/^::ffff:/i, "");
+
   if (!ip || !/^[0-9a-fA-F:.]{3,45}$/.test(ip)) return null;
+
   return nIdentifiePersonne(ip) ? null : ip;
 }
 
@@ -22,8 +28,14 @@ export function adresseIpVisiteur(lire: (nom: string) => string | null | undefin
 function nIdentifiePersonne(ip: string): boolean {
   if (ip.includes(".")) {
     const octets = ip.split(".").map((o) => Number(o));
-    if (octets.length !== 4 || octets.some((o) => !Number.isInteger(o) || o < 0 || o > 255)) return true;
+
+    if (
+      octets.length !== 4 ||
+      octets.some((o) => !Number.isInteger(o) || o < 0 || o > 255)
+    )
+      return true;
     const [a, b] = octets;
+
     return (
       a === 0 ||
       a === 10 ||
@@ -35,5 +47,8 @@ function nIdentifiePersonne(ip: string): boolean {
     );
   }
   const v6 = ip.toLowerCase();
-  return v6 === "::" || v6 === "::1" || /^f[cd]/.test(v6) || /^fe[89ab]/.test(v6);
+
+  return (
+    v6 === "::" || v6 === "::1" || /^f[cd]/.test(v6) || /^fe[89ab]/.test(v6)
+  );
 }

@@ -27,7 +27,9 @@ interface OptionsWidget {
 declare global {
   interface Window {
     openKkiapayWidget?: (options: OptionsWidget) => void;
-    addSuccessListener?: (cb: (reponse: { transactionId?: string }) => void) => void;
+    addSuccessListener?: (
+      cb: (reponse: { transactionId?: string }) => void,
+    ) => void;
     addFailedListener?: (cb: (erreur: unknown) => void) => void;
     removeKkiapayListener?: (evenement: string) => void;
   }
@@ -40,6 +42,7 @@ function chargerScript(): Promise<void> {
   if (window.openKkiapayWidget) return Promise.resolve();
   chargement ??= new Promise<void>((resolve, reject) => {
     const s = document.createElement("script");
+
     s.src = URL_SCRIPT;
     s.async = true;
     s.onload = () => resolve();
@@ -49,20 +52,29 @@ function chargerScript(): Promise<void> {
     };
     document.head.appendChild(s);
   });
+
   return chargement;
 }
 
-export function useKkiapay({ onSucces, onEchec }: { onSucces: () => void; onEchec: () => void }) {
+export function useKkiapay({
+  onSucces,
+  onEchec,
+}: {
+  onSucces: () => void;
+  onEchec: () => void;
+}) {
   const [pret, setPret] = useState(false);
   // Script KKiaPay non chargé (réseau, bloqueur de publicité) : on le dit, et
   // `reessayer` relance le chargement au lieu d'un « Chargement… » sans fin.
   const [erreurChargement, setErreurChargement] = useState(false);
   const [essai, setEssai] = useState(0);
   const rappels = useRef({ onSucces, onEchec });
+
   rappels.current = { onSucces, onEchec };
 
   useEffect(() => {
     let actif = true;
+
     setErreurChargement(false);
     chargerScript()
       .then(() => {
@@ -76,6 +88,7 @@ export function useKkiapay({ onSucces, onEchec }: { onSucces: () => void; onEche
         setPret(false);
         setErreurChargement(true);
       });
+
     return () => {
       actif = false;
       window.removeKkiapayListener?.("success");
@@ -87,7 +100,12 @@ export function useKkiapay({ onSucces, onEchec }: { onSucces: () => void; onEche
 
   const ouvrir = useCallback((options: OptionsWidget) => {
     if (!window.openKkiapayWidget) return false;
-    window.openKkiapayWidget({ theme: "#fd8127", position: "center", ...options });
+    window.openKkiapayWidget({
+      theme: "#fd8127",
+      position: "center",
+      ...options,
+    });
+
     return true;
   }, []);
 

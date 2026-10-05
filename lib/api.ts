@@ -1,4 +1,5 @@
 import { Api, ApiConfig } from "ak-api-http";
+
 import { baseURL } from "@/config/api";
 
 // Réglages communs au client du serveur (ci-dessous) et à celui du navigateur

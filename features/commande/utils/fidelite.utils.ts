@@ -5,8 +5,10 @@ import type {
   IPointsFidelite,
   ModeCommande,
 } from "../types/commande.types";
-import { INSECABLE, nombre } from "@/lib/typo";
+
 import { platDisponibleMaintenant, venduEn } from "./panier.utils";
+
+import { INSECABLE, nombre } from "@/lib/typo";
 
 /**
  * Règles des points de fidélité et des cadeaux au panier. Le serveur
@@ -18,8 +20,10 @@ import { platDisponibleMaintenant, venduEn } from "./panier.utils";
 type Brut = Record<string, unknown>;
 // Espaces du format français (fine insécable de toLocaleString) ramenées à
 // l'insécable du site, comme dans fcfa() (lib/typo.ts).
-const espaces = (texte: string) => texte.replace(/[\u00a0\u202f\u2009 ]/g, INSECABLE);
-const estUuid = (v: unknown): v is string => typeof v === "string" && /^[0-9a-f-]{36}$/i.test(v);
+const espaces = (texte: string) =>
+  texte.replace(/[\u00a0\u202f\u2009 ]/g, INSECABLE);
+const estUuid = (v: unknown): v is string =>
+  typeof v === "string" && /^[0-9a-f-]{36}$/i.test(v);
 
 /** « 1 point », « 1 250 points » (insécables entre les milliers et avant « point »). */
 export const pointsLisibles = (n: number) =>
@@ -40,6 +44,7 @@ export const valeurLisible = (francs: number) =>
  */
 export function soldeUtilisable(compte: Brut | null | undefined): number {
   const n = Number(compte?.redeemable_points ?? compte?.total_points);
+
   return Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
 }
 
@@ -50,9 +55,15 @@ export function soldeUtilisable(compte: Brut | null | undefined): number {
  * aucun plafond et la remise pourrait dépasser les plats : le site borne
  * alors au sous-total.
  */
-export function plafondRemisePoints(sousTotal: number, plafondPct: number): number {
+export function plafondRemisePoints(
+  sousTotal: number,
+  plafondPct: number,
+): number {
   const base = Math.max(0, sousTotal);
-  return plafondPct > 0 && plafondPct < 100 ? Math.floor((plafondPct / 100) * base) : Math.floor(base);
+
+  return plafondPct > 0 && plafondPct < 100
+    ? Math.floor((plafondPct / 100) * base)
+    : Math.floor(base);
 }
 
 /**
@@ -62,9 +73,15 @@ export function plafondRemisePoints(sousTotal: number, plafondPct: number): numb
  * Sans cette borne, 150 points demandés sur un panier dont le plafond n'en
  * couvre que 100 coûteraient 150 points pour 100 de remise.
  */
-export function maximumPointsUtiles(f: IPointsFidelite, sousTotal: number): number {
+export function maximumPointsUtiles(
+  f: IPointsFidelite,
+  sousTotal: number,
+): number {
   if (!(f.valeurPoint > 0)) return 0;
-  const parPlafond = Math.floor(plafondRemisePoints(sousTotal, f.plafondPct) / f.valeurPoint);
+  const parPlafond = Math.floor(
+    plafondRemisePoints(sousTotal, f.plafondPct) / f.valeurPoint,
+  );
+
   return Math.max(0, Math.min(Math.floor(f.solde), parPlafond));
 }
 
@@ -77,12 +94,21 @@ export const pointsUtilisables = (f: IPointsFidelite, sousTotal: number) =>
  * Le serveur, lui, accorde une remise nulle SANS rien dire sous le minimum
  * ou au-dessus du solde : mieux vaut l'expliquer ici.
  */
-export function erreurPoints(points: number, f: IPointsFidelite, sousTotal: number): string | null {
-  if (!Number.isInteger(points) || points <= 0) return "Saisissez un nombre de points.";
+export function erreurPoints(
+  points: number,
+  f: IPointsFidelite,
+  sousTotal: number,
+): string | null {
+  if (!Number.isInteger(points) || points <= 0)
+    return "Saisissez un nombre de points.";
   if (points > f.solde) return `Vous avez ${pointsLisibles(f.solde)}.`;
-  if (points < f.minimum) return `Utilisez au moins ${pointsLisibles(f.minimum)}.`;
+  if (points < f.minimum)
+    return `Utilisez au moins ${pointsLisibles(f.minimum)}.`;
   const max = maximumPointsUtiles(f, sousTotal);
-  if (points > max) return `Sur ce panier, vous pouvez utiliser au plus ${pointsLisibles(max)}.`;
+
+  if (points > max)
+    return `Sur ce panier, vous pouvez utiliser au plus ${pointsLisibles(max)}.`;
+
   return null;
 }
 
@@ -90,16 +116,29 @@ export function erreurPoints(points: number, f: IPointsFidelite, sousTotal: numb
  * Points réellement retenus : le choix du client, ramené au maximum si le
  * panier a diminué depuis, et 0 si cela passe sous le minimum.
  */
-export function pointsRetenus(choisis: number, f: IPointsFidelite | null, sousTotal: number): number {
+export function pointsRetenus(
+  choisis: number,
+  f: IPointsFidelite | null,
+  sousTotal: number,
+): number {
   if (!f || !(choisis > 0)) return 0;
   const n = Math.min(Math.floor(choisis), maximumPointsUtiles(f, sousTotal));
+
   return n >= Math.max(1, f.minimum) ? n : 0;
 }
 
 /** Remise estimée, calculée comme le serveur : floor(points x valeur), plafonnée. */
-export function remisePoints(points: number, f: IPointsFidelite | null, sousTotal: number): number {
+export function remisePoints(
+  points: number,
+  f: IPointsFidelite | null,
+  sousTotal: number,
+): number {
   if (!f || !(points > 0) || points < f.minimum || points > f.solde) return 0;
-  return Math.min(Math.floor(points * f.valeurPoint), plafondRemisePoints(sousTotal, f.plafondPct));
+
+  return Math.min(
+    Math.floor(points * f.valeurPoint),
+    plafondRemisePoints(sousTotal, f.plafondPct),
+  );
 }
 
 /**
@@ -109,14 +148,20 @@ export function remisePoints(points: number, f: IPointsFidelite | null, sousTota
  * publique points/calculate répond en erreur sur un montant nul.
  */
 export const pointsGagnes = (sousTotal: number, pointsParFranc: number) =>
-  pointsParFranc > 0 && sousTotal > 0 ? Math.floor(sousTotal * pointsParFranc) : 0;
+  pointsParFranc > 0 && sousTotal > 0
+    ? Math.floor(sousTotal * pointsParFranc)
+    : 0;
 
 /**
  * « Cette commande vous rapportera 12 points. », pour un visiteur connecté ou
  * non (réglages publics). Rien sous 1 point : la phrase ne promet jamais 0.
  */
-export function textePointsGagnes(sousTotal: number, pointsParFranc: number): string | null {
+export function textePointsGagnes(
+  sousTotal: number,
+  pointsParFranc: number,
+): string | null {
   const n = pointsGagnes(sousTotal, pointsParFranc);
+
   return n >= 1 ? `Cette commande vous rapportera ${pointsLisibles(n)}.` : null;
 }
 
@@ -126,14 +171,21 @@ export function textePointsGagnes(sousTotal: number, pointsParFranc: number): st
  * s'il ne permet plus le minimum. `null` si les points choisis tiennent
  * toujours. Le site les ramenait jusqu'ici sans rien dire.
  */
-export function avisPoints(choisis: number, f: IPointsFidelite | null, sousTotal: number): string | null {
+export function avisPoints(
+  choisis: number,
+  f: IPointsFidelite | null,
+  sousTotal: number,
+): string | null {
   if (!f || !(choisis > 0)) return null;
   const retenus = pointsRetenus(choisis, f, sousTotal);
+
   if (retenus >= Math.floor(choisis)) return null;
   if (retenus === 0) {
     return `Vos points ont été retirés${INSECABLE}: la commande est trop petite pour en utiliser au moins ${pointsLisibles(Math.max(1, f.minimum))}.`;
   }
-  const parPlafond = retenus < Math.floor(f.solde) && f.plafondPct > 0 && f.plafondPct < 100;
+  const parPlafond =
+    retenus < Math.floor(f.solde) && f.plafondPct > 0 && f.plafondPct < 100;
+
   return parPlafond
     ? `Points ajustés à ${nombre(retenus)}${INSECABLE}: ils paient au plus ${nombre(f.plafondPct)}${INSECABLE}% des plats.`
     : `Points ajustés à ${nombre(retenus)}${INSECABLE}: c'est votre solde.`;
@@ -151,12 +203,25 @@ export function avisPoints(choisis: number, f: IPointsFidelite | null, sousTotal
  * brute : l'action la transforme en adresse.
  */
 export function versCadeau(r: Brut): ICadeau | null {
-  const p = (r.payload && typeof r.payload === "object" ? r.payload : {}) as Brut;
+  const p = (
+    r.payload && typeof r.payload === "object" ? r.payload : {}
+  ) as Brut;
   const supplement = p.item_type === "SUPPLEMENT";
-  if (!supplement && p.item_type !== undefined && p.item_type !== null && p.item_type !== "DISH") return null;
+
+  if (
+    !supplement &&
+    p.item_type !== undefined &&
+    p.item_type !== null &&
+    p.item_type !== "DISH"
+  )
+    return null;
   const articleId = supplement ? p.supplement_id : p.dish_id;
+
   if (!estUuid(r.id) || !estUuid(articleId)) return null;
-  const nom = String(p.label || p.name || "").replace(/\s+/g, " ").trim();
+  const nom = String(p.label || p.name || "")
+    .replace(/\s+/g, " ")
+    .trim();
+
   return {
     id: r.id,
     type: supplement ? "SUPPLEMENT" : "PLAT",
@@ -172,21 +237,39 @@ export function versCadeau(r: Brut): ICadeau | null {
  * afficher. Mêmes contrôles que le serveur sur l'article offert (mode,
  * créneau) : il refuserait sinon la commande ENTIÈRE.
  */
-export function problemesCadeau(c: ICadeau, mode: ModeCommande, maintenant = new Date()): string[] {
+export function problemesCadeau(
+  c: ICadeau,
+  mode: ModeCommande,
+  maintenant = new Date(),
+): string[] {
   if (c.indisponible) return ["Ce cadeau n'est plus proposé pour le moment."];
   const problemes: string[] = [];
+
   if (!venduEn(c.available_order_types, mode)) {
-    problemes.push(`Indisponible ${mode === "DELIVERY" ? "en livraison" : "en retrait"}.`);
+    problemes.push(
+      `Indisponible ${mode === "DELIVERY" ? "en livraison" : "en retrait"}.`,
+    );
   }
-  if (!platDisponibleMaintenant(c.available_from ?? null, c.available_until ?? null, maintenant)) {
-    problemes.push(`Servi seulement de ${c.available_from} à ${c.available_until}.`);
+  if (
+    !platDisponibleMaintenant(
+      c.available_from ?? null,
+      c.available_until ?? null,
+      maintenant,
+    )
+  ) {
+    problemes.push(
+      `Servi seulement de ${c.available_from} à ${c.available_until}.`,
+    );
   }
+
   return problemes;
 }
 
 /** Noms des cadeaux qu'un restaurant ne propose pas (refusés au retrait, comme un plat payant). */
 export const cadeauxNonProposes = (cadeaux: ICadeau[], restaurantId: string) =>
-  cadeaux.filter((c) => (c.restaurantsExclus ?? []).includes(restaurantId)).map((c) => c.nom);
+  cadeaux
+    .filter((c) => (c.restaurantsExclus ?? []).includes(restaurantId))
+    .map((c) => c.nom);
 
 /**
  * Lignes payantes complétées des cadeaux choisis, sous la forme exacte de
@@ -207,22 +290,41 @@ export function articlesAvecCadeaux(
   cadeaux: CadeauChoisi[],
 ): { articles: IArticleCommande[]; nonPlaces: CadeauChoisi[] } {
   if (payants.length === 0) return { articles: [], nonPlaces: [...cadeaux] };
-  const articles = payants.map((a) => ({ ...a, supplements: [...a.supplements] }));
+  const articles = payants.map((a) => ({
+    ...a,
+    supplements: [...a.supplements],
+  }));
   const platsOfferts: IArticleCommande[] = [];
   const nonPlaces: CadeauChoisi[] = [];
   const vus = new Set<string>();
+
   for (const c of cadeaux) {
     // Un même cadeau deux fois : le serveur refuserait la commande.
     if (vus.has(c.id)) continue;
     vus.add(c.id);
     if (c.type === "SUPPLEMENT") {
-      const porteuse = articles.find((a) => !a.supplements.some((s) => s.id === c.articleId));
-      if (porteuse) porteuse.supplements.push({ id: c.articleId, quantity: 1, reward_id: c.id });
+      const porteuse = articles.find(
+        (a) => !a.supplements.some((s) => s.id === c.articleId),
+      );
+
+      if (porteuse)
+        porteuse.supplements.push({
+          id: c.articleId,
+          quantity: 1,
+          reward_id: c.id,
+        });
       else nonPlaces.push(c);
     } else {
       // Épicé ou non : choix du client (étape Avantages) ; absent, non épicé comme avant.
-      platsOfferts.push({ dish_id: c.articleId, quantity: 1, epice: c.epice === true, supplements: [], reward_id: c.id });
+      platsOfferts.push({
+        dish_id: c.articleId,
+        quantity: 1,
+        epice: c.epice === true,
+        supplements: [],
+        reward_id: c.id,
+      });
     }
   }
+
   return { articles: [...articles, ...platsOfferts], nonPlaces };
 }
