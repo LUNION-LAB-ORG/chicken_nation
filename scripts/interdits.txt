@@ -1,0 +1,63 @@
+# Motifs interdits sur le site (annexe A du plan d'intégration de la refonte).
+# Lu par scripts/controle-site.mjs, qui les cherche dans le HTML servi et,
+# avec l'option --construction, dans les fichiers de la construction.
+#
+# Une expression régulière JavaScript par ligne, casse respectée.
+# Avant la recherche, les entités HTML sont décodées et les espaces insécables
+# (U+00A0, U+202F, U+2009) remplacées par une espace simple : « 07 00 00 00 00 »
+# trouve aussi « 07&nbsp;00&nbsp;00&nbsp;00&nbsp;00 ».
+#
+# Les sections disent où chercher :
+#   [html]    tout le HTML servi (texte, attributs, scripts, JSON-LD, balises meta)
+#             et tous les fichiers de la construction ;
+#   [texte]   le texte visible seulement (balises, scripts et styles retirés ;
+#             title, alt, aria-label, placeholder et descriptions gardés) ;
+#   [relire]  signalé pour relecture à la main, sans compter comme écart.
+#
+# « @sauf <chemin> » en fin de ligne tolère le motif sur cette page
+# (et sur ses fichiers de construction).
+# Les caractères qu'on ne veut voir nulle part dans le dépôt sont écrits en \uXXXX.
+
+[html]
+# Aides de démonstration de la maquette
+07 00 00 00 00
+0700000000
+NATION10
+BON5000
+data-maquette
+Simulation
+Remettre l.exemple
+Passer à l.étape suivante
+TEL_DEMO
+CODE_DEMO
+POSITION_DEMO
+chicken-nation-maquette
+Exemples de quartiers
+
+# Anciens numéros des restaurants : seul le 27 21 71 21 30 est publié
+0720353535
+07 20 35 35 35
+0747000034
+07 47 00 00 34
+0700005556
+07 00 00 55 56
+0712853211
+07 12 85 32 11
+07 20 20 83 52
+0720208352
+
+# Promesses et mentions retirées
+3 ?000 cartes
+arrive sur WhatsApp
+Les Trois Sources @sauf /fr/confidentiality-none-disclosure-agreement
+
+[texte]
+# Réduction de 20 % jamais promise (trait d'union ou signe moins)
+[-\u2212]20 ?%
+# Tirets cadratin et demi-cadratin
+\u2014
+\u2013
+
+[relire]
+# Peut apparaître dans un texte légitime (FAQ) : à relire
+Exemple

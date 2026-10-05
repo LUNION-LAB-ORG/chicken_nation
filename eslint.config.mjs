@@ -1,25 +1,18 @@
+// Configuration « flat » d'ESLint 9, écrite avec les configurations natives de
+// chaque greffon : @eslint/compat (fixupConfigRules), absent de package.json et de
+// node_modules, empêchait ESLint de démarrer. Mêmes greffons et mêmes règles qu'avant.
+// Lancement : node node_modules/eslint/bin/eslint.js app components features lib
 import { defineConfig, globalIgnores } from "eslint/config";
-import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
 import react from "eslint-plugin-react";
+import reactHooks from "eslint-plugin-react-hooks";
 import unusedImports from "eslint-plugin-unused-imports";
 import _import from "eslint-plugin-import";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import jsxA11Y from "eslint-plugin-jsx-a11y";
-import prettier from "eslint-plugin-prettier";
+import prettierRecommended from "eslint-plugin-prettier/recommended";
+import nextPlugin from "@next/eslint-plugin-next";
 import globals from "globals";
 import tsParser from "@typescript-eslint/parser";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
-});
 
 export default defineConfig([globalIgnores([
     ".now/*",
@@ -43,21 +36,20 @@ export default defineConfig([globalIgnores([
     "!**/react-shim.js",
     "!**/tsup.config.ts",
 ]), {
-    extends: fixupConfigRules(compat.extends(
-        "plugin:react/recommended",
-        "plugin:prettier/recommended",
-        "plugin:react-hooks/recommended",
-        "plugin:jsx-a11y/recommended",
-        "plugin:@next/next/recommended",
-    )),
+    // Les greffons react, react-hooks, jsx-a11y, prettier et @next/next sont
+    // déclarés par leur configuration recommandée.
+    extends: [
+        react.configs.flat.recommended,
+        prettierRecommended,
+        reactHooks.configs["recommended-latest"],
+        jsxA11Y.flatConfigs.recommended,
+        nextPlugin.configs.recommended,
+    ],
 
     plugins: {
-        react: fixupPluginRules(react),
         "unused-imports": unusedImports,
-        import: fixupPluginRules(_import),
+        import: _import,
         "@typescript-eslint": typescriptEslint,
-        "jsx-a11y": fixupPluginRules(jsxA11Y),
-        prettier: fixupPluginRules(prettier),
     },
 
     languageOptions: {
