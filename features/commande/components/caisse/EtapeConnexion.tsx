@@ -77,7 +77,12 @@ export function EtapeConnexion({
           vos cadeaux et vos adresses vous suivent.
         </p>
         <p>
-          <Lien disabled={deconnexion} onClick={onDeconnecter}>
+          {/* aria-disabled et non disabled : un bouton désactivé sous le
+              focus le perd (retour en haut de page au clavier). */}
+          <Lien
+            aria-disabled={deconnexion || undefined}
+            onClick={onDeconnecter}
+          >
             Ce n&apos;est pas vous{INSECABLE}? Changer de compte
           </Lien>
         </p>

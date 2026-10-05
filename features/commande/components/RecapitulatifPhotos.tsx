@@ -6,6 +6,7 @@ import type {
   ILignePanier,
 } from "../types/commande.types";
 
+import { supplementsOffertsParLigne } from "../utils/fidelite.utils";
 import {
   detailsLigne,
   lignesACommander,
@@ -48,24 +49,8 @@ export function lignesRecapDuPanier(
     Pick<CadeauChoisi, "epice">)[] = [],
 ): ILigneRecap[] {
   const aCommander = lignesACommander(lignes);
-  // Suppléments de chaque ligne, cadeaux déjà posés compris.
-  const portes = aCommander.map(
-    (l) =>
-      new Set(l.supplements.filter((s) => s.quantite > 0).map((s) => s.id)),
-  );
-  const offerts: string[][] = aCommander.map(() => []);
-  const vus = new Set<string>();
-
-  for (const c of cadeaux) {
-    if (c.type !== "SUPPLEMENT" || vus.has(c.id)) continue;
-    vus.add(c.id);
-    const i = portes.findIndex((p) => !p.has(c.articleId));
-
-    if (i === -1) continue;
-    portes[i].add(c.articleId);
-    offerts[i].push(`+ 1 ${joli(c.nom)} offert`);
-  }
-  const payantes = aCommander.map((l, i) => {
+  const offerts = supplementsOffertsParLigne(lignes, cadeaux);
+  const payantes = aCommander.map((l) => {
     const d = detailsLigne(l);
 
     return {
@@ -77,7 +62,9 @@ export function lignesRecapDuPanier(
       choix: d.choix,
       supplements: d.supplements,
       montant: totalLigne(l),
-      offerts: offerts[i],
+      offerts: (offerts.get(l.cle) ?? []).map(
+        (nom) => `+ 1 ${joli(nom)} offert`,
+      ),
     };
   });
   const platsOfferts = payantes.length

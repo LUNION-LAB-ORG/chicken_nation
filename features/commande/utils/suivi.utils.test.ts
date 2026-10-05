@@ -198,6 +198,13 @@ describe("dates et heures (Abidjan, UTC+0)", () => {
         heure: "00:15",
       }),
     ).toBe(`Créneau de 0${_}h${_}15 à 0${_}h${_}30`);
+    // Heures rondes et minuit écrits comme à la caisse (« 21 h », « minuit »).
+    expect(creneauRetrait({ ...base, heure: "21:00" })).toBe(
+      `Créneau de 21${_}h à 21${_}h${_}15`,
+    );
+    expect(creneauRetrait({ ...base, heure: "23:45" })).toBe(
+      `Créneau de 23${_}h${_}45 à minuit`,
+    );
     expect(
       creneauRetrait({ ...base, type: "DELIVERY", heure: "18:15" }),
     ).toBeNull();

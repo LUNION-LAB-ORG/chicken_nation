@@ -12,6 +12,7 @@ import {
   pointsLisibles,
   pointsRetenus,
   remisePoints,
+  supplementsOffertsParLigne,
   textePointsGagnes,
   valeurLisible,
 } from "./fidelite.utils";
@@ -168,5 +169,58 @@ describe("cadeaux", () => {
     ]);
     expect(nonPlaces).toEqual([]);
     expect(articlesAvecCadeaux([], [coca]).nonPlaces).toEqual([coca]);
+  });
+
+  it("étape Panier et récapitulatif : supplément offert sur la ligne où le serveur le pose", () => {
+    const ligneDe = (cle, supplements = [], retire = false) => ({
+      cle,
+      dish_id: cle,
+      quantite: 1,
+      supplements,
+      retire,
+    });
+    const coca = {
+      id: "r2",
+      type: "SUPPLEMENT",
+      articleId: "coca",
+      nom: "Coca",
+    };
+    const avecCoca = [{ id: "coca", nom: "COCA", prix: 1000, quantite: 1 }];
+
+    // Première ligne déjà avec un Coca : le cadeau va sur la suivante.
+    expect([
+      ...supplementsOffertsParLigne(
+        [ligneDe("big", avecCoca), ligneDe("box")],
+        [coca],
+      ),
+    ]).toEqual([["box", ["Coca"]]]);
+    // Ligne retirée du catalogue : sautée, comme à la création.
+    expect([
+      ...supplementsOffertsParLigne(
+        [ligneDe("ancien", [], true), ligneDe("box")],
+        [coca],
+      ),
+    ]).toEqual([["box", ["Coca"]]]);
+    // Les payants envoyés au serveur posent le cadeau au même endroit.
+    const { articles } = articlesAvecCadeaux(
+      [
+        {
+          dish_id: "big",
+          quantity: 1,
+          epice: false,
+          supplements: [{ id: "coca", quantity: 1 }],
+        },
+        { dish_id: "box", quantity: 1, epice: false, supplements: [] },
+      ],
+      [coca],
+    );
+
+    expect(articles[1].supplements).toEqual([
+      { id: "coca", quantity: 1, reward_id: "r2" },
+    ]);
+    // Toutes les lignes l'ont déjà : nulle part.
+    expect([
+      ...supplementsOffertsParLigne([ligneDe("big", avecCoca)], [coca]),
+    ]).toEqual([]);
   });
 });

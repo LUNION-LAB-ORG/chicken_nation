@@ -251,7 +251,7 @@ describe("écrans de la caisse", () => {
         prixMisAJour={false}
         problemes={new Map()}
         revalidation={false}
-        supplementsOfferts={[]}
+        supplementsOfferts={new Map()}
         onQuantite={() => {}}
         onRetirer={() => {}}
         onVider={() => {}}
@@ -281,7 +281,7 @@ describe("écrans de la caisse", () => {
       prixMisAJour: true,
       problemes: new Map(),
       revalidation: false,
-      supplementsOfferts: ["COCA"],
+      supplementsOfferts: new Map([["box", ["COCA"]]]),
       onQuantite: () => {},
       onRetirer: () => {},
       onVider: () => {},

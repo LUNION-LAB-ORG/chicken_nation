@@ -99,11 +99,12 @@
   transform: translateY(-50%);
 }
 
-/* Zone de clic de 44 px autour du rond de 34 px (cible tactile du plan, 5.6). */
+/* Zone de clic de 44 px autour du rond de 34 px (cible tactile du plan, 5.6) :
+   l'élément posé se mesure depuis l'intérieur de la bordure (30 px), d'où 7 px. */
 .pause::after {
   content: "";
   position: absolute;
-  inset: -5px;
+  inset: -7px;
   border-radius: 50%;
 }
 

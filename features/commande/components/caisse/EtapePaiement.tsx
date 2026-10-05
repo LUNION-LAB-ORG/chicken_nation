@@ -22,6 +22,7 @@ import { messageErreurAction } from "../../utils/erreur-action.utils";
 import {
   etatPaiement,
   lireCommandeEnAttente,
+  lireMarquePaiement,
   noterCommandeEnAttente,
   noterEcartPoints,
   oublierCommandeEnAttente,
@@ -126,6 +127,17 @@ export function EtapePaiement({
   const [etat, setEtat] = useState<"libre" | "creation" | "ferme">("libre");
   const [erreur, setErreur] = useState<string | null>(null);
   const [ecart, setEcart] = useState<IEcartPoints | null>(null);
+  /**
+   * Commande non payée dont le module a été ouvert ailleurs (autre onglet,
+   * page rechargée au retour de Mobile Money) il y a moins de 15 min : le
+   * client est prévenu avant de la payer de nouveau ou de la remplacer.
+   * `confirmation` : succès déjà annoncé, on ne paie pas de nouveau.
+   */
+  const [averti, setAverti] = useState<{
+    id: string;
+    reference: string;
+    confirmation: boolean;
+  } | null>(null);
   const succes = useRef(false);
   // Commandes dont le module a été ouvert dans cette page : leur marque
   // « paiement commencé » vient de nous, pas d'une visite précédente.
@@ -197,6 +209,38 @@ export function EtapePaiement({
       // Commande non payée de ce client, créée ici ou dans un autre onglet.
       const attente = lireCommandeEnAttente(client.id);
       const decision = decisionPaiement(attente, signature);
+
+      // Paiement commencé hors de cette page : rouvrir ou remplacer la
+      // commande sans prévenir pouvait faire payer deux fois. Premier clic :
+      // l'avertissement ; second clic : on continue (sauf succès annoncé).
+      if (
+        attente &&
+        decision !== "creer" &&
+        !ouvertesIci.current.has(attente.reference)
+      ) {
+        const tentative = etatPaiement(
+          lireMarquePaiement(attente.reference),
+          Date.now(),
+        );
+        const confirme =
+          tentative === "commence" && averti?.reference === attente.reference;
+
+        if (tentative !== "libre" && !confirme) {
+          const lue = await obtenirCommandeAction(attente.id);
+
+          if (lue.ok && lue.data.commande.paied) return onPaye(attente.id);
+          if (lue.ok && aPayer(lue.data.commande)) {
+            setAverti({
+              id: attente.id,
+              reference: attente.reference,
+              confirmation: tentative !== "commence",
+            });
+
+            return setEtat("libre");
+          }
+        }
+      }
+      setAverti(null);
 
       if (attente && decision !== "creer") {
         const lue = await obtenirCommandeAction(attente.id);
@@ -371,6 +415,39 @@ export function EtapePaiement({
             Montant enregistré pour cette commande{INSECABLE}: {fcfa(montant)}.
           </p>
         ) : null}
+        {averti ? (
+          <p
+            className="rounded-carte bg-jaune-pale px-3.5 py-3 text-sm leading-[1.45]"
+            role="status"
+          >
+            {averti.confirmation ? (
+              <>
+                Le paiement de la commande{" "}
+                <span className="whitespace-nowrap">{averti.reference}</span> a
+                été accepté et attend sa confirmation. Ne payez pas une seconde
+                fois{INSECABLE}:{" "}
+                <Lien className="min-h-0" href={`/fr/commander/${averti.id}`}>
+                  suivez la commande
+                </Lien>
+                .
+              </>
+            ) : (
+              <>
+                Un paiement a déjà été commencé pour la commande{" "}
+                <span className="whitespace-nowrap">{averti.reference}</span>,
+                dans un autre onglet ou avant de quitter la page. Si vous avez
+                été débité, ne payez pas une seconde fois{INSECABLE}: appelez le{" "}
+                <a
+                  className="font-semibold whitespace-nowrap underline"
+                  href={telLien()}
+                >
+                  {TELEPHONE.replace(/ /g, INSECABLE)}
+                </a>
+                . Sinon, appuyez de nouveau sur «{INSECABLE}Payer{INSECABLE}».
+              </>
+            )}
+          </p>
+        ) : null}
         {commence ? (
           <p className="rounded-carte bg-jaune-pale px-3.5 py-3 text-sm leading-[1.45]">
             Un paiement a déjà été commencé pour cette commande. Si vous avez
@@ -412,8 +489,11 @@ export function EtapePaiement({
           ref={bouton}
           bloc
           aria-busy={occupe || undefined}
+          // aria-disabled pendant la création : un bouton désactivé sous le
+          // focus le perd (retour en haut de page au clavier).
+          aria-disabled={occupe || undefined}
           className="gap-1.5 px-4 min-[1000px]:w-auto"
-          disabled={!pret || occupe || !pretAPayer || erreurChargement}
+          disabled={!pret || !pretAPayer || erreurChargement}
           icone="cadenas"
           taille="grand"
           onClick={lancer}

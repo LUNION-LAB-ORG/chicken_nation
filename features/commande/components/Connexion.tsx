@@ -13,6 +13,7 @@ import {
 } from "../actions/connexion.action";
 import { oublierAdresseAtom } from "../stores/caisse.store";
 import { messageErreurAction } from "../utils/erreur-action.utils";
+import { prendreFocusConnexion } from "../utils/focus-connexion.utils";
 import { telephoneLisible } from "../utils/panier.utils";
 
 import { Bouton } from "@/components/site/Bouton";
@@ -78,6 +79,13 @@ export default function Connexion({
     if (etape === "telephone") champTelephone.current?.focus();
     if (etape === "profil") champPrenom.current?.focus();
   }, [etape]);
+
+  // Affiché juste après une déconnexion : le focus va au numéro.
+  useEffect(() => {
+    if (!prendreFocusConnexion()) return;
+    if (etapeInitiale === "telephone") champTelephone.current?.focus();
+    else champPrenom.current?.focus();
+  }, []);
 
   useEffect(() => {
     if (attente <= 0) return;

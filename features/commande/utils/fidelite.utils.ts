@@ -2,11 +2,16 @@ import type {
   CadeauChoisi,
   IArticleCommande,
   ICadeau,
+  ILignePanier,
   IPointsFidelite,
   ModeCommande,
 } from "../types/commande.types";
 
-import { platDisponibleMaintenant, venduEn } from "./panier.utils";
+import {
+  lignesACommander,
+  platDisponibleMaintenant,
+  venduEn,
+} from "./panier.utils";
 
 import { INSECABLE, nombre } from "@/lib/typo";
 
@@ -270,6 +275,41 @@ export const cadeauxNonProposes = (cadeaux: ICadeau[], restaurantId: string) =>
   cadeaux
     .filter((c) => (c.restaurantsExclus ?? []).includes(restaurantId))
     .map((c) => c.nom);
+
+/**
+ * Suppléments offerts posés sur les lignes du panier comme le serveur les
+ * posera (articlesAvecCadeaux) : la première ligne payante qui n'a pas déjà
+ * ce supplément. Clé de ligne → noms des cadeaux posés sur elle. Sert au
+ * récapitulatif ET à l'étape Panier, qui l'affichaient sur la première ligne
+ * même quand elle avait déjà ce supplément (le serveur le pose sur la suivante).
+ */
+export function supplementsOffertsParLigne(
+  lignes: ILignePanier[],
+  cadeaux: Pick<ICadeau, "id" | "type" | "articleId" | "nom">[],
+): Map<string, string[]> {
+  const aCommander = lignesACommander(lignes);
+  // Suppléments de chaque ligne, cadeaux déjà posés compris.
+  const portes = aCommander.map(
+    (l) =>
+      new Set(l.supplements.filter((s) => s.quantite > 0).map((s) => s.id)),
+  );
+  const offerts = new Map<string, string[]>();
+  const vus = new Set<string>();
+
+  for (const c of cadeaux) {
+    if (c.type !== "SUPPLEMENT" || vus.has(c.id)) continue;
+    vus.add(c.id);
+    const i = portes.findIndex((p) => !p.has(c.articleId));
+
+    if (i === -1) continue;
+    portes[i].add(c.articleId);
+    const cle = aCommander[i].cle;
+
+    offerts.set(cle, [...(offerts.get(cle) ?? []), c.nom]);
+  }
+
+  return offerts;
+}
 
 /**
  * Lignes payantes complétées des cadeaux choisis, sous la forme exacte de

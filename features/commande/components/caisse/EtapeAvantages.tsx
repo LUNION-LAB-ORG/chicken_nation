@@ -3,7 +3,7 @@
 import type { ICadeau, IPointsFidelite } from "../../types/commande.types";
 import type { ReactNode } from "react";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 import MesCadeaux from "../MesCadeaux";
 import MesPoints from "../MesPoints";
@@ -84,16 +84,49 @@ export function EtapeAvantages({
   const [erreurCode, setErreurCode] = useState<string | null>(null);
   const [verification, setVerification] = useState(false);
 
+  /**
+   * Le champ et son bloc « Code appliqué » se remplacent : après un geste du
+   * client, le focus va à ce qui prend la place (« Retirer », ou le champ),
+   * au lieu de retomber en haut de la page.
+   */
+  const gesteCode = useRef<"applique" | "retire" | null>(null);
+
+  useEffect(() => {
+    const geste = gesteCode.current;
+
+    gesteCode.current = null;
+    if (geste === "applique")
+      document.getElementById(`${id}-retirer-code`)?.focus();
+    if (geste === "retire") document.getElementById(`${id}-saisie`)?.focus();
+  }, [code?.code, id]);
+
+  const focaliserSaisie = () =>
+    requestAnimationFrame(() =>
+      document.getElementById(`${id}-saisie`)?.focus(),
+    );
+
   const appliquer = async () => {
+    if (verification) return;
     const c = saisie.trim().toUpperCase().replace(/\s+/g, "");
 
-    if (!c) return setErreurCode("Entrez un code promo ou un bon d'achat.");
+    if (!c) {
+      setErreurCode("Entrez un code promo ou un bon d'achat.");
+
+      return focaliserSaisie();
+    }
     setErreurCode(null);
     setVerification(true);
+    gesteCode.current = "applique";
     const message = await onAppliquerCode(c);
 
     setVerification(false);
-    if (message) return setErreurCode(message);
+    if (message) {
+      // Le focus revient au champ à corriger, relié au message.
+      gesteCode.current = null;
+      setErreurCode(message);
+
+      return focaliserSaisie();
+    }
     setSaisie("");
   };
 
@@ -117,7 +150,14 @@ export function EtapeAvantages({
               Code {code.code} appliqué{INSECABLE}: {"−"}
               {fcfa(code.remise)}
             </span>
-            <Lien className="text-encre" onClick={onRetirerCode}>
+            <Lien
+              className="text-encre"
+              id={`${id}-retirer-code`}
+              onClick={() => {
+                gesteCode.current = "retire";
+                onRetirerCode();
+              }}
+            >
               Retirer
             </Lien>
           </div>
@@ -151,9 +191,11 @@ export function EtapeAvantages({
                   setErreurCode(null);
                 }}
               />
+              {/* aria-disabled et non disabled : un bouton désactivé sous le
+                  focus le perd (retour en haut de page au clavier). */}
               <Bouton
                 aria-busy={verification || undefined}
-                disabled={verification}
+                aria-disabled={verification || undefined}
                 type="submit"
                 variante="sombre"
               >

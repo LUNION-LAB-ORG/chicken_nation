@@ -142,8 +142,11 @@ export function EtapePanier({
   /** Relecture des plats au catalogue en cours. */
   revalidation: boolean;
   prixMisAJour: boolean;
-  /** Suppléments offerts posés sur la première ligne payante. */
-  supplementsOfferts: string[];
+  /**
+   * Suppléments offerts par clé de ligne, posés comme le serveur les posera
+   * (supplementsOffertsParLigne) : pas forcément sur la première ligne.
+   */
+  supplementsOfferts: Map<string, string[]>;
   platsOfferts: IPlatOffertPanier[];
   /** « Modifier » : absent tant que la fiche plat n'est pas branchée. */
   onModifier?: (index: number) => void;
@@ -174,7 +177,6 @@ export function EtapePanier({
       </section>
     );
   }
-  const premierePayante = lignes.findIndex((l) => !l.retire);
 
   return (
     <>
@@ -213,7 +215,7 @@ export function EtapePanier({
               key={l.cle}
               ligne={l}
               mode={mode}
-              offerts={i === premierePayante ? supplementsOfferts : []}
+              offerts={l.retire ? [] : (supplementsOfferts.get(l.cle) ?? [])}
               problemes={problemes.get(l.cle) ?? []}
               onModifier={onModifier ? () => onModifier(i) : undefined}
               onQuantite={(q) => onQuantite(l, q)}

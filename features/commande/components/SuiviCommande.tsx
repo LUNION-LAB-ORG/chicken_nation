@@ -12,6 +12,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { obtenirCommandeAction } from "../actions/commande.action";
 import { useActionsCommande } from "../hooks/useActionsCommande";
+import { fermerModuleKkiapay } from "../hooks/useKkiapay";
 import { usePaiementCommande } from "../hooks/usePaiementCommande";
 import { lirePanierGarde, viderPanierAtom } from "../stores/panier.store";
 import { panierDeLaCommande } from "../utils/caisse.utils";
@@ -292,6 +293,9 @@ export default function SuiviCommande({
   // caisse) veut dire que le client vient de payer : « Paiement accepté ».
   useEffect(() => {
     if (!paye || !reference) return;
+    // Paiement vu par la relecture pendant que le module est encore ouvert
+    // (validation sur le téléphone) : sa fenêtre couvrirait « Paiement accepté ».
+    fermerModuleKkiapay();
     const m = lireMarquePaiement(reference);
     const derniere = Math.max(m?.succesA ?? 0, m?.ouvertA ?? 0);
 
@@ -330,8 +334,14 @@ export default function SuiviCommande({
 
   const etat =
     commande && aPayer(commande) ? etatPaiement(marque, horloge) : "libre";
+  // « Payer » affiché et actif (avec l'avertissement si un paiement a été
+  // commencé) : « Voir et payer » y mène le focus.
   const payable =
-    !!commande && aPayer(commande) && etat === "libre" && pret && !!paiement;
+    !!commande &&
+    aPayer(commande) &&
+    (etat === "libre" || etat === "commence") &&
+    pret &&
+    !!paiement;
 
   useEffect(() => {
     if (!payable || !focusPayer.current) return;
@@ -569,7 +579,10 @@ export default function SuiviCommande({
                     </p>
                   ) : null}
                   {etat === "commence" ? (
-                    <p className="rounded-carte bg-jaune-pale px-3.5 py-3 text-sm">
+                    <p
+                      className="rounded-carte bg-jaune-pale px-3.5 py-3 text-sm"
+                      id="avertissement-paiement"
+                    >
                       Un paiement a déjà été commencé pour cette commande. Si
                       vous avez été débité, ne payez pas une seconde fois
                       {INSECABLE}: appelez le <Numero />.
@@ -603,6 +616,11 @@ export default function SuiviCommande({
                     <Bouton
                       ref={boutonPayer}
                       bloc
+                      aria-describedby={
+                        etat === "commence"
+                          ? "avertissement-paiement"
+                          : undefined
+                      }
                       disabled={!pret || !paiement || enCours === "modifier"}
                       icone="cadenas"
                       taille="grand"

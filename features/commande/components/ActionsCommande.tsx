@@ -11,6 +11,7 @@ import { deconnexionAction } from "../actions/connexion.action";
 import { useActionsCommande } from "../hooks/useActionsCommande";
 import { oublierAdresseAtom } from "../stores/caisse.store";
 import { messageErreurAction } from "../utils/erreur-action.utils";
+import { demanderFocusConnexion } from "../utils/focus-connexion.utils";
 
 import { Bouton } from "@/components/site/Bouton";
 
@@ -189,6 +190,7 @@ export function BoutonDeconnexion() {
           try {
             await deconnexionAction();
             oublierAdresse();
+            demanderFocusConnexion();
             router.refresh();
           } catch (e) {
             setEnCours(false);

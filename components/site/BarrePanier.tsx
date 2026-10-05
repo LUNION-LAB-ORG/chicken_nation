@@ -38,13 +38,14 @@ export function BarrePanier() {
   const total = fcfa(sousTotal(lignes));
   const libelle = `${tiroirBranche ? "Ouvrir le panier" : "Voir le panier"}, ${pluriel(nombre, "article", "articles")}, ${total}`;
   const classe =
-    "flex min-h-[54px] w-full items-center gap-3 rounded-pilule border-0 bg-orange pr-[18px] pl-2.5 text-base font-bold text-encre no-underline shadow-bouton hover:bg-orange-appui lg:w-auto lg:gap-[18px]";
+    "flex min-h-[54px] w-full items-center gap-2 rounded-pilule border-0 bg-orange pr-3.5 pl-2.5 text-[clamp(14px,4.3vw,16px)] font-bold text-encre no-underline shadow-bouton hover:bg-orange-appui min-[360px]:gap-3 min-[360px]:pr-[18px] lg:w-auto lg:gap-[18px]";
   const contenu = (
     <>
       <span className="inline-grid h-[34px] min-w-[34px] place-items-center rounded-pilule bg-encre px-2 text-[15px] text-white tabular-nums">
         {nombre}
       </span>
-      <span>Voir le panier</span>
+      {/* Jamais coupé en deux lignes, même à 320 px avec un total à 6 chiffres. */}
+      <span className="whitespace-nowrap">Voir le panier</span>
       <span className="ml-auto whitespace-nowrap tabular-nums">{total}</span>
     </>
   );

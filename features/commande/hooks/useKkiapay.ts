@@ -32,6 +32,7 @@ declare global {
     ) => void;
     addFailedListener?: (cb: (erreur: unknown) => void) => void;
     removeKkiapayListener?: (evenement: string) => void;
+    closeKkiapayWidget?: () => void;
   }
 }
 
@@ -54,6 +55,20 @@ function chargerScript(): Promise<void> {
   });
 
   return chargement;
+}
+
+/**
+ * Ferme le module s'il est ouvert. Sert quand la page apprend le paiement par
+ * un autre chemin (retour de l'application Mobile Money, relecture du suivi) :
+ * sans cela, la fenêtre de KKiaPay restait par-dessus « Paiement accepté ».
+ * Sans effet si le module n'a jamais été ouvert.
+ */
+export function fermerModuleKkiapay() {
+  try {
+    window.closeKkiapayWidget?.();
+  } catch {
+    /* module jamais ouvert : rien à fermer */
+  }
 }
 
 export function useKkiapay({

@@ -6,7 +6,7 @@ import { Icone, type NomIcone } from "./Icone";
 import { cn } from "@/lib/utils";
 
 const styleLien =
-  "inline-flex min-h-11 items-center gap-1.5 border-0 bg-transparent p-0 text-sm font-semibold text-orange-texte underline decoration-[1.5px] underline-offset-[3px] hover:text-encre disabled:cursor-default disabled:text-encre-doux disabled:no-underline";
+  "inline-flex min-h-11 items-center gap-1.5 border-0 bg-transparent p-0 text-sm font-semibold text-orange-texte underline decoration-[1.5px] underline-offset-[3px] hover:text-encre disabled:cursor-default disabled:text-encre-doux disabled:no-underline aria-disabled:cursor-default aria-disabled:text-encre-doux aria-disabled:no-underline";
 
 type LienProps = {
   /** Sans adresse, le lien est un bouton (« Modifier », « Renvoyer le code »). */

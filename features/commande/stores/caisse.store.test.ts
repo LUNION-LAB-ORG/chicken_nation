@@ -113,6 +113,69 @@ describe("choix gardés (cn-caisse)", () => {
     });
   });
 
+  it("page sans caisse ni tiroir (Mes commandes, carte) : une écriture part du choix gardé, pas des valeurs par défaut", () => {
+    const valeurs = new Map([
+      [
+        "cn-caisse",
+        JSON.stringify({
+          mode: "PICKUP",
+          adresse: {
+            libelle: "Angré",
+            latitude: 5.39,
+            longitude: -3.98,
+            repere: "Portail bleu",
+          },
+          restaurantId: "r1",
+        }),
+      ],
+    ]);
+
+    globalThis.window = {
+      localStorage: {
+        getItem: (k) => (valeurs.has(k) ? valeurs.get(k) : null),
+        setItem: (k, v) => valeurs.set(k, String(v)),
+        removeItem: (k) => valeurs.delete(k),
+      },
+    };
+    try {
+      // Store neuf : l'atome n'a jamais été relu du navigateur.
+      const s = createStore();
+
+      s.set(oublierAdresseAtom);
+      expect(JSON.parse(valeurs.get("cn-caisse"))).toEqual({
+        mode: "PICKUP",
+        adresse: null,
+        restaurantId: "r1",
+      });
+
+      // « Retirer ici » sur la carte : l'adresse gardée n'est pas effacée.
+      valeurs.set(
+        "cn-caisse",
+        JSON.stringify({
+          mode: "DELIVERY",
+          adresse: { libelle: "Angré", latitude: 5.39, longitude: -3.98 },
+          restaurantId: null,
+        }),
+      );
+      const t = createStore();
+
+      t.set(modeAtom, "PICKUP");
+      t.set(restaurantIdAtom, "r2");
+      expect(JSON.parse(valeurs.get("cn-caisse"))).toEqual({
+        mode: "PICKUP",
+        adresse: {
+          libelle: "Angré",
+          latitude: 5.39,
+          longitude: -3.98,
+          repere: "",
+        },
+        restaurantId: "r2",
+      });
+    } finally {
+      delete globalThis.window;
+    }
+  });
+
   it("changer de restaurant remet l'heure à « dès que possible »", () => {
     const s = createStore();
 

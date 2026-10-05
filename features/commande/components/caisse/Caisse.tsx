@@ -33,6 +33,7 @@ import {
   verifierCodeReductionAction,
 } from "../../actions/commande.action";
 import { deconnexionAction } from "../../actions/connexion.action";
+import { fermerModuleKkiapay } from "../../hooks/useKkiapay";
 import {
   adresseAtom,
   allerEtapeAtom,
@@ -65,6 +66,7 @@ import {
 } from "../../utils/caisse.utils";
 import { articleDeLigne } from "../../utils/analytique.utils";
 import { messageErreurAction } from "../../utils/erreur-action.utils";
+import { demanderFocusConnexion } from "../../utils/focus-connexion.utils";
 import {
   articlesAvecCadeaux,
   avisPoints,
@@ -74,6 +76,7 @@ import {
   pointsRetenus,
   problemesCadeau,
   remisePoints,
+  supplementsOffertsParLigne,
 } from "../../utils/fidelite.utils";
 import {
   lireCommandeEnAttente,
@@ -275,6 +278,9 @@ export function Caisse({
   // ── Fin de parcours ────────────────────────────────────────────────────
 
   const quitter = (message: string, adresseSuite: string) => {
+    // Paiement appris hors du module (retour de Mobile Money) : sa fenêtre,
+    // encore ouverte, couvrirait le suivi.
+    fermerModuleKkiapay();
     setRedirection(message);
     vider();
     oublierCommandeEnAttente();
@@ -830,6 +836,12 @@ export function Caisse({
 
   // ── Gestes ─────────────────────────────────────────────────────────────
 
+  /** Titre de l'étape affichée, après le rendu (ligne retirée, panier vidé). */
+  const focaliserTitreEtape = () =>
+    requestAnimationFrame(() =>
+      document.getElementById("t-etape")?.focus({ preventScroll: true }),
+    );
+
   const aller = (n: number) => {
     setErreurEtape(null);
     setErreurEpice(null);
@@ -962,11 +974,13 @@ export function Caisse({
     ) : null;
 
   const seDeconnecter = async () => {
+    if (deconnexion) return;
     setErreurCompte(null);
     setDeconnexion(true);
     try {
       await deconnexionAction();
       oublierAdresse();
+      demanderFocusConnexion();
       setClient(null);
       afficherMessage("Vous êtes déconnecté.");
     } catch (e) {
@@ -1177,9 +1191,10 @@ export function Caisse({
         prixMisAJour={prixMisAJour}
         problemes={problemes}
         revalidation={revalidation}
-        supplementsOfferts={cadeauxRetenus
-          .filter((c) => c.type === "SUPPLEMENT")
-          .map(nomCadeau)}
+        supplementsOfferts={supplementsOffertsParLigne(
+          lignes,
+          cadeauxRetenus.map((c) => ({ ...c, nom: nomCadeau(c) })),
+        )}
         onModifier={
           ficheBranchee
             ? (i) =>
@@ -1195,10 +1210,14 @@ export function Caisse({
         }
         onRetirer={(l: ILignePanier) => {
           changerQuantite({ cle: l.cle, quantite: 0 });
+          // La ligne et son bouton disparaissent : le focus va au titre de
+          // l'étape (comme dans le tiroir), au lieu du haut de la page.
+          focaliserTitreEtape();
           afficherMessage(`${l.nom} retiré du panier.`);
         }}
         onVider={() => {
           vider();
+          focaliserTitreEtape();
           afficherMessage("Panier vidé.");
         }}
       />

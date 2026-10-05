@@ -2,7 +2,7 @@
 
 import type { IPointsFidelite } from "../types/commande.types";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 import {
   erreurPoints,
@@ -53,12 +53,36 @@ export default function MesPoints({
   const max = maximumPointsUtiles(f, sousTotal);
   const minimum = Math.max(1, f.minimum);
 
+  /**
+   * Le formulaire et le bloc « points utilisés » se remplacent : après un
+   * geste du client, le focus va à ce qui prend la place (« Retirer », ou le
+   * champ), au lieu de retomber en haut de la page.
+   */
+  const geste = useRef(false);
+  const utilises = retenus > 0;
+
+  useEffect(() => {
+    if (!geste.current) return;
+    geste.current = false;
+    document
+      .getElementById(utilises ? `${id}-retirer` : `${id}-points`)
+      ?.focus();
+  }, [utilises, id]);
+
   const utiliser = (n: number) => {
     const e = erreurPoints(n, f, sousTotal);
 
     setErreur(e);
-    if (e) return;
+    if (e) {
+      // Le focus revient au champ à corriger, relié au message.
+      requestAnimationFrame(() =>
+        document.getElementById(`${id}-points`)?.focus(),
+      );
+
+      return;
+    }
     setSaisie("");
+    geste.current = true;
     onUtiliser(n);
   };
 
@@ -91,8 +115,10 @@ export default function MesPoints({
           </span>
           <Lien
             className="text-encre"
+            id={`${id}-retirer`}
             onClick={() => {
               setErreur(null);
+              geste.current = true;
               onRetirer();
             }}
           >

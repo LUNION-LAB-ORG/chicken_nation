@@ -37,6 +37,19 @@ const hhmm = (minutes: number) => {
   return `${Math.floor(m / 60)}${N}h${N}${String(m % 60).padStart(2, "0")}`;
 };
 
+/**
+ * Bornes d'un créneau de retrait écrites comme à la caisse (« 18 h 15 »,
+ * « 21 h », « minuit »), et non « 21 h 00 ».
+ */
+const heureCreneau = (minutes: number) => {
+  const m = ((Math.round(minutes) % 1440) + 1440) % 1440;
+
+  if (m === 0) return "minuit";
+  const mm = m % 60;
+
+  return `${Math.floor(m / 60)}${N}h${mm ? `${N}${String(mm).padStart(2, "0")}` : ""}`;
+};
+
 /** « 2026-10-02T08:17:24Z » → « 8 h 17 », ou null si la date est illisible. */
 export function heureDe(iso: string | null | undefined): string | null {
   const d = iso ? new Date(iso) : null;
@@ -112,7 +125,7 @@ export function creneauRetrait(
   // la commande : la minute peut précéder la création.
   if (ecart <= 5 || ecart >= 1435) return "Dès que possible";
 
-  return `Créneau de ${hhmm(demandee)} à ${hhmm(demandee + 15)}`;
+  return `Créneau de ${heureCreneau(demandee)} à ${heureCreneau(demandee + 15)}`;
 }
 
 // ── État de la commande ───────────────────────────────────────────────────

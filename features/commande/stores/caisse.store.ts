@@ -3,7 +3,7 @@
 import type { IAdresseLivraison, ModeCommande } from "../types/commande.types";
 import type { EtapeCaisse } from "../utils/caisse.utils";
 
-import { atom } from "jotai";
+import { atom, type Getter } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
 import { lignesACommander, signaturePanier } from "../utils/panier.utils";
@@ -85,18 +85,38 @@ export const caisseAtom = atom((get) =>
   lireCaisseGardee(get(caisseGardeeAtom)),
 );
 
+/**
+ * Base d'une écriture : la valeur du navigateur. L'atome n'est relu du
+ * navigateur qu'une fois affiché quelque part ; sur une page sans caisse ni
+ * tiroir (Mes commandes, « Retirer ici » sur la carte), il vaut encore
+ * CAISSE_VIDE, et l'écriture effaçait le reste (« Se déconnecter » remettait
+ * la livraison et oubliait le restaurant de retrait). Stockage bloqué : la
+ * valeur de la page.
+ */
+function caissePourEcrire(get: Getter): ICaisseGardee {
+  try {
+    const brut = window.localStorage.getItem("cn-caisse");
+
+    if (brut !== null) return lireCaisseGardee(JSON.parse(brut));
+  } catch {
+    /* stockage bloqué ou valeur illisible */
+  }
+
+  return get(caisseAtom);
+}
+
 /** Livraison ou retrait. */
 export const modeAtom = atom(
   (get) => get(caisseAtom).mode,
   (get, set, mode: ModeCommande) =>
-    set(caisseGardeeAtom, { ...get(caisseAtom), mode }),
+    set(caisseGardeeAtom, { ...caissePourEcrire(get), mode }),
 );
 
 /** Adresse de livraison choisie (texte, point GPS et repère), ou null. */
 export const adresseAtom = atom(
   (get) => get(caisseAtom).adresse,
   (get, set, adresse: IAdresseLivraison | null) =>
-    set(caisseGardeeAtom, { ...get(caisseAtom), adresse }),
+    set(caisseGardeeAtom, { ...caissePourEcrire(get), adresse }),
 );
 
 /**
@@ -106,7 +126,7 @@ export const adresseAtom = atom(
  * eux, ne disent rien de lui.
  */
 export const oublierAdresseAtom = atom(null, (get, set) =>
-  set(caisseGardeeAtom, { ...get(caisseAtom), adresse: null }),
+  set(caisseGardeeAtom, { ...caissePourEcrire(get), adresse: null }),
 );
 
 /** Heure de retrait (ISO d'un créneau), null = dès que possible. En mémoire seulement. */
@@ -116,9 +136,10 @@ export const heureRetraitAtom = atom<string | null>(null);
 export const restaurantIdAtom = atom(
   (get) => get(caisseAtom).restaurantId,
   (get, set, restaurantId: string | null) => {
-    if (restaurantId !== get(caisseAtom).restaurantId)
-      set(heureRetraitAtom, null);
-    set(caisseGardeeAtom, { ...get(caisseAtom), restaurantId });
+    const actuelle = caissePourEcrire(get);
+
+    if (restaurantId !== actuelle.restaurantId) set(heureRetraitAtom, null);
+    set(caisseGardeeAtom, { ...actuelle, restaurantId });
   },
 );
 
