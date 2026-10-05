@@ -1,115 +1,68 @@
+import type { ICategorieCarte, IPlatApi } from "../types/carte.types";
+
+import { cache } from "react";
+
+import { construireCarte } from "../carte";
+
 import { baseURL } from "@/config/api";
-import { formatImageUrl } from "@/utils/formatImageUrl";
 
-// Plat tel que renvoyé par GET /dishes pour un visiteur non connecté
-// (le backend n'y met que les plats visibles par tout le monde).
-interface IPlatApi {
-    id: string;
-    name: string;
-    description: string | null;
-    price: number;
-    is_promotion: boolean;
-    promotion_price: number | null;
-    image: string | null;
-    entity_status: string;
-    category: { id: string; name: string } | null;
-}
+export type { ICategorieCarte, IPlatCarte } from "../types/carte.types";
+// Ancienne carte (/fr/restaurants/nos-menus) jusqu'à la nouvelle (lot L7).
+export { menuSchemaOrg as carteSchemaOrg } from "@/lib/seo/menu";
 
-export interface IPlatCarte {
-    id: string;
-    nom: string;
-    description: string;
-    prix: number;
-    // Prix barré quand le plat est en promotion.
-    prixAvantPromo: number | null;
-    image: string;
-}
+/** Étiquette de cache de la carte (à passer à `revalidateTag` après un changement au backoffice). */
+export const ETIQUETTE_CARTE = "carte";
+const REVALIDATION_CARTE = 900;
 
-export interface ICategorieCarte {
-    nom: string;
-    plats: IPlatCarte[];
-}
+// La réponse brute (776 ko pour 49 plats en production) est gardée telle
+// quelle par le cache de données de Next, qui refuse tout au-delà de 2 Mo.
+const TAILLE_A_SURVEILLER = 1_500_000;
 
-// "POULET PANÉ" → "Poulet pané"
-function nomCategorie(nom: string) {
-    const bas = nom.trim().toLowerCase();
-    return bas.charAt(0).toUpperCase() + bas.slice(1);
+/**
+ * Lecture de `GET /dishes` par `fetch` natif et non par ak-api-http (lib/api.ts) :
+ * cette bibliothèque passe par axios, que Next ne met pas en cache.
+ * En cas d'échec, une erreur est levée : pendant une revalidation, Next garde
+ * la dernière version valide de la page au lieu de publier une carte vide ;
+ * pendant la construction, celle-ci échoue et l'ancien conteneur reste en service.
+ */
+async function lirePlatsApi(): Promise<IPlatApi[]> {
+  const res = await fetch(`${baseURL}/dishes`, {
+    next: { revalidate: REVALIDATION_CARTE, tags: [ETIQUETTE_CARTE] },
+    // Le site sait composer un menu (options) : le serveur montre alors
+    // aussi les plats composables, cachés aux anciennes applications.
+    headers: { "x-app-composable": "1" },
+  });
+
+  if (!res.ok)
+    throw new Error(
+      `Carte publique illisible : GET /dishes a répondu ${res.status}`,
+    );
+  const texte = await res.text();
+
+  if (texte.length > TAILLE_A_SURVEILLER) {
+    // eslint-disable-next-line no-console -- journal du serveur : taille de la réponse à surveiller
+    console.warn(
+      `GET /dishes pèse ${Math.round(texte.length / 1000)} ko : au-delà de 2 Mo, Next ne la met plus en cache (plan, risque R5).`,
+    );
+  }
+  const corps = JSON.parse(texte) as IPlatApi[] | { data?: IPlatApi[] };
+  const plats = Array.isArray(corps) ? corps : corps.data;
+
+  if (!Array.isArray(plats))
+    throw new Error(
+      "Carte publique illisible : GET /dishes ne renvoie pas de liste",
+    );
+
+  return plats;
 }
 
 /**
- * Carte publique lue côté serveur, gardée en cache 15 minutes : un prix ou
- * une promotion changés au backoffice arrivent sur le site sans redéploiement.
- * Renvoie une liste vide si le backend ne répond pas.
+ * Carte publique rangée par catégorie (ordre de `carte.categories.ts`), avec
+ * une section Promotions en tête quand des plats sont en promotion.
+ * Gardée 15 minutes : un prix ou une promotion changés au backoffice arrivent
+ * sur le site sans redéploiement. Une seule lecture par rendu (`cache`) :
+ * accroche, promotions, catégories, pages plats et sitemap la partagent.
  */
-export async function obtenirCartePublique(): Promise<ICategorieCarte[]> {
-    let plats: IPlatApi[] = [];
-    try {
-        const res = await fetch(`${baseURL}/dishes`, {
-            next: { revalidate: 900 },
-            // Le site sait composer un menu (options) : le serveur montre alors
-            // aussi les plats composables, cachés aux anciennes applications.
-            headers: { "x-app-composable": "1" },
-        });
-        if (!res.ok) return [];
-        const corps = (await res.json()) as IPlatApi[] | { data?: IPlatApi[] };
-        plats = Array.isArray(corps) ? corps : (corps.data ?? []);
-    } catch {
-        return [];
-    }
-
-    const parCategorie = new Map<string, IPlatCarte[]>();
-    for (const p of plats) {
-        if (p.entity_status !== "ACTIVE" || !p.category) continue;
-        // Même critère que l'application : promotion ET prix promo renseigné.
-        const enPromo = p.is_promotion && !!p.promotion_price && p.promotion_price < p.price;
-        const plat: IPlatCarte = {
-            id: p.id,
-            nom: p.name.trim(),
-            description: (p.description ?? "").replace(/\s+/g, " ").trim(),
-            prix: enPromo ? p.promotion_price! : p.price,
-            prixAvantPromo: enPromo ? p.price : null,
-            image: formatImageUrl(p.image ?? undefined, "/assets/images/logo.png"),
-        };
-        const nom = nomCategorie(p.category.name);
-        parCategorie.set(nom, [...(parCategorie.get(nom) ?? []), plat]);
-    }
-
-    // L'onglet Promotions réunit tous les plats en promotion, quelle que soit
-    // leur catégorie (ils restent aussi visibles dans la leur).
-    const promos = new Map<string, IPlatCarte>();
-    for (const liste of Array.from(parCategorie.values())) {
-        for (const plat of liste) if (plat.prixAvantPromo) promos.set(plat.id, plat);
-    }
-    for (const plat of parCategorie.get("Promotions") ?? []) promos.set(plat.id, plat);
-    if (promos.size > 0) parCategorie.set("Promotions", Array.from(promos.values()));
-    else parCategorie.delete("Promotions");
-
-    return Array.from(parCategorie.entries())
-        .map(([nom, liste]): ICategorieCarte => ({ nom, plats: liste.sort((a, b) => a.prix - b.prix) }))
-        // Les promotions d'abord, puis l'ordre alphabétique.
-        .sort((a, b) => (a.nom === "Promotions" ? -1 : b.nom === "Promotions" ? 1 : a.nom.localeCompare(b.nom, "fr")));
-}
-
-/** Carte au format schema.org « Menu », lue par Google. */
-export function carteSchemaOrg(categories: ICategorieCarte[]) {
-    return {
-        "@context": "https://schema.org",
-        "@type": "Menu",
-        // Repris par le hasMenu des fiches Restaurant (restaurantsSchemaOrg).
-        "@id": "https://www.chicken-nation.com/fr/restaurants/nos-menus#carte",
-        name: "La carte CHICKEN NATION",
-        url: "https://www.chicken-nation.com/fr/restaurants/nos-menus",
-        inLanguage: "fr",
-        hasMenuSection: categories.map((c) => ({
-            "@type": "MenuSection",
-            name: c.nom,
-            hasMenuItem: c.plats.map((p) => ({
-                "@type": "MenuItem",
-                name: p.nom,
-                ...(p.description ? { description: p.description } : {}),
-                ...(p.image.startsWith("http") ? { image: p.image } : {}),
-                offers: { "@type": "Offer", price: p.prix, priceCurrency: "XOF" },
-            })),
-        })),
-    };
-}
+export const obtenirCartePublique = cache(
+  async (): Promise<ICategorieCarte[]> => construireCarte(await lirePlatsApi()),
+);

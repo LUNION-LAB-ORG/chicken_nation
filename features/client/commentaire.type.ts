@@ -1,37 +1,27 @@
-// Interface Client
-interface IClient {
-    id: string;
-    first_name: string;
-    last_name: string;
-    phone: string;
-    image: string | null;
-}
+/* eslint-disable @typescript-eslint/no-unused-vars -- types globaux (fichier sans import ni export) : les composants des avis les utilisent sans les importer. */
 
-// Interface Commande
-interface ICommande {
-    id: string;
-    reference: string;
-    created_at: string;
-}
-
-// Interface Commentaire
+/**
+ * Avis client tel que le renvoie la route publique `GET /comments/bests`
+ * (backend `avis-public.util.ts`) : ni téléphone, ni photo, ni commande.
+ */
 interface ICommentaire {
-    id: string;
-    message: string;
-    rating: number;
-    customer_id: string;
-    order_id: string;
-    created_at: string;
-    updated_at: string;
-    customer: IClient;
-    order: ICommande;
+  id: string;
+  message: string;
+  /** Note de 1 à 5. */
+  rating: number;
+  created_at: string;
+  customer: {
+    /** Prénom ; absent si l'API renvoie null. */
+    first_name?: string;
+    /** Initiale du nom seulement (« K »), jamais le nom entier ; absente si l'API renvoie null. */
+    last_name?: string;
+  };
 }
-
 
 type ObtenirCommentairesParams = {
-    page?: number;
-    limit?: number;
-    min_rating?: number;
-    max_rating?: number;
-    restaurantId?: string;
+  page?: number;
+  limit?: number;
+  min_rating?: number;
+  max_rating?: number;
+  restaurantId?: string;
 };
