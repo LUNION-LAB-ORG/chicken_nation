@@ -103,7 +103,8 @@ export default function Connexion({
           </p>
           <Input
             label="Numéro WhatsApp"
-            placeholder="07 00 00 00 00"
+            // Aide plutôt qu'un exemple de numéro : un faux numéro en exemple est interdit sur le site.
+            description="Numéro à 10 chiffres, qui commence par 07, 05 ou 01."
             type="tel"
             inputMode="tel"
             autoComplete="tel-national"

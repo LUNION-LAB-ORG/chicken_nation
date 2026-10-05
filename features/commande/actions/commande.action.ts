@@ -4,19 +4,20 @@ import { formatImageUrl } from "@/utils/formatImageUrl";
 import { appelApi } from "../apis/api-client.server";
 import type {
   CadeauChoisi,
-  CategorieSupplement,
-  IAdresseLivraison,
+  IAdresseEnregistree,
   ICadeau,
   ICommande,
+  IConditionsCommande,
   IConfigPaiement,
+  ICreationCommande,
   IFideliteClient,
   IFraisLivraison,
+  IItineraireLivraison,
   ILignePanier,
   ILivraisonDisponible,
   IPlatDetail,
-  IPointsFidelite,
+  IReglagesFidelite,
   ISuggestionAdresse,
-  ModeCommande,
   Resultat,
 } from "../types/commande.types";
 import { versCommande } from "../utils/commande.utils";
@@ -25,18 +26,32 @@ import {
   articlesPayants,
   assietteCodePromo,
   lignesACommander,
-  normaliserGroupes,
   platsNonProposes,
   problemesLigne,
   sousTotal,
 } from "../utils/panier.utils";
+import {
+  IMAGE_PAR_DEFAUT,
+  modesDeVente,
+  versAdresseEnregistree,
+  versConditionsCommande,
+  versFrais,
+  versItineraire,
+  versPlatDetail,
+  versReglagesFidelite,
+} from "../utils/reponses-api.utils";
 import { obtenirClientAction } from "./connexion.action";
 
 type Brut = Record<string, unknown>;
 const nombre = (v: unknown) => (Number.isFinite(Number(v)) ? Number(v) : 0);
-const TOUS_LES_MODES = ["DELIVERY", "PICKUP", "TABLE"];
-const modes = (v: unknown) => (Array.isArray(v) && v.length ? (v as string[]) : TOUS_LES_MODES);
 const estUuid = (id: string) => /^[0-9a-f-]{36}$/i.test(id);
+const CONNEXION_REQUISE = "Connectez-vous pour continuer.";
+
+/** Configuration publique de paiement jointe à une commande par le serveur (clé publique, jamais de secret). */
+const versPaiement = (p: unknown): IConfigPaiement | null => {
+  const x = p as Brut | undefined;
+  return x?.public_key ? { public_key: String(x.public_key), sandbox: !!x.sandbox } : null;
+};
 
 // ── Carte ─────────────────────────────────────────────────────────────────
 
@@ -45,45 +60,7 @@ export async function obtenirPlatAction(id: string): Promise<Resultat<IPlatDetai
   if (!estUuid(id)) return { ok: false, message: "Plat introuvable.", statut: 404 };
   const res = await appelApi<Brut>(`/dishes/${id}`, { public: true, entetes: { "x-app-composable": "1" } });
   if (!res.ok) return res;
-  const p = res.data;
-  const prix = nombre(p.price);
-  const promo = nombre(p.promotion_price);
-  const enPromo = !!p.is_promotion && promo > 0 && promo < prix;
-
-  // Un même supplément peut être rattaché deux fois : on dédoublonne.
-  const vus = new Set<string>();
-  const supplements = (Array.isArray(p.dish_supplements) ? (p.dish_supplements as Brut[]) : [])
-    .map((ds) => ds.supplement as Brut | undefined)
-    .filter((s): s is Brut => !!s && typeof s.id === "string" && s.available !== false)
-    .filter((s) => (vus.has(s.id as string) ? false : (vus.add(s.id as string), true)))
-    .map((s) => ({
-      id: s.id as string,
-      name: String(s.name ?? "").replace(/\s+/g, " ").trim(),
-      price: nombre(s.price),
-      category: (["FOOD", "DRINK", "ACCESSORY"].includes(String(s.category)) ? s.category : "ACCESSORY") as CategorieSupplement,
-      available_order_types: modes(s.available_order_types),
-    }));
-
-  return {
-    ok: true,
-    data: {
-      id: String(p.id),
-      name: String(p.name ?? "").trim(),
-      description: String(p.description ?? "").replace(/\s+/g, " ").trim(),
-      image: formatImageUrl((p.image as string) ?? undefined, "/assets/images/logo.png"),
-      prix: enPromo ? promo : prix,
-      prixAvantPromo: enPromo ? prix : null,
-      spice_level: (["ALWAYS", "OPTIONAL", "NEVER"].includes(String(p.spice_level)) ? p.spice_level : "OPTIONAL") as IPlatDetail["spice_level"],
-      available_order_types: modes(p.available_order_types),
-      available_from: (p.available_from as string) || null,
-      available_until: (p.available_until as string) || null,
-      restaurantsExclus: Array.isArray(p.excluded_restaurant_ids)
-        ? (p.excluded_restaurant_ids as unknown[]).filter((r): r is string => typeof r === "string")
-        : [],
-      groupes: normaliserGroupes(p.option_groups),
-      supplements,
-    },
-  };
+  return { ok: true, data: versPlatDetail(res.data) };
 }
 
 /**
@@ -174,20 +151,125 @@ export async function calculerFraisAction(
   });
   const res = await appelApi<Brut>(`/orders/frais-livraison?${params}`, { public: true });
   if (!res.ok) return res;
-  const d = res.data;
-  if (d.montant === undefined || d.montant === null) {
-    return { ok: false, message: "Cette adresse n'est pas desservie pour le moment." };
+  return versFrais(res.data);
+}
+
+/**
+ * Restaurant qui préparera la livraison et frais pour cette adresse
+ * (« Préparée au restaurant X, à N km »), en un seul appel. C'est le serveur
+ * qui choisit le restaurant ; il peut changer à la commande si un plat y est
+ * exclu. ⚠️ La route demande aussi le trajet à Google (facturé, gardé un
+ * moment en cache par le serveur) : à appeler une fois par adresse choisie,
+ * calculerFraisAction suffit quand seul le montant du panier change.
+ */
+export async function itineraireLivraisonAction(
+  latitude: number,
+  longitude: number,
+  montantPanier: number,
+): Promise<Resultat<IItineraireLivraison>> {
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return { ok: false, message: "Position invalide." };
+  const params = new URLSearchParams({
+    lat: String(latitude),
+    long: String(longitude),
+    order_amount: String(Math.max(0, Math.round(Number(montantPanier) || 0))),
+  });
+  const res = await appelApi<Brut>(`/orders/itineraire-livraison?${params}`, { public: true });
+  if (!res.ok) return res;
+  return versItineraire(res.data);
+}
+
+// ── Adresses enregistrées (carnet partagé avec l'application) ─────────────
+
+/** Ce que le client saisit d'une adresse à enregistrer (titre, texte et point GPS). */
+type IChampsAdresse = Omit<IAdresseEnregistree, "id">;
+
+/**
+ * Champs d'une adresse remis sous la forme de l'API, ou message d'erreur.
+ * Une action serveur s'appelle avec n'importe quels arguments : tout est
+ * revérifié ici. `partiel` : seuls les champs donnés sont contrôlés (PATCH).
+ */
+function corpsAdresse(a: Partial<IChampsAdresse>, partiel: boolean): Resultat<Brut> {
+  const corps: Brut = {};
+  if (!partiel || a.titre !== undefined) {
+    const titre = String(a.titre ?? "").replace(/\s+/g, " ").trim();
+    if (titre.length > 40) return { ok: false, message: "Nom de l'adresse trop long (40 caractères au plus)." };
+    corps.title = titre || "Adresse";
   }
-  const avant = d.original_montant !== undefined && d.original_montant !== null ? nombre(d.original_montant) : null;
-  return {
-    ok: true,
-    data: {
-      montant: nombre(d.montant),
-      montantAvantOffre: avant !== null && avant > nombre(d.montant) ? avant : null,
-      offre: (d.offer_name as string) || null,
-      distanceKm: d.distance !== undefined ? nombre(d.distance) : null,
-    },
-  };
+  if (!partiel || a.libelle !== undefined) {
+    const libelle = String(a.libelle ?? "").replace(/\s+/g, " ").trim();
+    if (libelle.length < 3 || libelle.length > 300) return { ok: false, message: "Adresse invalide." };
+    corps.address = libelle;
+  }
+  if (!partiel || a.latitude !== undefined || a.longitude !== undefined) {
+    const lat = Number(a.latitude);
+    const lng = Number(a.longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180 || (!lat && !lng)) {
+      return { ok: false, message: "Position de l'adresse invalide." };
+    }
+    corps.latitude = lat;
+    corps.longitude = lng;
+  }
+  return { ok: true, data: corps };
+}
+
+/** Adresses enregistrées du client connecté, les plus récentes d'abord. */
+export async function listerAdressesAction(): Promise<Resultat<IAdresseEnregistree[]>> {
+  const client = await obtenirClientAction();
+  if (!client) return { ok: false, message: CONNEXION_REQUISE };
+  // Le serveur lit le client dans le jeton ; l'identifiant de l'adresse ne sert qu'à la forme de la route.
+  const res = await appelApi<Brut[]>(`/addresses/customer/${encodeURIComponent(client.id)}`);
+  if (!res.ok) return res;
+  const adresses = (Array.isArray(res.data) ? res.data : [])
+    .map(versAdresseEnregistree)
+    .filter((a): a is IAdresseEnregistree => a !== null)
+    .slice(0, 20);
+  return { ok: true, data: adresses };
+}
+
+/** Enregistre une adresse dans le carnet du client (le repère reste propre à la commande). */
+export async function enregistrerAdresseAction(a: IChampsAdresse): Promise<Resultat<IAdresseEnregistree>> {
+  const corps = corpsAdresse(a ?? {}, false);
+  if (!corps.ok) return corps;
+  const res = await appelApi<Brut>("/addresses", { methode: "POST", corps: corps.data });
+  if (!res.ok) return res;
+  const adresse = versAdresseEnregistree(res.data);
+  return adresse ? { ok: true, data: adresse } : { ok: false, message: "Adresse enregistrée, mais illisible. Rechargez la page." };
+}
+
+/** Renomme ou déplace une adresse du client ; le serveur refuse celle d'un autre. */
+export async function modifierAdresseAction(
+  id: string,
+  champs: Partial<IChampsAdresse>,
+): Promise<Resultat<IAdresseEnregistree>> {
+  if (!estUuid(String(id))) return { ok: false, message: "Adresse introuvable." };
+  const corps = corpsAdresse(champs ?? {}, true);
+  if (!corps.ok) return corps;
+  if (Object.keys(corps.data).length === 0) return { ok: false, message: "Rien à modifier." };
+  const res = await appelApi<Brut>(`/addresses/${id}`, { methode: "PATCH", corps: corps.data });
+  if (!res.ok) return res;
+  // La réponse embarque la fiche du client : seuls les champs de l'adresse sont repris.
+  const adresse = versAdresseEnregistree(res.data);
+  return adresse ? { ok: true, data: adresse } : { ok: false, message: "Adresse modifiée, mais illisible. Rechargez la page." };
+}
+
+/** Retire une adresse du carnet du client ; le serveur refuse celle d'un autre. */
+export async function supprimerAdresseAction(id: string): Promise<Resultat<null>> {
+  if (!estUuid(String(id))) return { ok: false, message: "Adresse introuvable." };
+  const res = await appelApi<Brut>(`/addresses/${id}`, { methode: "DELETE" });
+  return res.ok ? { ok: true, data: null } : res;
+}
+
+// ── Conditions de la commande ─────────────────────────────────────────────
+
+/**
+ * Taux des frais de service et grille de livraison (route publique du lot
+ * L4). Serveur plus ancien, réseau ou réponse illisible : tout à null, et le
+ * site écrit « calculés au paiement ». La grille n'est donnée que si elle
+ * s'applique vraiment (grille_frais_appliquee).
+ */
+export async function lireConditionsCommandeAction(): Promise<IConditionsCommande> {
+  const res = await appelApi<Brut>("/orders/conditions-commande", { public: true });
+  return versConditionsCommande(res.ok ? res.data : null);
 }
 
 // ── Code promo ou bon ─────────────────────────────────────────────────────
@@ -222,20 +304,20 @@ export async function verifierCodeReductionAction(
 // ── Fidélité : points et cadeaux ──────────────────────────────────────────
 
 /** Réglages de fidélité (route publique), lus à chaque fois : le back office peut les changer. */
-async function lireReglagesFidelite(): Promise<Resultat<Omit<IPointsFidelite, "solde">>> {
+async function lireReglagesFidelite(): Promise<Resultat<IReglagesFidelite>> {
   const res = await appelApi<Brut>("/fidelity/loyalty/config", { public: true });
   if (!res.ok) return res;
-  const d = res.data ?? {};
-  return {
-    ok: true,
-    data: {
-      valeurPoint: Math.max(0, nombre(d.point_value_in_xof)),
-      minimum: Math.max(0, nombre(d.minimum_redemption_points)),
-      // Absent : le serveur applique 50 (loyalty.service, capLoyaltyDiscount).
-      plafondPct: d.max_redemption_pct === null || d.max_redemption_pct === undefined ? 50 : nombre(d.max_redemption_pct),
-      pointsParFranc: Math.max(0, nombre(d.points_per_xof)),
-    },
-  };
+  return { ok: true, data: versReglagesFidelite(res.data) };
+}
+
+/**
+ * Réglages de fidélité lisibles SANS connexion : « Cette commande vous
+ * rapportera N points » (fidelite.utils, textePointsGagnes) dans le panier
+ * d'un visiteur, et la durée de validité des points. En cas d'échec, rien
+ * n'est affiché : aucun chiffre de fidélité n'est écrit en dur.
+ */
+export async function lireReglagesFideliteAction(): Promise<Resultat<IReglagesFidelite>> {
+  return lireReglagesFidelite();
 }
 
 /**
@@ -245,7 +327,7 @@ async function lireReglagesFidelite(): Promise<Resultat<Omit<IPointsFidelite, "s
  * laissé tel quel, le serveur reste le garde-fou.
  */
 async function completerCadeau(c: ICadeau): Promise<ICadeau> {
-  const image = c.image ? formatImageUrl(c.image, "/assets/images/logo.png") : "/assets/images/logo.png";
+  const image = c.image ? formatImageUrl(c.image, IMAGE_PAR_DEFAUT) : IMAGE_PAR_DEFAUT;
   if (c.type === "PLAT") {
     const plat = await obtenirPlatAction(c.articleId);
     if (!plat.ok) return { ...c, image, ...(plat.statut === 404 ? { indisponible: true } : {}) };
@@ -265,7 +347,7 @@ async function completerCadeau(c: ICadeau): Promise<ICadeau> {
   return {
     ...c,
     image,
-    available_order_types: modes(s.available_order_types),
+    available_order_types: modesDeVente(s.available_order_types),
     ...(s.available === false ? { indisponible: true } : {}),
   };
 }
@@ -277,7 +359,7 @@ async function completerCadeau(c: ICadeau): Promise<ICadeau> {
  */
 export async function lireFideliteAction(): Promise<Resultat<IFideliteClient>> {
   const client = await obtenirClientAction();
-  if (!client) return { ok: false, message: "Connectez-vous pour continuer." };
+  if (!client) return { ok: false, message: CONNEXION_REQUISE };
   const [reglages, compte, gagnes] = await Promise.all([
     lireReglagesFidelite(),
     appelApi<Brut>(`/fidelity/loyalty/customer/${encodeURIComponent(client.id)}`),
@@ -294,27 +376,15 @@ export async function lireFideliteAction(): Promise<Resultat<IFideliteClient>> {
 
 // ── Commande ──────────────────────────────────────────────────────────────
 
-export interface ICreationCommande {
-  mode: ModeCommande;
-  lignes: ILignePanier[];
-  adresse: IAdresseLivraison | null;
-  restaurantId: string | null;
-  /** ISO ; null = dès que possible. */
-  heureRetrait: string | null;
-  code: string | null;
-  /** Points de fidélité à utiliser, jamais avec un code. Absent : page d'avant le 02/10. */
-  points?: number;
-  /** Cadeaux choisis, ajoutés à 0 F. */
-  cadeaux?: CadeauChoisi[];
-}
-
 /**
  * `remise` : remise accordée par le serveur (code ou points). Le panier la
  * compare à son estimation pour prévenir le client avant le paiement.
+ * `montant` et `paiement` : total à débiter et clé publique KKiaPay renvoyés
+ * par le serveur, pour ouvrir le paiement sans relire la commande (étape 5).
  */
-export async function creerCommandeAction(
-  c: ICreationCommande,
-): Promise<Resultat<{ id: string; remise: number }>> {
+export async function creerCommandeAction(c: ICreationCommande): Promise<
+  Resultat<{ id: string; reference: string; montant: number; remise: number; paiement: IConfigPaiement | null }>
+> {
   const lignes = lignesACommander(c.lignes);
   if (lignes.length === 0) return { ok: false, message: "Votre panier est vide." };
 
@@ -323,7 +393,13 @@ export async function creerCommandeAction(
   const cadeaux: CadeauChoisi[] = (Array.isArray(c.cadeaux) ? c.cadeaux : [])
     .filter((x) => !!x && estUuid(String(x.id)) && estUuid(String(x.articleId)) && (x.type === "PLAT" || x.type === "SUPPLEMENT"))
     .slice(0, 10)
-    .map((x) => ({ id: x.id, type: x.type, articleId: x.articleId, nom: String(x.nom ?? "").slice(0, 80) }));
+    .map((x) => ({
+      id: x.id,
+      type: x.type,
+      articleId: x.articleId,
+      nom: String(x.nom ?? "").slice(0, 80),
+      ...(typeof x.epice === "boolean" ? { epice: x.epice } : {}),
+    }));
   // RG-02 : points OU code, jamais les deux (le serveur refuserait aussi).
   if (points > 0 && c.code) {
     return { ok: false, message: "Les points et un code ne se cumulent pas. Retirez l'un des deux." };
@@ -349,7 +425,7 @@ export async function creerCommandeAction(
    * « null null », vu par la caisse, le livreur et Turbo.
    */
   const client = await obtenirClientAction();
-  if (!client) return { ok: false, message: "Connectez-vous pour continuer." };
+  if (!client) return { ok: false, message: CONNEXION_REQUISE };
   if (!client.first_name || !client.last_name) {
     return { ok: false, message: "Indiquez votre prénom et votre nom avant de commander." };
   }
@@ -408,7 +484,16 @@ export async function creerCommandeAction(
     entetes: { "x-canal-commande": "web" },
   });
   if (!res.ok) return res;
-  return { ok: true, data: { id: String(res.data.id), remise: nombre(res.data.discount) } };
+  return {
+    ok: true,
+    data: {
+      id: String(res.data.id),
+      reference: String(res.data.reference ?? ""),
+      montant: nombre(res.data.amount),
+      remise: nombre(res.data.discount),
+      paiement: versPaiement(res.data.payment),
+    },
+  };
 }
 
 /**
@@ -440,14 +525,7 @@ export async function obtenirCommandeAction(
   if (!estUuid(id)) return { ok: false, message: "Commande introuvable.", statut: 404 };
   const res = await appelApi<Brut>(`/orders/${id}/client`);
   if (!res.ok) return res;
-  const p = res.data.payment as Brut | undefined;
-  return {
-    ok: true,
-    data: {
-      commande: versCommande(res.data),
-      paiement: p?.public_key ? { public_key: String(p.public_key), sandbox: !!p.sandbox } : null,
-    },
-  };
+  return { ok: true, data: { commande: versCommande(res.data), paiement: versPaiement(res.data.payment) } };
 }
 
 export async function listerCommandesAction(): Promise<Resultat<ICommande[]>> {

@@ -55,6 +55,40 @@ export function oublierPanierCommande(commandeId: string) {
   ecrire(session, clePanier(commandeId), null);
 }
 
+// ── Commande créée à l'étape Paiement, pas encore payée ────────────────────
+
+/**
+ * La caisse crée la commande au clic « Payer » (étape 5), puis ouvre le module
+ * de paiement. Si le client le ferme sans payer et clique de nouveau, c'est la
+ * MÊME commande qui doit être payée, pas une seconde. On garde donc, le temps
+ * de l'onglet, la commande créée et la signature de ce qu'elle contient
+ * (caisse.utils, signatureCommande). Clé à part des autres, pour l'onglet.
+ */
+export interface ICommandeEnAttente {
+  id: string;
+  reference: string;
+  signature: string;
+}
+
+const CLE_EN_ATTENTE = "cn-commande-en-attente";
+
+export function noterCommandeEnAttente(c: ICommandeEnAttente) {
+  ecrire(session, CLE_EN_ATTENTE, JSON.stringify(c));
+}
+
+export function lireCommandeEnAttente(): ICommandeEnAttente | null {
+  try {
+    const c = JSON.parse(lire(session, CLE_EN_ATTENTE) ?? "null") as ICommandeEnAttente | null;
+    return c && typeof c.id === "string" && typeof c.reference === "string" && typeof c.signature === "string" ? c : null;
+  } catch {
+    return null;
+  }
+}
+
+export function oublierCommandeEnAttente() {
+  ecrire(session, CLE_EN_ATTENTE, null);
+}
+
 // ── Remise des points plus faible que prévu ───────────────────────────────
 
 /**

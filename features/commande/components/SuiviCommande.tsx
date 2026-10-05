@@ -7,37 +7,36 @@ import { Spinner } from "@heroui/spinner";
 import { CheckCircle2, Phone } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { nomCourt } from "@/features/restaurants/restaurant.utils";
+import { INSECABLE, TELEPHONE, telLien } from "@/lib/typo";
 import { annulerCommandeAction, obtenirCommandeAction } from "../actions/commande.action";
-import { useKkiapay } from "../hooks/useKkiapay";
+import { usePaiementCommande } from "../hooks/usePaiementCommande";
 import { restaurerPanierAtom } from "../stores/panier.store";
 import type { IClient, ICommande, IConfigPaiement } from "../types/commande.types";
 import { actionPerimee, messageErreurAction } from "../utils/erreur-action.utils";
 import { pointsLisibles } from "../utils/fidelite.utils";
 import {
-  ecrireMarquePaiement,
   effacerMarquePaiement,
   etatPaiement,
   type IEcartPoints,
-  type IMarquePaiement,
   lireEcartPoints,
-  lireMarquePaiement,
   lirePanierCommande,
   oublierEcartPoints,
   oublierPanierCommande,
 } from "../utils/memoire-navigateur.utils";
-import { fcfa, telephoneLisible } from "../utils/panier.utils";
+import { fcfa } from "../utils/panier.utils";
 import { aPayer, couleurStatut, estTerminee, etapesSuivi, libelleStatut } from "../utils/statut.utils";
 
-/** Lien d'appel du restaurant de la commande, s'il a un numéro. */
-function AppelRestaurant({ commande }: { commande: ICommande }) {
-  if (!commande.restaurant?.phone) return null;
-  const tel = commande.restaurant.phone;
+/** Numéro du site, le seul affiché (retouche 6), jamais coupé en fin de ligne. */
+const NUMERO = TELEPHONE.replace(/ /g, INSECABLE);
+
+/**
+ * « Une question ? Appelez le 27 21 71 21 30. » Jamais le numéro d'un
+ * restaurant : le seul numéro affiché par le site est celui du centre d'appels.
+ */
+function AppelSite() {
   return (
-    <a
-      href={`tel:+225${tel.replace(/\D/g, "").replace(/^225/, "")}`}
-      className="flex items-center justify-center gap-2 text-sm font-semibold text-primary"
-    >
-      <Phone size={16} /> Une question ? Appelez le restaurant au {telephoneLisible(tel)}
+    <a href={telLien()} className="flex items-center justify-center gap-2 text-sm font-semibold text-primary">
+      <Phone size={16} aria-hidden="true" /> Une question{INSECABLE}? Appelez le {NUMERO}
     </a>
   );
 }
@@ -59,10 +58,7 @@ export default function SuiviCommande({
   // Relecture arrêtée : page à recharger (redéploiement, session expirée) ou
   // commande disparue. Relire ne changerait rien, on propose de recharger.
   const [arrete, setArrete] = useState(false);
-  const [echec, setEchec] = useState(false);
   const [horloge, setHorloge] = useState(() => Date.now());
-  // Tentative de paiement gardée dans le navigateur (cf. memoire-navigateur.utils).
-  const [marque, setMarque] = useState<IMarquePaiement | null>(null);
   const [panierSauve, setPanierSauve] = useState(false);
   // Remise des points plus faible que celle estimée au panier (cf. Panier).
   const [ecartPoints, setEcartPoints] = useState<IEcartPoints | null>(null);
@@ -130,20 +126,28 @@ export default function SuiviCommande({
 
   const reference = commande?.reference ?? null;
   const paye = !!commande?.paied;
-  useEffect(() => {
-    if (!reference) return;
-    setMarque(lireMarquePaiement(reference));
-  }, [reference]);
+
+  // Ouverture du module, marque cn-paiement-<référence>, succès et échec
+  // (usePaiementCommande) ; après chacun, la commande est relue.
+  const { pret, erreurChargement, reessayer, payer: ouvrirPaiementCommande, echec, marque, oublierMarque } =
+    usePaiementCommande({
+      reference,
+      client,
+      apresSucces: () => {
+        setHorloge(Date.now());
+        relire();
+      },
+      apresEchec: () => relire(),
+    });
 
   // Payée : la tentative et le panier gardé ne servent plus.
   useEffect(() => {
     if (!paye || !reference) return;
-    effacerMarquePaiement(reference);
+    oublierMarque(reference);
     oublierPanierCommande(id);
     oublierEcartPoints(id);
-    setMarque(null);
     setEcartPoints(null);
-  }, [paye, reference, id]);
+  }, [paye, reference, id, oublierMarque]);
 
   const etat = commande && aPayer(commande) ? etatPaiement(marque, horloge) : "libre";
   const termine = !!commande && estTerminee(commande);
@@ -171,46 +175,10 @@ export default function SuiviCommande({
     };
   }, [relire, rapide, termine, arrete]);
 
-  const { pret, ouvrir, erreurChargement, reessayer } = useKkiapay({
-    onSucces: () => {
-      setEchec(false);
-      if (reference) {
-        const m = { ...lireMarquePaiement(reference), succesA: Date.now() };
-        ecrireMarquePaiement(reference, m);
-        setMarque(m);
-      }
-      setHorloge(Date.now());
-      relire();
-    },
-    onEchec: () => {
-      setEchec(true);
-      if (reference) effacerMarquePaiement(reference);
-      setMarque(null);
-      relire();
-    },
-  });
-
-  const payer = useCallback(
-    () => {
-      if (!commande || !paiement || !aPayer(commande)) return;
-      setEchec(false);
-      const ouvert = ouvrir({
-        amount: Math.ceil(commande.amount),
-        key: paiement.public_key,
-        sandbox: paiement.sandbox,
-        phone: client.phone.replace(/^\+225/, ""),
-        name: [client.first_name, client.last_name].filter(Boolean).join(" "),
-        ...(client.email ? { email: client.email } : {}),
-        reason: `Règlement Commande ${commande.reference}`,
-        data: commande.reference,
-      });
-      if (!ouvert) return;
-      const m = { ouvertA: Date.now() };
-      ecrireMarquePaiement(commande.reference, m);
-      setMarque(m);
-    },
-    [commande, paiement, client, ouvrir],
-  );
+  const payer = useCallback(() => {
+    if (!commande || !paiement || !aPayer(commande)) return;
+    ouvrirPaiementCommande(commande, paiement);
+  }, [commande, paiement, ouvrirPaiementCommande]);
 
   // Pas d'ouverture automatique du module de paiement : KKiaPay ignore un
   // appel fait avant d'avoir fini de se préparer, sans aucun moyen de le
@@ -297,10 +265,12 @@ export default function SuiviCommande({
             <>
               <p className="font-semibold">Un paiement est peut-être en cours de vérification. Ne payez pas une seconde fois.</p>
               <p className="text-sm text-gray-600">
-                Cette page se met à jour toute seule. En cas de doute, appelez le restaurant et donnez la référence{" "}
-                <strong>{commande.reference}</strong>.
+                Cette page se met à jour toute seule. En cas de doute, appelez le{" "}
+                <a href={telLien()} className="font-semibold text-primary underline">
+                  {NUMERO}
+                </a>{" "}
+                et donnez la référence <strong>{commande.reference}</strong>.
               </p>
-              <AppelRestaurant commande={commande} />
             </>
           ) : (
             <>
@@ -316,7 +286,11 @@ export default function SuiviCommande({
               {etat === "commence" && (
                 <p className="rounded-xl bg-warning-50 p-3 text-sm text-warning-700">
                   Un paiement a déjà été commencé pour cette commande. Si vous avez été débité, ne payez pas une seconde
-                  fois : appelez le restaurant.
+                  fois{INSECABLE}: appelez le{" "}
+                  <a href={telLien()} className="font-semibold underline">
+                    {NUMERO}
+                  </a>
+                  .
                 </p>
               )}
               {echec && <p role="alert" className="text-sm text-danger">Le paiement n&apos;a pas abouti. Vous pouvez réessayer.</p>}
@@ -453,7 +427,7 @@ export default function SuiviCommande({
         </dl>
       </div>
 
-      {etat !== "verification" && <AppelRestaurant commande={commande} />}
+      {etat !== "verification" && <AppelSite />}
       <Link href="/commander/mes-commandes" className="text-center text-sm text-primary underline">
         Toutes mes commandes
       </Link>

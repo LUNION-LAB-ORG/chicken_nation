@@ -2,8 +2,8 @@
 
 import { atom } from "jotai";
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
-import type { ILignePanier, IPlatDetail } from "../types/commande.types";
-import { ajouterLigne, rafraichirLigne, totalLigne } from "../utils/panier.utils";
+import type { ILignePanier, IPlatDetail, ModeCommande } from "../types/commande.types";
+import { ajouterLigne, rafraichirLigne, remplacerLigne, retirerArticlesHorsMode, totalLigne } from "../utils/panier.utils";
 
 /** Stockage texte au sens de jotai (son type n'est pas exporté). */
 interface StockageTexte {
@@ -14,61 +14,67 @@ interface StockageTexte {
 }
 
 /**
+ * Stockage JSON dans localStorage pour atomWithStorage : jamais d'erreur
+ * (navigation privée, stockage bloqué) et synchronisé entre onglets. Partagé
+ * par le panier (`cn-panier`) et les choix de la caisse (`cn-caisse`).
+ */
+export const stockageNavigateur = <T>() =>
+  createJSONStorage<T>(
+    (): StockageTexte =>
+      typeof window === "undefined"
+        ? (undefined as unknown as StockageTexte)
+        : {
+            // Navigation privée ou stockage bloqué : la valeur vit le temps de la page.
+            getItem: (k) => {
+              try {
+                return window.localStorage.getItem(k);
+              } catch {
+                return null;
+              }
+            },
+            setItem: (k, v) => {
+              try {
+                window.localStorage.setItem(k, v);
+              } catch {
+                /* stockage indisponible */
+              }
+            },
+            removeItem: (k) => {
+              try {
+                window.localStorage.removeItem(k);
+              } catch {
+                /* stockage indisponible */
+              }
+            },
+            /**
+             * Synchronisation entre onglets. Jotai n'écoute l'événement « storage »
+             * de lui-même que pour un vrai window.localStorage, pas pour cet objet :
+             * sans cet abonnement, un onglet resté ouvert sur la carte gardait le
+             * panier d'avant la commande et le réécrivait au prochain ajout (plats
+             * déjà payés de retour dans le panier). `key` null : stockage vidé.
+             */
+            subscribe: (k, rappel) => {
+              const ecoute = (e: StorageEvent) => {
+                if (e.key !== k && e.key !== null) return;
+                try {
+                  if (e.storageArea !== window.localStorage) return;
+                } catch {
+                  return;
+                }
+                rappel(e.key === null ? null : e.newValue);
+              };
+              window.addEventListener("storage", ecoute);
+              return () => window.removeEventListener("storage", ecoute);
+            },
+          },
+  );
+
+/**
  * Panier gardé dans le navigateur (localStorage), comme l'application le garde
  * sur le téléphone. Les prix n'y sont qu'un souvenir d'affichage : le serveur
  * relit tout depuis sa base à la création de la commande.
  */
-const stockage = createJSONStorage<ILignePanier[]>(
-  (): StockageTexte =>
-    typeof window === "undefined"
-      ? (undefined as unknown as StockageTexte)
-      : {
-          // Navigation privée ou stockage bloqué : le panier vit le temps de la page.
-          getItem: (k) => {
-            try {
-              return window.localStorage.getItem(k);
-            } catch {
-              return null;
-            }
-          },
-          setItem: (k, v) => {
-            try {
-              window.localStorage.setItem(k, v);
-            } catch {
-              /* stockage indisponible */
-            }
-          },
-          removeItem: (k) => {
-            try {
-              window.localStorage.removeItem(k);
-            } catch {
-              /* stockage indisponible */
-            }
-          },
-          /**
-           * Synchronisation entre onglets. Jotai n'écoute l'événement « storage »
-           * de lui-même que pour un vrai window.localStorage, pas pour cet objet :
-           * sans cet abonnement, un onglet resté ouvert sur la carte gardait le
-           * panier d'avant la commande et le réécrivait au prochain ajout (plats
-           * déjà payés de retour dans le panier). `key` null : stockage vidé.
-           */
-          subscribe: (k, rappel) => {
-            const ecoute = (e: StorageEvent) => {
-              if (e.key !== k && e.key !== null) return;
-              try {
-                if (e.storageArea !== window.localStorage) return;
-              } catch {
-                return;
-              }
-              rappel(e.key === null ? null : e.newValue);
-            };
-            window.addEventListener("storage", ecoute);
-            return () => window.removeEventListener("storage", ecoute);
-          },
-        },
-);
-
-export const panierAtom = atomWithStorage<ILignePanier[]>("cn-panier", [], stockage);
+export const panierAtom = atomWithStorage<ILignePanier[]>("cn-panier", [], stockageNavigateur<ILignePanier[]>());
 
 export const ajouterAuPanierAtom = atom(null, (get, set, ligne: ILignePanier) => {
   set(panierAtom, ajouterLigne(get(panierAtom), ligne));
@@ -83,6 +89,23 @@ export const changerQuantiteAtom = atom(null, (get, set, { cle, quantite }: { cl
 });
 
 export const viderPanierAtom = atom(null, (_get, set) => set(panierAtom, []));
+
+/**
+ * « Mettre à jour » depuis « Modifier » : la ligne est remplacée à sa place
+ * (panier.utils, remplacerLigne). `cleAvant` : clé de la ligne ouverte, pour
+ * la retrouver si le panier a changé dans un autre onglet.
+ */
+export const remplacerLigneAtom = atom(
+  null,
+  (get, set, { index, ligne, cleAvant }: { index: number; ligne: ILignePanier; cleAvant?: string }) => {
+    set(panierAtom, remplacerLigne(get(panierAtom), index, ligne, cleAvant));
+  },
+);
+
+/** « Retirer ces articles » : ce qui ne se vend pas dans ce mode quitte le panier. */
+export const retirerHorsModeAtom = atom(null, (get, set, mode: ModeCommande) => {
+  set(panierAtom, retirerArticlesHorsMode(get(panierAtom), mode));
+});
 
 /**
  * Plats relus au catalogue à l'ouverture du panier, appliqués au panier TEL

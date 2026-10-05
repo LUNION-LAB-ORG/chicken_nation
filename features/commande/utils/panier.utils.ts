@@ -1,3 +1,4 @@
+import { INSECABLE, joli, typo } from "@/lib/typo";
 import type {
   IArticleCommande,
   IGroupeOptions,
@@ -6,6 +7,7 @@ import type {
   IPlatDetail,
   ISupplementChoisi,
   ModeCommande,
+  NiveauEpice,
 } from "../types/commande.types";
 
 /**
@@ -14,8 +16,13 @@ import type {
  * le serveur recalcule tous les montants et c'est son total qui est débité.
  */
 
-export const fcfa = (montant: number) =>
-  `${Math.round(montant).toLocaleString("fr-FR").replace(/ | /g, " ")} FCFA`;
+/** Montant en francs : une seule version pour tout le site (lib/typo.ts, insécables comprises). */
+export { fcfa } from "@/lib/typo";
+
+/** Quantité d'un plat sur une ligne : de 1 à 50 (le serveur n'a pas de limite). */
+export const QUANTITE_MAX = 50;
+/** Quantité d'un supplément sur une ligne : de 0 à 20. */
+export const QUANTITE_SUPPLEMENT_MAX = 20;
 
 /** Supplément au même prix quelle que soit la quantité du plat (comme l'application). */
 export function totalLigne(l: Pick<ILignePanier, "prixUnitaire" | "options" | "supplements" | "quantite">) {
@@ -104,6 +111,113 @@ export function ajouterLigne(lignes: ILignePanier[], nouvelle: ILignePanier): IL
   );
 }
 
+/**
+ * « Mettre à jour » depuis « Modifier » : la ligne `index` est remplacée À SA
+ * PLACE, au lieu d'être fusionnée en fin de panier. Si la ligne modifiée
+ * devient identique à une autre ligne, les deux fusionnent (comme deux ajouts
+ * identiques).
+ *
+ * `cleAvant` : clé de la ligne ouverte par « Modifier ». Si le panier a changé
+ * entre-temps (autre onglet), la ligne est retrouvée par sa clé ; disparue,
+ * la nouvelle ligne est simplement ajoutée.
+ */
+export function remplacerLigne(
+  lignes: ILignePanier[],
+  index: number,
+  nouvelle: ILignePanier,
+  cleAvant?: string,
+): ILignePanier[] {
+  let i = Number.isInteger(index) && index >= 0 && index < lignes.length ? index : -1;
+  if (cleAvant !== undefined && lignes[i]?.cle !== cleAvant) i = lignes.findIndex((l) => l.cle === cleAvant);
+  if (i === -1) return ajouterLigne(lignes, nouvelle);
+  const reste = lignes.filter((_, j) => j !== i);
+  if (reste.some((l) => l.cle === nouvelle.cle)) return ajouterLigne(reste, nouvelle);
+  return [...reste.slice(0, i), nouvelle, ...reste.slice(i)];
+}
+
+/**
+ * Signature du panier : change dès qu'une ligne, un choix ou une quantité
+ * change. Sert à oublier un code vérifié pour un autre panier.
+ */
+export const signaturePanier = (lignes: ILignePanier[]) =>
+  lignesACommander(lignes)
+    .map((l) => `${l.cle}*${l.quantite}`)
+    .join("|");
+
+// ── Fiche plat : construction d'une ligne ────────────────────────────────
+
+/**
+ * Épicé ou non pour une ligne : imposé par le plat (ALWAYS, NEVER) ou choisi
+ * par le client (OPTIONAL). `null` : choix encore à faire ; il est
+ * obligatoire et sans valeur par défaut (maquette).
+ */
+export function epiceDeLigne(niveau: NiveauEpice, choix: boolean | null): boolean | null {
+  if (niveau === "ALWAYS") return true;
+  if (niveau === "NEVER") return false;
+  return choix;
+}
+
+/** Vendu en livraison ou en retrait. Un plat servi seulement sur place ne s'ajoute pas au panier du site. */
+export const commandableEnLigne = (types: string[] | null | undefined) =>
+  venduEn(types, "DELIVERY") || venduEn(types, "PICKUP");
+
+/** Ce que le client a choisi dans la fiche d'un plat. */
+export interface IChoixFiche {
+  epice: boolean;
+  options: IOptionChoisie[];
+  /** Quantité par identifiant de supplément ; zéro ou absent : non pris. */
+  supplements: Record<string, number>;
+  quantite: number;
+}
+
+/**
+ * Ligne de panier tirée d'un plat relu au catalogue et des choix du client.
+ * Quantités ramenées dans leurs bornes (plat 1 à 50, supplément 0 à 20).
+ * Un supplément absent du plat est ignoré.
+ */
+export function construireLigne(plat: IPlatDetail, choix: IChoixFiche): ILignePanier {
+  const borne = (n: number, min: number, max: number) =>
+    Number.isFinite(n) ? Math.max(min, Math.min(max, Math.floor(n))) : min;
+  const supplements: ISupplementChoisi[] = plat.supplements
+    .map((s) => ({ s, quantite: borne(choix.supplements[s.id] ?? 0, 0, QUANTITE_SUPPLEMENT_MAX) }))
+    .filter(({ quantite }) => quantite > 0)
+    .map(({ s, quantite }) => ({
+      id: s.id,
+      nom: s.name,
+      prix: s.price,
+      quantite,
+      available_order_types: s.available_order_types,
+    }));
+  return {
+    cle: signatureLigne(plat.id, choix.epice, choix.options, supplements),
+    dish_id: plat.id,
+    nom: plat.name,
+    image: plat.image,
+    prixUnitaire: plat.prix,
+    epice: choix.epice,
+    options: choix.options,
+    supplements,
+    quantite: borne(choix.quantite, 1, QUANTITE_MAX),
+    available_order_types: plat.available_order_types,
+    available_from: plat.available_from,
+    available_until: plat.available_until,
+    restaurantsExclus: plat.restaurantsExclus,
+    spice_level: plat.spice_level,
+  };
+}
+
+/**
+ * Choix d'une ligne en clair, pour l'affichage : `choix` (« XL (3 pcs) ·
+ * Ketchup · Non épicé ») et `supplements` (« + 2 Coca, 1 Cheddar fries »).
+ * « Non épicé » n'est écrit que pour un plat où le client a choisi.
+ */
+export function detailsLigne(l: Pick<ILignePanier, "options" | "supplements" | "epice" | "spice_level">) {
+  const epice = l.epice ? "Épicé" : l.spice_level === "OPTIONAL" ? "Non épicé" : null;
+  const choix = [...l.options.map((o) => typo(o.label.replace(/\s+/g, " ").trim())), epice].filter(Boolean).join(" · ");
+  const supps = l.supplements.filter((s) => s.quantite > 0).map((s) => `${s.quantite}${INSECABLE}${joli(s.nom)}`);
+  return { choix, supplements: supps.length ? `+ ${supps.join(", ")}` : "" };
+}
+
 // ── Options des plats composables ────────────────────────────────────────
 
 /** Bornes ramenées dans un domaine valide, choix triés par position. */
@@ -126,7 +240,16 @@ export function normaliserGroupes(brut: unknown): IGroupeOptions[] {
         .sort((a, b) => a.position - b.position);
       const max = Math.max(1, Math.min(nombre(g.max_select, 1) || 1, items.length || 1));
       const min = Math.max(0, Math.min(nombre(g.min_select), max));
-      return { id: String(g.id ?? ""), name: String(g.name ?? ""), min_select: min, max_select: max, position: nombre(g.position), items };
+      const description = typeof g.description === "string" ? g.description.replace(/\s+/g, " ").trim() : "";
+      return {
+        id: String(g.id ?? ""),
+        name: String(g.name ?? ""),
+        description: description || null,
+        min_select: min,
+        max_select: max,
+        position: nombre(g.position),
+        items,
+      };
     })
     .filter((g) => g.id && g.name && g.items.length > 0)
     .sort((a, b) => a.position - b.position);
@@ -233,6 +356,35 @@ export function problemesLigne(l: ILignePanier, mode: ModeCommande, maintenant =
   return problemes;
 }
 
+/**
+ * Articles du panier qui ne se vendent pas dans ce mode (plats et
+ * suppléments), noms sans doublon : alerte « Livraison impossible avec… ».
+ */
+export function articlesHorsMode(lignes: ILignePanier[], mode: ModeCommande): string[] {
+  const noms: string[] = [];
+  for (const l of lignesACommander(lignes)) {
+    if (!venduEn(l.available_order_types, mode)) noms.push(l.nom);
+    for (const s of l.supplements) if (s.quantite > 0 && !venduEn(s.available_order_types, mode)) noms.push(s.nom);
+  }
+  return Array.from(new Set(noms));
+}
+
+/**
+ * « Retirer ces articles » de l'alerte : les plats qui ne se vendent pas dans
+ * ce mode quittent le panier, les suppléments qui ne s'y vendent pas quittent
+ * leur ligne, et les lignes devenues identiques fusionnent. Une ligne retirée
+ * du catalogue reste (elle n'est pas commandée, le client la voit signalée).
+ */
+export function retirerArticlesHorsMode(lignes: ILignePanier[], mode: ModeCommande): ILignePanier[] {
+  return lignes.reduce<ILignePanier[]>((panier, l) => {
+    if (l.retire) return [...panier, l];
+    if (!venduEn(l.available_order_types, mode)) return panier;
+    const supplements = l.supplements.filter((s) => venduEn(s.available_order_types, mode));
+    if (supplements.length === l.supplements.length) return ajouterLigne(panier, l);
+    return ajouterLigne(panier, { ...l, supplements, cle: signatureLigne(l.dish_id, l.epice, l.options, supplements) });
+  }, []);
+}
+
 /** Noms des plats du panier qu'un restaurant ne propose pas (refusés au retrait). */
 export const platsNonProposes = (lignes: ILignePanier[], restaurantId: string) =>
   lignesACommander(lignes)
@@ -287,6 +439,7 @@ export function rafraichirLigne(l: ILignePanier, plat: IPlatDetail | null | unde
     available_from: plat.available_from,
     available_until: plat.available_until,
     restaurantsExclus: plat.restaurantsExclus,
+    spice_level: plat.spice_level,
     options,
     supplements,
     ...(indisponibles.length ? { indisponibles } : {}),

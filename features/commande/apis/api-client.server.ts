@@ -65,7 +65,7 @@ async function adresseVisiteur(): Promise<string | null> {
 }
 
 interface OptionsAppel {
-  methode?: "GET" | "POST" | "PATCH";
+  methode?: "GET" | "POST" | "PATCH" | "DELETE";
   corps?: unknown;
   /** Appel sans jeton (routes publiques). */
   public?: boolean;

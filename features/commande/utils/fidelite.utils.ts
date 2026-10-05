@@ -5,6 +5,7 @@ import type {
   IPointsFidelite,
   ModeCommande,
 } from "../types/commande.types";
+import { INSECABLE, nombre } from "@/lib/typo";
 import { platDisponibleMaintenant, venduEn } from "./panier.utils";
 
 /**
@@ -15,17 +16,18 @@ import { platDisponibleMaintenant, venduEn } from "./panier.utils";
  */
 
 type Brut = Record<string, unknown>;
-// Espaces insécables du format français remplacés, comme dans fcfa().
-const espaces = (texte: string) => texte.replace(/[  ]/g, " ");
+// Espaces du format français (fine insécable de toLocaleString) ramenées à
+// l'insécable du site, comme dans fcfa() (lib/typo.ts).
+const espaces = (texte: string) => texte.replace(/[\u00a0\u202f\u2009 ]/g, INSECABLE);
 const estUuid = (v: unknown): v is string => typeof v === "string" && /^[0-9a-f-]{36}$/i.test(v);
 
-/** « 1 point », « 1 250 points ». */
+/** « 1 point », « 1 250 points » (insécables entre les milliers et avant « point »). */
 export const pointsLisibles = (n: number) =>
-  `${espaces(Math.round(n).toLocaleString("fr-FR"))} point${Math.abs(Math.round(n)) >= 2 ? "s" : ""}`;
+  `${nombre(n)}${INSECABLE}point${Math.abs(Math.round(n)) >= 2 ? "s" : ""}`;
 
 /** Valeur d'un point : elle peut avoir des décimales (2,5 FCFA), que fcfa() arrondirait. */
 export const valeurLisible = (francs: number) =>
-  `${espaces(francs.toLocaleString("fr-FR", { maximumFractionDigits: 2 }))} FCFA`;
+  `${espaces(francs.toLocaleString("fr-FR", { maximumFractionDigits: 2 }))}${INSECABLE}FCFA`;
 
 // ── Points ────────────────────────────────────────────────────────────────
 
@@ -109,6 +111,34 @@ export function remisePoints(points: number, f: IPointsFidelite | null, sousTota
 export const pointsGagnes = (sousTotal: number, pointsParFranc: number) =>
   pointsParFranc > 0 && sousTotal > 0 ? Math.floor(sousTotal * pointsParFranc) : 0;
 
+/**
+ * « Cette commande vous rapportera 12 points. », pour un visiteur connecté ou
+ * non (réglages publics). Rien sous 1 point : la phrase ne promet jamais 0.
+ */
+export function textePointsGagnes(sousTotal: number, pointsParFranc: number): string | null {
+  const n = pointsGagnes(sousTotal, pointsParFranc);
+  return n >= 1 ? `Cette commande vous rapportera ${pointsLisibles(n)}.` : null;
+}
+
+/**
+ * Phrase à montrer quand le panier a changé depuis le choix des points : ils
+ * sont ramenés au maximum de ce panier (« Points ajustés à 120 ») ou retirés
+ * s'il ne permet plus le minimum. `null` si les points choisis tiennent
+ * toujours. Le site les ramenait jusqu'ici sans rien dire.
+ */
+export function avisPoints(choisis: number, f: IPointsFidelite | null, sousTotal: number): string | null {
+  if (!f || !(choisis > 0)) return null;
+  const retenus = pointsRetenus(choisis, f, sousTotal);
+  if (retenus >= Math.floor(choisis)) return null;
+  if (retenus === 0) {
+    return `Vos points ont été retirés${INSECABLE}: la commande est trop petite pour en utiliser au moins ${pointsLisibles(Math.max(1, f.minimum))}.`;
+  }
+  const parPlafond = retenus < Math.floor(f.solde) && f.plafondPct > 0 && f.plafondPct < 100;
+  return parPlafond
+    ? `Points ajustés à ${nombre(retenus)}${INSECABLE}: ils paient au plus ${nombre(f.plafondPct)}${INSECABLE}% des plats.`
+    : `Points ajustés à ${nombre(retenus)}${INSECABLE}: c'est votre solde.`;
+}
+
 // ── Cadeaux ───────────────────────────────────────────────────────────────
 
 /**
@@ -161,8 +191,9 @@ export const cadeauxNonProposes = (cadeaux: ICadeau[], restaurantId: string) =>
 /**
  * Lignes payantes complétées des cadeaux choisis, sous la forme exacte de
  * l'application (useCheckoutFlow) :
- *  - plat offert : ligne à part { dish_id, quantity: 1, epice: false,
- *    supplements: [], reward_id }, après les lignes payantes ;
+ *  - plat offert : ligne à part { dish_id, quantity: 1, epice,
+ *    supplements: [], reward_id }, après les lignes payantes (épicé selon
+ *    le choix du client, non épicé par défaut) ;
  *  - supplément offert : { id, quantity: 1, reward_id } dans les
  *    suppléments de la première ligne payante (le serveur exige un plat).
  * Une seule différence : une ligne qui porte DÉJÀ ce supplément est sautée.
@@ -189,7 +220,8 @@ export function articlesAvecCadeaux(
       if (porteuse) porteuse.supplements.push({ id: c.articleId, quantity: 1, reward_id: c.id });
       else nonPlaces.push(c);
     } else {
-      platsOfferts.push({ dish_id: c.articleId, quantity: 1, epice: false, supplements: [], reward_id: c.id });
+      // Épicé ou non : choix du client (étape Avantages) ; absent, non épicé comme avant.
+      platsOfferts.push({ dish_id: c.articleId, quantity: 1, epice: c.epice === true, supplements: [], reward_id: c.id });
     }
   }
   return { articles: [...articles, ...platsOfferts], nonPlaces };
