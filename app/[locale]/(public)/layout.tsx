@@ -1,14 +1,17 @@
 import { metadata, organizationSchema, viewport } from "../meta";
 
-import Footer from "@/components/(public)/common/footer";
-import Header from "@/components/(public)/common/header";
+import { BarrePanier } from "@/components/site/BarrePanier";
+import { Entete } from "@/components/site/entete/Entete";
+import { Annonce, MessageFlottant } from "@/components/site/MessageFlottant";
+import { PiedDePage } from "@/components/site/pied/PiedDePage";
 
 export { metadata, viewport };
 
 /**
- * Mise en page des pages publiques. Plus de largeur plafonnée (les aplats vont
- * bord à bord) ni de bloc « Télécharger l'application » sur toutes les pages.
- * L'en-tête et le pied de page actuels restent jusqu'au nouveau gabarit (lot L5).
+ * Mise en page des pages publiques : lien « Aller au contenu », en-tête
+ * collant, contenu, pied de page, puis les îlots communs (barre du panier,
+ * message flottant et zone lue par les lecteurs d'écran).
+ * Les aplats vont bord à bord : chaque section gère sa largeur de 1 200 px.
  */
 export default function PublicLayout({
   children,
@@ -21,13 +24,26 @@ export default function PublicLayout({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         type="application/ld+json"
       />
-      <div className="relative flex min-h-screen w-full flex-col overflow-hidden">
-        <Header />
-        <main className="flex flex-1 flex-col" id="contenu">
+      <a
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-60 focus:rounded-pilule focus:bg-white focus:px-4 focus:py-2.5 focus:font-semibold focus:text-encre focus:shadow-2"
+        href="#contenu"
+      >
+        Aller au contenu
+      </a>
+      <div className="flex min-h-dvh flex-col">
+        <Entete />
+        {/* clip et non hidden : les barres collantes des pages (pastilles de
+            la carte) restent collantes. */}
+        <main className="flex flex-1 flex-col overflow-x-clip" id="contenu">
           {children}
         </main>
-        <Footer />
+        <PiedDePage />
       </div>
+      <BarrePanier />
+      {/* Fenêtres de la commande (fiche plat, tiroir du panier), chargées à
+          la demande : montées ici au lot L11b. */}
+      <MessageFlottant />
+      <Annonce />
     </>
   );
 }

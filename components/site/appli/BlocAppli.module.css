@@ -1,0 +1,94 @@
+/* Bloc « La Nation dans votre poche » (maquette, CSS 819-846 ; retouches 9 et 10).
+   Fond #FCD424 : le jaune de l'illustration, la jointure ne se voit pas. */
+
+.appli {
+  position: relative;
+  overflow: hidden;
+  padding-top: 44px;
+  background: var(--color-jaune-appli);
+  color: var(--color-encre);
+}
+
+.interieur {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 22px;
+}
+
+.texte {
+  display: grid;
+  align-content: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.texte > p:first-of-type {
+  max-width: 34em;
+}
+
+.telecharger {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 4px;
+}
+
+.tel {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.tel a {
+  font-weight: 800;
+  color: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tel a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.visuel {
+  align-self: end;
+  min-width: 0;
+  margin-inline: calc(var(--gouttiere) * -1);
+}
+
+/* Le haut de l'illustration (feuille coupée) se fond dans le jaune. */
+.visuel img {
+  display: block;
+  width: 100%;
+  height: auto;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 7%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 7%);
+}
+
+/* On ne scanne pas son propre écran : pas de QR code sur téléphone. */
+@media (width < 720px) {
+  .qr {
+    display: none;
+  }
+}
+
+@media (width >= 720px) {
+  .appli {
+    padding-top: 0;
+  }
+
+  .interieur {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 28px;
+  }
+
+  .texte {
+    padding-block: 48px 52px;
+  }
+
+  /* L'illustration va jusqu'au bord droit de l'écran. */
+  .visuel {
+    margin-inline: 0
+      calc((var(--gouttiere) + max(0px, (100vw - var(--largeur)) / 2)) * -1);
+  }
+}

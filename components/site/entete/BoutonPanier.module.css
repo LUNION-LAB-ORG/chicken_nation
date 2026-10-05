@@ -1,0 +1,33 @@
+/* Compteur du bouton panier (maquette, CSS 228-237) : il saute à chaque ajout. */
+
+.compteur {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border: 2px solid var(--color-papier);
+  border-radius: var(--radius-pilule);
+  background: var(--color-orange);
+  color: var(--color-encre);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.saute {
+  animation: saute 0.35s ease-out;
+}
+
+@keyframes saute {
+  40% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

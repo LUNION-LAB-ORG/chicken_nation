@@ -1,0 +1,77 @@
+/* Avis clients (maquette, CSS 801-818). Téléphone : rangée qui défile.
+   Dès 900 px : colonnes CSS (3, puis 4 dès 1 150 px) au lieu de la
+   répartition mesurée en JavaScript de la maquette. Le sélecteur [class]
+   passe avant la grille de RangeeDefilante. */
+
+@media (width >= 900px) {
+  .liste[class] {
+    display: block;
+    columns: 3;
+    column-gap: 14px;
+  }
+
+  .liste > li {
+    margin-bottom: 14px;
+    break-inside: avoid;
+  }
+}
+
+@media (width >= 1150px) {
+  .liste[class] {
+    columns: 4;
+  }
+}
+
+.avis {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 18px;
+  background: #fff;
+  border: 1px solid var(--color-trait);
+  border-radius: var(--radius-carte);
+}
+
+.etoiles {
+  display: flex;
+  gap: 2px;
+  color: var(--color-orange);
+}
+
+.etoiles svg {
+  width: 17px;
+  height: 17px;
+}
+
+.avis blockquote {
+  flex: 1;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.avis figcaption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-encre-doux);
+}
+
+.initiales {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-orange-pale);
+  color: var(--color-orange-texte);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}

@@ -1,0 +1,402 @@
+/* Section et cartes des restaurants (maquette, CSS 633-706 ; retouche 8).
+   Téléphone : petite photo à gauche, infos à droite. Dès 1 000 px : cartes
+   égales sur une rangée, hauteurs alignées (sous-grille). La bulle des
+   horaires se pose par-dessus la carte, sans l'étirer. */
+
+/* ---------- En-tête de la section ---------- */
+
+.tete {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px 28px;
+  min-height: 150px;
+  margin-bottom: 18px;
+  padding: 22px 20px 20px;
+  border-radius: var(--radius-panneau);
+  background: var(--color-encre);
+  color: #fff;
+  --focus: var(--color-jaune);
+}
+
+.teteFond {
+  z-index: -2;
+  object-fit: cover;
+  object-position: 60% 55%;
+}
+
+/* Voile sombre sous le texte, plus léger à droite où se voit la photo. */
+.tete::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    90deg,
+    rgba(20, 11, 5, 0.84) 0%,
+    rgba(20, 11, 5, 0.62) 55%,
+    rgba(20, 11, 5, 0.4) 100%
+  );
+}
+
+.teteTexte {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.teteTexte p {
+  max-width: 32em;
+  font-weight: 500;
+}
+
+.tel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.tel > svg {
+  width: 40px;
+  height: 40px;
+  padding: 9px;
+  border-radius: 50%;
+  background: var(--color-jaune);
+  color: var(--color-encre);
+}
+
+.tel > span {
+  display: grid;
+}
+
+.tel small {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-sur-encre-doux);
+}
+
+.tel a {
+  color: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tel a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+@media (width >= 900px) {
+  .tete {
+    min-height: 164px;
+    max-height: 180px;
+    padding: 26px 32px;
+  }
+
+  .tel {
+    font-size: 28px;
+  }
+}
+
+/* ---------- Grille et cartes ---------- */
+
+.grille {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.resto {
+  position: relative;
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  grid-template-areas:
+    "photo txt"
+    "photo adr"
+    "actions actions";
+  grid-template-rows: auto 1fr auto;
+  gap: 4px 12px;
+  align-items: start;
+  min-width: 0;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid var(--color-trait);
+  border-radius: var(--radius-carte);
+}
+
+.photo {
+  position: relative;
+  grid-area: photo;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-photo);
+  background: var(--color-creme);
+}
+
+.photo img {
+  object-fit: cover;
+}
+
+/* Restaurant sans photo dans la base : le logo sur le fond crème. */
+.sansPhoto {
+  display: grid;
+  place-items: center;
+}
+
+.sansPhoto img {
+  width: 30%;
+  height: auto;
+}
+
+.txt {
+  grid-area: txt;
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.nom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.nom a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.nom a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.logo {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px var(--color-trait),
+    var(--shadow-bouton);
+}
+
+.logo img {
+  display: block;
+  width: auto;
+  height: 28px;
+}
+
+.adr {
+  grid-area: adr;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--color-encre-doux);
+}
+
+.actions {
+  position: relative;
+  grid-area: actions;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 10px;
+  margin-top: 4px;
+}
+
+/* ---------- Bulle des horaires ---------- */
+
+.bulle {
+  position: absolute;
+  z-index: 8;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 10px);
+  max-width: 280px;
+  padding: 12px 14px;
+  background: #fff;
+  color: var(--color-encre);
+  border: 1px solid var(--color-trait-fort);
+  border-radius: var(--radius-carte);
+  box-shadow: var(--shadow-2);
+}
+
+/* Pointe vers le lien « Horaires ». */
+.bulle::after {
+  content: "";
+  position: absolute;
+  left: 24px;
+  bottom: -7px;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-right: 1px solid var(--color-trait-fort);
+  border-bottom: 1px solid var(--color-trait-fort);
+  transform: rotate(45deg);
+}
+
+.bulleTitre {
+  padding-right: 34px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.bulleTitre small {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-encre-doux);
+}
+
+.bulle ul {
+  display: grid;
+  gap: 2px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12.5px;
+}
+
+.bulle li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--color-encre-doux);
+  font-variant-numeric: tabular-nums;
+}
+
+.bulle li > span:last-child {
+  flex: none;
+  white-space: nowrap;
+}
+
+.bulle li.aujourdhui {
+  font-weight: 700;
+  color: var(--color-encre);
+}
+
+.bulleFermer {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 40px;
+  height: 40px;
+}
+
+.bulleFermer svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---------- Largeurs ---------- */
+
+@media (width < 360px) {
+  .resto {
+    grid-template-columns: 84px minmax(0, 1fr);
+    gap: 4px 10px;
+  }
+
+  .logo {
+    width: 34px;
+    height: 34px;
+  }
+
+  .logo img {
+    height: 24px;
+  }
+}
+
+@media (640px <= width < 1000px) {
+  .grille {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Nombre impair sur 2 colonnes : le dernier prend toute la rangée. */
+  .grille > .resto:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (width >= 1000px) {
+  .grille {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .resto {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "photo" "txt" "adr" "actions";
+    grid-template-rows: auto auto 1fr auto;
+    gap: 8px;
+  }
+
+  .photo {
+    margin-bottom: 2px;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .actions > button {
+    align-self: flex-start;
+  }
+
+  /* Cartes étroites (176 à 216 px) : la bulle déborde de la carte pour que
+     « Mercredi  10 h à minuit » tienne sur une ligne. Calée sur le bord
+     gauche de la carte, sur le bord droit pour la dernière colonne. */
+  .bulle {
+    left: -11px;
+    right: auto;
+    width: 236px;
+    max-width: none;
+  }
+
+  .bulle::after {
+    left: 35px;
+  }
+
+  .grille > .resto:nth-child(5n) .bulle {
+    left: auto;
+    right: -11px;
+  }
+
+  /* Pointe toujours sous « Horaires » : 271 px = 236 + 11 + 24, moins la
+     largeur de la carte. */
+  .grille > .resto:nth-child(5n) .bulle::after {
+    left: calc(271px - (min(100vw, var(--largeur)) - 120px) / 5);
+  }
+
+  /* Rangées alignées d'une carte à l'autre (nom, état, adresse, boutons). */
+  @supports (grid-template-rows: subgrid) {
+    .grille {
+      grid-template-rows: auto auto 1fr auto;
+    }
+
+    .resto {
+      grid-row: span 4;
+      grid-template-rows: subgrid;
+      row-gap: 8px;
+    }
+  }
+}

@@ -1,0 +1,267 @@
+/* Carte de plat (maquette, CSS 468-500 et 925-947 ; retouche 5).
+   Le nom est le lien de la carte et sa zone couvre toute la carte ; le bouton
+   « Ajouter » passe au-dessus. Photo entière, jamais coupée (PhotoPlat). */
+
+.plat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid var(--color-trait);
+  border-radius: var(--radius-carte);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+@media (hover: hover) {
+  .plat:hover {
+    border-color: var(--color-trait-fort);
+    box-shadow: var(--shadow-1);
+  }
+}
+
+/* Zone photo à hauteur fixe (sélecteur à deux classes : passe avant les
+   valeurs par défaut de PhotoPlat). */
+.plat .photo {
+  --marge: 10px;
+  height: var(--h-photo, 190px);
+}
+
+.corps {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px 2px 2px;
+}
+
+.nom {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.ouvrir {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ouvrir::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: var(--radius-carte);
+}
+
+/* Contour de focus sur toute la carte. */
+.ouvrir:focus-visible {
+  outline: none;
+}
+
+.ouvrir:focus-visible::after {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.desc {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-encre-doux);
+}
+
+.pied {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.prix {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.prix strong {
+  font-size: 16px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.prix .promo {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--color-jaune);
+}
+
+.prix s {
+  font-size: 13px;
+  color: var(--color-encre-doux);
+  white-space: nowrap;
+}
+
+/* Au-dessus de la zone cliquable de la carte. */
+.ajouter {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Vitrine : promotions de l'accueil, aplat orange ---------- */
+
+.vitrine {
+  background: var(--color-orange);
+  border: 2px solid var(--color-encre);
+  box-shadow: var(--shadow-autocollant);
+}
+
+@media (hover: hover) {
+  .vitrine:hover {
+    border-color: var(--color-encre);
+    box-shadow: 5px 5px 0 var(--color-encre);
+  }
+}
+
+.vitrine .photo {
+  --h-photo: 196px;
+  --etiq: 34px;
+  border-radius: calc(var(--radius-carte) - 4px);
+}
+
+.vitrine .corps {
+  gap: 6px;
+  padding: 12px 4px 4px;
+}
+
+.vitrine .nom {
+  font-size: 17px;
+}
+
+.vitrine .desc,
+.vitrine .prix s {
+  color: var(--color-encre);
+}
+
+.vitrine .prix strong {
+  font-size: 18px;
+}
+
+.vitrine .prix .promo {
+  box-shadow: 0 0 0 1.5px var(--color-encre);
+}
+
+@media (width >= 900px) {
+  .vitrine .photo {
+    --h-photo: clamp(210px, 19.5vw, 250px);
+    --etiq: 38px;
+    --marge: 14px;
+  }
+
+  .vitrine .nom {
+    font-size: 19px;
+  }
+
+  .vitrine .desc {
+    font-size: 14px;
+  }
+
+  .vitrine .prix strong {
+    font-size: 20px;
+  }
+
+  .vitrine .prix s {
+    font-size: 14px;
+  }
+}
+
+/* ---------- Carte : grilles de la carte, liste sous 600 px ---------- */
+
+.carte .photo {
+  --h-photo: 180px;
+}
+
+@media (width >= 600px) {
+  .carte .nom {
+    font-size: 16.5px;
+  }
+
+  .carte .prix strong {
+    font-size: 17px;
+  }
+}
+
+@media (width >= 1100px) {
+  .carte .photo {
+    --h-photo: 204px;
+    --etiq: 34px;
+  }
+}
+
+/* Téléphone : photo de 128 px à gauche, texte à droite. */
+@media (width < 600px) {
+  .carte {
+    display: grid;
+    grid-template-columns: 128px minmax(0, 1fr);
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .carte .photo {
+    --marge: 6px;
+    --etiq: 20px;
+    height: auto;
+    min-height: 112px;
+  }
+
+  .carte .corps {
+    padding: 0;
+  }
+
+  .carte .pied {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .carte .badge {
+    top: 4px;
+    left: 4px;
+    padding: 2px 6px;
+    font-size: 10.5px;
+  }
+
+  .carte .ajouter {
+    min-height: 40px;
+    padding: 0 14px 0 10px;
+    gap: 4px;
+    font-size: 13.5px;
+  }
+
+  .carte .ajouter svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (width < 360px) {
+  .carte {
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: 10px;
+  }
+}
