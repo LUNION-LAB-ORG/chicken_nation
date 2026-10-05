@@ -20,6 +20,24 @@ describe("TitreAffiche", () => {
     expect(espion).not.toHaveBeenCalled();
   });
 
+  it("garde l'interligne serré à chaque taille (tailwind-merge ne le retire pas)", () => {
+    for (const taille of ["section", "ecran", "compacte", "appli"]) {
+      const html = renderToStaticMarkup(
+        <TitreAffiche className="text-jaune" taille={taille}>
+          Nos restaurants
+        </TitreAffiche>,
+      );
+
+      expect(html).toContain("leading-[0.95]");
+    }
+    const panneau = renderToStaticMarkup(
+      <TitreAffiche taille="panneau">Votre panier</TitreAffiche>,
+    );
+
+    expect(panneau).toContain("leading-none");
+    expect(panneau).not.toContain("leading-[0.95]");
+  });
+
   it("signale un texte accentué et le rend en Poppins 800", () => {
     espion = spyOn(console, "error").mockImplementation(() => {});
     const html = renderToStaticMarkup(

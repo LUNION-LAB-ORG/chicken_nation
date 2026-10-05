@@ -2,18 +2,21 @@ import { tv } from "tailwind-variants";
 
 import { estTexteAffiche } from "@/lib/typo";
 
+// L'interligne suit la taille dans chaque variante : tailwind-merge retire un
+// `leading-*` placé AVANT une classe de taille de police (elle fixe aussi
+// l'interligne en Tailwind 4), il ne peut donc pas rester dans `base`.
 const styleTitre = tv({
-  base: "leading-[0.95] font-normal uppercase [font-synthesis:none] text-balance",
+  base: "font-normal uppercase [font-synthesis:none] text-balance",
   variants: {
     taille: {
       /** Titre de section (CSS 103) */
-      section: "text-[clamp(32px,6vw,58px)]",
+      section: "text-[clamp(32px,6vw,58px)] leading-[0.95]",
       /** En-tête d'écran : carte, caisse (CSS 883) */
-      ecran: "text-[clamp(46px,9vw,92px)]",
+      ecran: "text-[clamp(46px,9vw,92px)] leading-[0.95]",
       /** En-tête d'écran compact (CSS 888) */
-      compacte: "text-[clamp(34px,5vw,60px)]",
+      compacte: "text-[clamp(34px,5vw,60px)] leading-[0.95]",
       /** Bloc Application (CSS 825) */
-      appli: "text-[clamp(32px,5vw,52px)]",
+      appli: "text-[clamp(32px,5vw,52px)] leading-[0.95]",
       /** Tête du panier (CSS 965) */
       panneau: "text-[34px] leading-none",
     },
