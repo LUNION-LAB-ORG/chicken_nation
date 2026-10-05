@@ -1,256 +1,781 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import type {
+  IGroupeOptions,
+  ILignePanier,
+  ISupplementPlat,
+  ModeCommande,
+  Resultat,
+} from "../types/commande.types";
+import type { IFicheDemandee } from "../stores/interface.store";
+import type { IChoixEnCours, IFichePlat } from "../utils/fiche.utils";
+import type { CSSProperties, ReactNode, RefObject } from "react";
+
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import Image from "next/image";
-import { useSetAtom } from "jotai";
-import { Minus, Plus } from "lucide-react";
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/modal";
-import { Button } from "@heroui/button";
-import { Spinner } from "@heroui/spinner";
-import { addToast } from "@heroui/toast";
-import { obtenirPlatAction } from "../actions/commande.action";
-import { ajouterAuPanierAtom } from "../stores/panier.store";
-import type { IOptionChoisie, IPlatDetail, ISupplementChoisi } from "../types/commande.types";
+import { useEffect, useRef, useState } from "react";
+
+import { lireFichePlatAction } from "../actions/fiche-plat.action";
+import { modeAtom } from "../stores/caisse.store";
+import {
+  ficheDemandeeAtom,
+  tiroirPanierOuvertAtom,
+} from "../stores/interface.store";
+import {
+  ajouterAuPanierAtom,
+  panierAtom,
+  remplacerLigneAtom,
+} from "../stores/panier.store";
 import { messageErreurAction } from "../utils/erreur-action.utils";
 import {
+  aideMaximum,
+  choixInitiaux,
+  decouperLibelle,
+  empechementPlat,
+  groupePayant,
+  groupesIncomplets,
+  ligneAModifier,
+  ligneDeFiche,
+  mentionPlatHorsMode,
+  mentionSupplementHorsMode,
+  messageGroupe,
+  messageSupplementHorsMode,
+  noteSupplementsHorsMode,
+  regleGroupe,
+  supplementsParCategorie,
+  totalFiche,
+} from "../utils/fiche.utils";
+import {
   basculerOption,
-  fcfa,
-  groupeIncomplet,
-  mentionModes,
-  platDisponibleMaintenant,
-  selectionParDefaut,
-  signatureLigne,
-  totalLigne,
+  QUANTITE_MAX,
+  QUANTITE_SUPPLEMENT_MAX,
+  venduEn,
 } from "../utils/panier.utils";
 
-const TITRES_SUPPLEMENTS: Record<string, string> = {
-  FOOD: "Sauces",
-  DRINK: "Boissons",
-  ACCESSORY: "Accompagnements",
-};
+import { ChoixEpice } from "./ChoixEpice";
+import styles from "./FichePlat.module.css";
 
-function Compteur({ valeur, onChange, min = 0, libelle }: { valeur: number; onChange: (v: number) => void; min?: number; libelle: string }) {
+import { Accordeon } from "@/components/site/Accordeon";
+import { BadgePromo, Surtitre } from "@/components/site/Autocollants";
+import { Bouton, LienBouton } from "@/components/site/Bouton";
+import { CaseACocher, ChoixRadio, GroupeChoix } from "@/components/site/Choix";
+import { Compteur } from "@/components/site/Compteur";
+import { Tag } from "@/components/site/Etiquettes";
+import { Feuille } from "@/components/site/Feuille";
+import { Icone } from "@/components/site/Icone";
+import { afficherMessage, annoncer } from "@/components/site/MessageFlottant";
+import { PhotoPlat } from "@/components/site/PhotoPlat";
+import { PrixPlat } from "@/components/site/plats/CartePlat";
+import { photoPlat } from "@/features/menus/photo-plat";
+import { fcfa, INSECABLE, joli, nombre, phrase, typo } from "@/lib/typo";
+import { cn } from "@/lib/utils";
+
+/** id du titre de la fiche (aria-labelledby de la fenêtre). */
+const TITRE_ID = "fiche-nom";
+const ID_EPICE = "fiche-groupe-epice";
+const idGroupe = (g: Pick<IGroupeOptions, "id">) => `fiche-groupe-${g.id}`;
+
+// ── Lecture du plat, gardée quelques minutes ──────────────────────────────
+
+/**
+ * Plats déjà ouverts, gardés 5 minutes : rouvrir une fiche (ou « Modifier »
+ * une ligne) ne relit pas l'API. Les prix n'y sont qu'un affichage : le
+ * serveur relit tout à la création de la commande.
+ */
+const DUREE_MEMOIRE = 5 * 60 * 1000;
+const memoire = new Map<string, { fiche: IFichePlat; lu: number }>();
+
+function ficheGardee(id: string): IFichePlat | null {
+  const garde = memoire.get(id);
+
+  return garde && Date.now() - garde.lu < DUREE_MEMOIRE ? garde.fiche : null;
+}
+
+async function lireFiche(id: string): Promise<Resultat<IFichePlat>> {
+  const gardee = ficheGardee(id);
+
+  if (gardee) return { ok: true, data: gardee };
+  const res = await lireFichePlatAction(id);
+
+  if (res.ok) memoire.set(id, { fiche: res.data, lu: Date.now() });
+
+  return res;
+}
+
+// ── Contenu (sans état, rendu aussi dans les tests) ───────────────────────
+
+/** Petite pastille d'information (« Servi épicé »), maquette CSS 1121. */
+function PastilleInfo({ children }: { children: ReactNode }) {
   return (
-    <div className="flex items-center gap-2">
-      <button
-        type="button"
-        aria-label={`Retirer ${libelle}`}
-        disabled={valeur <= min}
-        onClick={() => onChange(valeur - 1)}
-        className="flex h-8 w-8 items-center justify-center rounded-full border border-primary text-primary disabled:opacity-30"
-      >
-        <Minus size={16} />
-      </button>
-      <span className="w-6 text-center font-semibold" aria-live="polite">{valeur}</span>
-      <button
-        type="button"
-        aria-label={`Ajouter ${libelle}`}
-        onClick={() => onChange(Math.min(valeur + 1, 20))}
-        className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white"
-      >
-        <Plus size={16} />
-      </button>
+    <p className="inline-flex w-fit items-center gap-1.5 rounded-pilule border border-trait bg-surface px-3 py-[5px] text-[13px] leading-[1.3] font-semibold">
+      {children}
+    </p>
+  );
+}
+
+/** Photo d'un supplément (44 px), ou une case crème s'il n'en a pas. */
+function PhotoSupplement({ s }: { s: ISupplementPlat }) {
+  if (!s.image)
+    return <span aria-hidden="true" className="size-11 rounded-lg bg-creme" />;
+
+  return (
+    <Image
+      alt=""
+      className="size-11 rounded-lg bg-creme object-contain"
+      height={44}
+      sizes="44px"
+      src={s.image}
+      width={44}
+    />
+  );
+}
+
+export interface IContenuFicheProps {
+  fiche: IFichePlat;
+  choix: IChoixEnCours;
+  mode: ModeCommande;
+  /** « Modifier » une ligne du panier : « Mettre à jour » au lieu d'« Ajouter ». */
+  edition: boolean;
+  /** Le client a voulu ajouter : les choix obligatoires manquants sont signalés. */
+  tentative: boolean;
+  /** Catégories de suppléments ouvertes au premier affichage. */
+  ouverts: ReadonlySet<string>;
+  maintenant?: Date;
+  titreRef?: RefObject<HTMLHeadingElement | null>;
+  defileRef?: RefObject<HTMLDivElement | null>;
+  surOption: (g: IGroupeOptions, itemId: string) => void;
+  surEpice: (epice: boolean) => void;
+  surSupplement: (s: ISupplementPlat, quantite: number) => void;
+  surQuantite: (quantite: number) => void;
+  surValider: () => void;
+}
+
+/**
+ * Contenu de la fiche plat (maquette, JS 566-626) : tête (photo à sa taille,
+ * catégorie, nom, description, prix, épicé, mentions), groupes d'options,
+ * épicé ou non, suppléments par catégorie, puis le pied (quantité,
+ * « Ajouter » ou « Mettre à jour » avec le total en direct).
+ */
+export function ContenuFiche({
+  fiche,
+  choix,
+  mode,
+  edition,
+  tentative,
+  ouverts,
+  maintenant,
+  titreRef,
+  defileRef,
+  surOption,
+  surEpice,
+  surSupplement,
+  surQuantite,
+  surValider,
+}: IContenuFicheProps) {
+  const { plat, categorie } = fiche;
+  const photo = photoPlat(plat.id, plat.image);
+  const remise =
+    plat.prixAvantPromo !== null ? plat.prixAvantPromo - plat.prix : 0;
+  const empechement = empechementPlat(plat, maintenant);
+  const incomplets = tentative
+    ? new Set(groupesIncomplets(plat.groupes, choix.options).map((g) => g.id))
+    : new Set<string>();
+  const epiceManquant =
+    tentative && plat.spice_level === "OPTIONAL" && choix.epice === null;
+  const mentionPlat = empechement
+    ? null
+    : mentionPlatHorsMode(plat.available_order_types, mode);
+  const categories = supplementsParCategorie(plat.supplements);
+  const supplementsHorsMode = plat.supplements.some(
+    (s) => !venduEn(s.available_order_types, mode),
+  );
+  const description = plat.description ? typo(phrase(plat.description)) : "";
+
+  return (
+    <div className={styles.interieur}>
+      <div ref={defileRef} className={styles.defile}>
+        <div className={styles.haut}>
+          {/* Image principale de la fenêtre, visible dès l'ouverture :
+              chargée tout de suite. */}
+          <PhotoPlat
+            etiquetteGauche
+            preload
+            alt={plat.name}
+            className={styles.photo}
+            etiquette={photo.etiquette}
+            fond={photo.fond}
+            marge={14}
+            sizes="(min-width: 960px) 428px, (min-width: 760px) 368px, 100vw"
+            src={photo.src}
+            style={{ "--ratio": photo.ratio } as CSSProperties}
+            tailleEtiquette={36}
+          />
+          <div className={styles.tete}>
+            {categorie ? <Surtitre>{categorie}</Surtitre> : null}
+            <h2
+              ref={titreRef}
+              className="text-[22px] leading-[1.15] font-extrabold [overflow-wrap:anywhere] min-[760px]:text-[26px]"
+              id={TITRE_ID}
+              tabIndex={-1}
+            >
+              {plat.name}
+            </h2>
+            {description ? (
+              <p className="text-[14.5px] text-encre-doux">{description}</p>
+            ) : null}
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+              <PrixPlat className={styles.prix} plat={plat} />
+              {remise > 0 ? (
+                <BadgePromo statique>
+                  −{nombre(remise)}
+                  {INSECABLE}FCFA
+                </BadgePromo>
+              ) : null}
+            </div>
+            {plat.spice_level === "ALWAYS" ? (
+              <PastilleInfo>
+                <Icone className="size-4 text-orange-texte" nom="feu" />
+                Servi épicé
+              </PastilleInfo>
+            ) : null}
+            {plat.spice_level === "NEVER" ? (
+              <PastilleInfo>Non épicé</PastilleInfo>
+            ) : null}
+            {mentionPlat ? (
+              <p>
+                <Tag className="rounded-md whitespace-normal" genre="emporter">
+                  {mentionPlat}
+                </Tag>
+              </p>
+            ) : null}
+            {empechement ? (
+              <p className="rounded-carte bg-rouge-fond px-3.5 py-3 text-sm font-semibold text-rouge">
+                {empechement}
+              </p>
+            ) : null}
+          </div>
+        </div>
+
+        {plat.groupes.map((g) => {
+          const multiple = g.max_select > 1;
+          const nombreChoisis = choix.options.filter(
+            (o) => o.group_id === g.id,
+          ).length;
+          const plein = multiple && nombreChoisis >= g.max_select;
+          const payant = groupePayant(g);
+          const Choix = multiple ? CaseACocher : ChoixRadio;
+
+          return (
+            <div key={g.id} id={idGroupe(g)}>
+              <GroupeChoix
+                colonnes
+                erreur={incomplets.has(g.id) ? messageGroupe(g) : null}
+                idErreur={`${idGroupe(g)}-erreur`}
+                legende={joli(g.name)}
+                precision={regleGroupe(g)}
+                requis={g.min_select > 0}
+              >
+                {g.description ? (
+                  <p className="col-span-full -mt-1 text-[13px] text-encre-doux">
+                    {typo(g.description)}
+                  </p>
+                ) : null}
+                {g.items.map((item) => {
+                  const coche = choix.options.some(
+                    (o) => o.item_id === item.id,
+                  );
+                  const { titre, detail } = decouperLibelle(item.label);
+
+                  return (
+                    <Choix
+                      key={item.id}
+                      aria-invalid={incomplets.has(g.id) ? true : undefined}
+                      checked={coche}
+                      detail={
+                        detail || !item.available ? (
+                          <>
+                            {detail}
+                            {!item.available ? (
+                              <span className="block">
+                                Indisponible pour le moment
+                              </span>
+                            ) : null}
+                          </>
+                        ) : undefined
+                      }
+                      disabled={!item.available || (plein && !coche)}
+                      id={`fiche-option-${item.id}`}
+                      inclus={item.price_delta <= 0}
+                      label={titre}
+                      name={`fiche-groupe-${g.id}`}
+                      prix={
+                        item.price_delta > 0
+                          ? `+${fcfa(item.price_delta)}`
+                          : payant
+                            ? "Inclus"
+                            : undefined
+                      }
+                      value={item.id}
+                      onChange={() => surOption(g, item.id)}
+                      // Choix unique facultatif : un second clic le retire
+                      // (un bouton radio ne se décoche pas de lui-même).
+                      onClick={
+                        !multiple && coche && g.min_select === 0
+                          ? () => surOption(g, item.id)
+                          : undefined
+                      }
+                    />
+                  );
+                })}
+                {plein ? (
+                  <p className="col-span-full text-[13px] text-encre-doux">
+                    {aideMaximum(g)}
+                  </p>
+                ) : null}
+              </GroupeChoix>
+            </div>
+          );
+        })}
+
+        {plat.spice_level === "OPTIONAL" ? (
+          <div id={ID_EPICE}>
+            <ChoixEpice
+              erreur={
+                epiceManquant
+                  ? "Choisissez épicé ou non épicé pour continuer."
+                  : null
+              }
+              id="fiche"
+              valeur={choix.epice}
+              onChange={surEpice}
+            />
+          </div>
+        ) : null}
+
+        {categories.length ? (
+          <section
+            aria-labelledby="fiche-supplements"
+            className={cn(styles.supps, "grid min-w-0 gap-2.5")}
+          >
+            <h3
+              className="flex w-full flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5 text-base font-bold"
+              id="fiche-supplements"
+            >
+              Suppléments
+              <small className="text-[12.5px] font-medium text-encre-doux">
+                Facultatif · comptés une fois pour cette ligne
+              </small>
+            </h3>
+            {categories.map((c) => {
+              const choisis = c.supplements.reduce(
+                (n, s) => n + (choix.supplements[s.id] ?? 0),
+                0,
+              );
+
+              return (
+                <Accordeon
+                  key={c.cle}
+                  classeCorps={styles.corps}
+                  ouvert={ouverts.has(c.cle)}
+                  sousTitre={
+                    <>
+                      {c.supplements.length}
+                      {INSECABLE}au choix
+                      {choisis ? (
+                        <span className="ml-2.5 inline-grid h-[22px] min-w-[22px] place-items-center rounded-pilule bg-orange px-1.5 text-xs font-bold text-encre tabular-nums">
+                          {choisis}
+                          <span className="sr-only">
+                            {" "}
+                            {choisis > 1 ? "choisis" : "choisi"}
+                          </span>
+                        </span>
+                      ) : null}
+                    </>
+                  }
+                  titre={c.libelle}
+                >
+                  <ul className="contents">
+                    {c.supplements.map((s) => {
+                      const quantite = choix.supplements[s.id] ?? 0;
+                      const nom = joli(s.name);
+                      const mention = mentionSupplementHorsMode(
+                        s.available_order_types,
+                        mode,
+                      );
+
+                      return (
+                        <li key={s.id} className={styles.supp}>
+                          <PhotoSupplement s={s} />
+                          <p className="grid min-w-0 gap-px text-sm leading-[1.3] font-semibold">
+                            <span className="[overflow-wrap:anywhere]">
+                              {nom}
+                            </span>
+                            <small className="text-[12.5px] font-medium text-encre-doux tabular-nums">
+                              +{fcfa(s.price)}
+                            </small>
+                            {mention ? (
+                              <Tag
+                                className="rounded-md whitespace-normal"
+                                genre="emporter"
+                              >
+                                {mention}
+                              </Tag>
+                            ) : null}
+                          </p>
+                          <Compteur
+                            className={cn(
+                              "[&_button]:size-11",
+                              quantite > 0 && "border-encre bg-surface",
+                            )}
+                            max={QUANTITE_SUPPLEMENT_MAX}
+                            min={0}
+                            nom={nom}
+                            valeur={quantite}
+                            onChange={(q) => surSupplement(s, q)}
+                          />
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </Accordeon>
+              );
+            })}
+          </section>
+        ) : null}
+
+        {supplementsHorsMode ? (
+          <p className="grid grid-cols-[20px_minmax(0,1fr)] gap-2 text-[13px] leading-[1.45] text-encre-doux">
+            <Icone className="mt-px size-[18px] text-encre" nom="sac" />
+            <span>{noteSupplementsHorsMode(mode)}</span>
+          </p>
+        ) : null}
+      </div>
+
+      <div className={styles.pied}>
+        <Compteur
+          className="[&_button]:w-11"
+          libelle="Quantité"
+          max={QUANTITE_MAX}
+          min={1}
+          nom={plat.name}
+          taille="grand"
+          valeur={choix.quantite}
+          onChange={surQuantite}
+        />
+        {/* Libellé à gauche, total à droite. Trop étroit (« Mettre à jour »
+            sur téléphone) : le total passe sous le libellé, aligné à gauche ;
+            ni l'un ni l'autre ne se coupe. */}
+        <Bouton
+          entre
+          className="min-w-0 flex-1 flex-wrap content-center gap-x-2.5 gap-y-0 px-[clamp(14px,4vw,18px)] text-left whitespace-normal"
+          disabled={Boolean(empechement)}
+          taille="grand"
+          onClick={surValider}
+        >
+          <span className="whitespace-nowrap">
+            {edition ? "Mettre à jour" : "Ajouter"}
+          </span>
+          <span className="whitespace-nowrap tabular-nums">
+            {fcfa(totalFiche(plat, choix))}
+          </span>
+        </Bouton>
+      </div>
     </div>
   );
 }
 
-export default function FichePlat({ platId, onClose }: { platId: string | null; onClose: () => void }) {
+// ── Fiche branchée sur le panier ──────────────────────────────────────────
+
+type Etat =
+  | { statut: "chargement" }
+  | { statut: "erreur"; message: string; introuvable: boolean }
+  | { statut: "pret"; fiche: IFichePlat };
+
+/** Catégories ouvertes d'emblée : la première, et celles où un supplément est déjà pris. */
+function categoriesOuvertes(fiche: IFichePlat, choix: IChoixEnCours) {
+  return new Set(
+    supplementsParCategorie(fiche.plat.supplements)
+      .filter(
+        (c, i) => i === 0 || c.supplements.some((s) => choix.supplements[s.id]),
+      )
+      .map((c) => c.cle),
+  );
+}
+
+/** Mouvement réduit demandé par le visiteur (lu à chaque fois : il peut changer). */
+const mouvementReduit = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+/**
+ * Fiche plat en fenêtre (plan, section 1.1 et lot L11b), ouverte depuis
+ * l'accueil, la carte, une page plat ou « Modifier » dans le panier :
+ * `ficheDemandeeAtom` dit quel plat, et quelle ligne modifier. Montée par
+ * FenetresCommande et chargée à la demande.
+ *
+ * « Ajouter » vérifie les choix obligatoires (défilement jusqu'au premier
+ * manquant et annonce), puis ajoute la ligne au panier, ou la remplace à sa
+ * place pour « Mettre à jour ». Venue du tiroir, la fiche rend la main au
+ * tiroir en se fermant.
+ */
+export default function FichePlat() {
+  const [demande, setDemande] = useAtom(ficheDemandeeAtom);
+  const ouvrirTiroir = useSetAtom(tiroirPanierOuvertAtom);
+  const lignes = useAtomValue(panierAtom);
+  const mode = useAtomValue(modeAtom);
   const ajouter = useSetAtom(ajouterAuPanierAtom);
-  const [plat, setPlat] = useState<IPlatDetail | null>(null);
-  const [erreur, setErreur] = useState<string | null>(null);
-  const [epice, setEpice] = useState(false);
-  const [options, setOptions] = useState<IOptionChoisie[]>([]);
-  const [supplements, setSupplements] = useState<Record<string, number>>({});
-  const [quantite, setQuantite] = useState(1);
+  const remplacer = useSetAtom(remplacerLigneAtom);
+
+  const [etat, setEtat] = useState<Etat>({ statut: "chargement" });
+  const [choix, setChoix] = useState<IChoixEnCours | null>(null);
+  const [ouverts, setOuverts] = useState<ReadonlySet<string>>(new Set());
+  const [tentative, setTentative] = useState(false);
+  const [relance, setRelance] = useState(0);
+  const [ligneEditee, setLigneEditee] = useState<ILignePanier | null>(null);
+  const [demandeVue, setDemandeVue] = useState<IFicheDemandee | null>(null);
+  // Chaque ouverture repart d'un contenu neuf (volets des suppléments compris).
+  const [ouverture, setOuverture] = useState(0);
+
+  const titreRef = useRef<HTMLHeadingElement>(null);
+  const defileRef = useRef<HTMLDivElement>(null);
+  const lignesRef = useRef(lignes);
 
   useEffect(() => {
-    if (!platId) return;
+    lignesRef.current = lignes;
+  }, [lignes]);
+
+  /** Choix de départ : nouveau plat, ou ligne du panier à modifier. */
+  const preparer = (
+    fiche: IFichePlat,
+    pour: IFicheDemandee,
+    panier: ILignePanier[],
+  ) => {
+    const ligne = ligneAModifier(panier, pour);
+    const depart = choixInitiaux(fiche.plat, ligne);
+
+    setLigneEditee(ligne);
+    setChoix(depart);
+    setOuverts(categoriesOuvertes(fiche, depart));
+    setTentative(false);
+    setEtat({ statut: "pret", fiche });
+  };
+
+  // Nouvelle demande : la fiche repart de zéro DÈS ce rendu (jamais le plat
+  // précédent affiché un instant). Plat déjà lu : prêt tout de suite.
+  if (demande && demande !== demandeVue) {
+    setDemandeVue(demande);
+    setOuverture((n) => n + 1);
+    const gardee = ficheGardee(demande.platId);
+
+    if (gardee) preparer(gardee, demande, lignes);
+    else setEtat({ statut: "chargement" });
+  }
+
+  // Plat pas encore lu : lecture (et relecture à « Réessayer »).
+  useEffect(() => {
+    if (!demande || ficheGardee(demande.platId)) return;
     let actif = true;
-    setPlat(null);
-    setErreur(null);
-    setSupplements({});
-    setQuantite(1);
-    obtenirPlatAction(platId)
+
+    lireFiche(demande.platId)
       .then((res) => {
         if (!actif) return;
-        if (!res.ok) return setErreur(res.message);
-        setPlat(res.data);
-        setEpice(res.data.spice_level === "ALWAYS");
-        setOptions(selectionParDefaut(res.data.groupes));
+        if (res.ok) preparer(res.data, demande, lignesRef.current);
+        else
+          setEtat({
+            statut: "erreur",
+            message: res.message,
+            introuvable: res.statut === 404,
+          });
       })
       .catch((e) => {
-        if (actif) setErreur(messageErreurAction(e));
+        if (actif)
+          setEtat({
+            statut: "erreur",
+            message: messageErreurAction(e),
+            introuvable: false,
+          });
       });
+
     return () => {
       actif = false;
     };
-  }, [platId]);
+  }, [demande, relance]);
 
-  const supplementsChoisis: ISupplementChoisi[] = useMemo(
-    () =>
-      (plat?.supplements ?? [])
-        .filter((s) => (supplements[s.id] ?? 0) > 0)
-        .map((s) => ({
-          id: s.id,
-          nom: s.name,
-          prix: s.price,
-          quantite: supplements[s.id],
-          available_order_types: s.available_order_types,
-        })),
-    [plat, supplements],
-  );
+  // Plat prêt : le nom reçoit le focus (lu par les lecteurs d'écran), la
+  // fiche repart du haut.
+  const pret = etat.statut === "pret";
 
-  const parCategorie = useMemo(() => {
-    const groupes: Record<string, IPlatDetail["supplements"]> = {};
-    for (const s of plat?.supplements ?? []) (groupes[s.category] ??= []).push(s);
-    return groupes;
-  }, [plat]);
+  useEffect(() => {
+    if (!demande || !pret) return;
+    defileRef.current?.scrollTo({ top: 0 });
+    titreRef.current?.focus({ preventScroll: true });
+  }, [demande, pret]);
 
-  const disponible = plat ? platDisponibleMaintenant(plat.available_from, plat.available_until) : false;
-  const incomplet = plat ? groupeIncomplet(plat.groupes, options) : null;
-  const total = plat ? totalLigne({ prixUnitaire: plat.prix, options, supplements: supplementsChoisis, quantite }) : 0;
+  const fermer = () => {
+    const depuis = demande?.depuis;
+
+    setDemande(null);
+    if (depuis === "panier") ouvrirTiroir(true);
+  };
+
+  /** Message affiché une fois la fiche fermée (sinon il partirait avec elle). */
+  const messageApresFermeture = (texte: string) => {
+    const fenetre = titreRef.current?.closest("dialog");
+
+    if (fenetre?.open)
+      fenetre.addEventListener("close", () => afficherMessage(texte), {
+        once: true,
+      });
+    else afficherMessage(texte);
+  };
 
   const valider = () => {
-    if (!plat || incomplet || !disponible) return;
-    ajouter({
-      cle: signatureLigne(plat.id, epice, options, supplementsChoisis),
-      dish_id: plat.id,
-      nom: plat.name,
-      image: plat.image,
-      prixUnitaire: plat.prix,
-      epice,
-      options,
-      supplements: supplementsChoisis,
-      quantite,
-      available_order_types: plat.available_order_types,
-      available_from: plat.available_from,
-      available_until: plat.available_until,
-      restaurantsExclus: plat.restaurantsExclus,
-    });
-    addToast({ title: `${plat.name} ajouté au panier`, color: "success" });
-    onClose();
+    if (etat.statut !== "pret" || !choix || !demande) return;
+    const { plat } = etat.fiche;
+
+    if (empechementPlat(plat)) return;
+    const manquants = groupesIncomplets(plat.groupes, choix.options);
+    const epiceManquant =
+      plat.spice_level === "OPTIONAL" && choix.epice === null;
+
+    if (manquants.length || epiceManquant) {
+      setTentative(true);
+      const bloc = document.getElementById(
+        manquants.length ? idGroupe(manquants[0]) : ID_EPICE,
+      );
+      const defile = defileRef.current;
+
+      // Défilement de la fiche seulement (jamais de la page dessous), le
+      // groupe au milieu.
+      if (bloc && defile) {
+        const b = bloc.getBoundingClientRect();
+        const d = defile.getBoundingClientRect();
+
+        defile.scrollTo({
+          top: defile.scrollTop + b.top - d.top - (d.height - b.height) / 2,
+          behavior: mouvementReduit() ? "auto" : "smooth",
+        });
+      }
+      bloc
+        ?.querySelector<HTMLInputElement>("input:not(:disabled)")
+        ?.focus({ preventScroll: true });
+      annoncer("Il manque un choix obligatoire.");
+
+      return;
+    }
+
+    const ligne = ligneDeFiche(plat, choix);
+
+    if (ligneEditee && demande.indexLigne !== undefined) {
+      remplacer({
+        index: demande.indexLigne,
+        ligne,
+        cleAvant: ligneEditee.cle,
+      });
+      messageApresFermeture(`Ligne mise à jour${INSECABLE}: ${plat.name}`);
+    } else {
+      ajouter(ligne);
+      messageApresFermeture(
+        `Ajouté au panier${INSECABLE}: ${ligne.quantite}${INSECABLE}×${INSECABLE}${plat.name}`,
+      );
+    }
+    fermer();
+  };
+
+  const surSupplement = (s: ISupplementPlat, quantite: number) => {
+    const avant = choix?.supplements[s.id] ?? 0;
+
+    setChoix((c) =>
+      c ? { ...c, supplements: { ...c.supplements, [s.id]: quantite } } : c,
+    );
+    if (avant === 0 && quantite > 0 && !venduEn(s.available_order_types, mode))
+      afficherMessage(messageSupplementHorsMode(joli(s.name), mode));
   };
 
   return (
-    <Modal isOpen={!!platId} onClose={onClose} size="lg" scrollBehavior="inside" placement="center">
-      <ModalContent>
-        {!plat ? (
-          <ModalBody className="flex min-h-48 items-center justify-center">
-            {erreur ? <p className="text-center text-gray-700">{erreur}</p> : <Spinner color="primary" />}
-          </ModalBody>
-        ) : (
-          <>
-            <ModalHeader className="flex flex-col gap-1 pr-10">
-              <span className="text-xl font-bold uppercase">{plat.name}</span>
-              <span className="text-primary">
-                {plat.prixAvantPromo && <span className="mr-2 text-sm text-gray-500 line-through">{fcfa(plat.prixAvantPromo)}</span>}
-                {fcfa(plat.prix)}
-              </span>
-              {mentionModes(plat.available_order_types) && (
-                <span className="text-sm font-normal text-warning-700">{mentionModes(plat.available_order_types)}</span>
-              )}
-            </ModalHeader>
-            <ModalBody className="gap-5">
-              <div className="relative mx-auto h-48 w-full">
-                <Image src={plat.image} alt={plat.name} fill sizes="512px" className="object-contain" />
-              </div>
-              {plat.description && <p className="text-sm text-gray-600">{plat.description}</p>}
-              {!disponible && (
-                <p className="rounded-xl bg-warning-50 p-3 text-sm text-warning-700">
-                  Ce plat est servi de {plat.available_from} à {plat.available_until}. Revenez à ce moment-là pour le commander.
-                </p>
-              )}
-
-              {plat.spice_level === "OPTIONAL" && (
-                <fieldset>
-                  <legend className="mb-2 font-semibold">Épicé ?</legend>
-                  <div className="flex gap-2">
-                    {[false, true].map((v) => (
-                      <button
-                        key={String(v)}
-                        type="button"
-                        aria-pressed={epice === v}
-                        onClick={() => setEpice(v)}
-                        className={`rounded-full border px-4 py-2 text-sm font-medium ${epice === v ? "border-primary bg-primary text-white" : "border-gray-300"}`}
-                      >
-                        {v ? "Épicé" : "Non épicé"}
-                      </button>
-                    ))}
-                  </div>
-                </fieldset>
-              )}
-
-              {plat.groupes.map((g) => {
-                const nb = options.filter((o) => o.group_id === g.id).length;
-                return (
-                  <fieldset key={g.id}>
-                    <legend className="mb-2 font-semibold">
-                      {g.name}{" "}
-                      <span className="text-sm font-normal text-gray-500">
-                        {g.min_select > 0 ? "obligatoire, " : ""}
-                        {g.max_select === 1 ? "1 choix" : `jusqu'à ${g.max_select} choix`}
-                      </span>
-                    </legend>
-                    <div className="flex flex-col gap-2">
-                      {g.items.map((i) => {
-                        const choisi = options.some((o) => o.item_id === i.id);
-                        return (
-                          <button
-                            key={i.id}
-                            type="button"
-                            role={g.max_select === 1 ? "radio" : "checkbox"}
-                            aria-checked={choisi}
-                            disabled={!i.available || (!choisi && g.max_select > 1 && nb >= g.max_select)}
-                            onClick={() => setOptions((sel) => basculerOption(sel, g, i.id))}
-                            className={`flex items-center justify-between rounded-xl border px-4 py-3 text-left text-sm disabled:opacity-40 ${choisi ? "border-primary bg-primary/10" : "border-gray-200"}`}
-                          >
-                            <span>
-                              {i.label}
-                              {!i.available && " (indisponible)"}
-                            </span>
-                            {i.price_delta > 0 && <span className="text-gray-600">+ {fcfa(i.price_delta)}</span>}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </fieldset>
-                );
-              })}
-
-              {Object.entries(parCategorie).map(([categorie, liste]) => (
-                <fieldset key={categorie}>
-                  <legend className="mb-2 font-semibold">
-                    {TITRES_SUPPLEMENTS[categorie] ?? "Suppléments"} <span className="text-sm font-normal text-gray-500">en plus</span>
-                  </legend>
-                  <ul className="flex flex-col gap-2">
-                    {liste.map((s) => (
-                      <li key={s.id} className="flex items-center justify-between gap-3 text-sm">
-                        <span>
-                          {s.name} <span className="text-gray-500">+ {fcfa(s.price)}</span>
-                          {mentionModes(s.available_order_types) && (
-                            <span className="block text-xs text-warning-700">{mentionModes(s.available_order_types)}</span>
-                          )}
-                        </span>
-                        <Compteur
-                          libelle={s.name}
-                          valeur={supplements[s.id] ?? 0}
-                          onChange={(v) => setSupplements((x) => ({ ...x, [s.id]: Math.max(0, v) }))}
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                </fieldset>
-              ))}
-            </ModalBody>
-            <ModalFooter className="flex items-center justify-between gap-3">
-              <Compteur libelle={plat.name} valeur={quantite} min={1} onChange={setQuantite} />
-              <Button color="primary" className="font-semibold" isDisabled={!disponible || !!incomplet} onPress={valider}>
-                {incomplet ? `Choisissez : ${incomplet.name}` : `Ajouter · ${fcfa(total)}`}
-              </Button>
-            </ModalFooter>
-          </>
-        )}
-      </ModalContent>
-    </Modal>
+    <Feuille
+      forme="fiche"
+      libelleFermer="Fermer la fiche"
+      ouverte={Boolean(demande)}
+      titreId={TITRE_ID}
+      onFermer={fermer}
+    >
+      {etat.statut === "pret" && choix ? (
+        <ContenuFiche
+          key={ouverture}
+          choix={choix}
+          defileRef={defileRef}
+          edition={Boolean(ligneEditee)}
+          fiche={etat.fiche}
+          mode={mode}
+          ouverts={ouverts}
+          surEpice={(epice) => setChoix((c) => (c ? { ...c, epice } : c))}
+          surOption={(g, itemId) =>
+            setChoix((c) =>
+              c ? { ...c, options: basculerOption(c.options, g, itemId) } : c,
+            )
+          }
+          surQuantite={(quantite) =>
+            setChoix((c) => (c ? { ...c, quantite } : c))
+          }
+          surSupplement={surSupplement}
+          surValider={valider}
+          tentative={tentative}
+          titreRef={titreRef}
+        />
+      ) : etat.statut === "erreur" ? (
+        <div className="grid justify-items-start gap-3 p-6 pr-16 min-[760px]:p-8 min-[760px]:pr-16">
+          <h2
+            className="text-lg leading-[1.3] font-bold"
+            id={TITRE_ID}
+            tabIndex={-1}
+          >
+            {etat.introuvable
+              ? "Ce plat n'est plus proposé"
+              : "La fiche du plat ne s'affiche pas"}
+          </h2>
+          <p className="text-sm text-encre-doux">
+            {etat.introuvable
+              ? "Il a été retiré de la carte. Choisissez un autre plat."
+              : etat.message}
+          </p>
+          {etat.introuvable ? (
+            <LienBouton href="/fr/carte" onClick={() => setDemande(null)}>
+              Voir la carte
+            </LienBouton>
+          ) : (
+            <Bouton
+              onClick={() => {
+                setEtat({ statut: "chargement" });
+                setRelance((n) => n + 1);
+              }}
+            >
+              Réessayer
+            </Bouton>
+          )}
+        </div>
+      ) : (
+        <div
+          className={cn(
+            styles.chargement,
+            "grid min-h-48 place-items-center gap-3 p-8",
+          )}
+        >
+          <h2 className="sr-only" id={TITRE_ID}>
+            Fiche du plat
+          </h2>
+          <p
+            className="flex items-center gap-3 text-sm font-semibold text-encre-doux"
+            role="status"
+          >
+            <span
+              aria-hidden="true"
+              className="size-6 rounded-full border-[3px] border-trait border-t-orange motion-safe:animate-spin"
+            />
+            Chargement du plat…
+          </p>
+        </div>
+      )}
+    </Feuille>
   );
 }

@@ -1,0 +1,145 @@
+/* Fiche plat (maquette, CSS 1044-1176, retouche 5).
+   Une seule colonne qui défile : tête (photo à sa taille | catégorie, nom,
+   description, prix), puis les choix ; pied fixe avec la quantité et
+   « Ajouter ». La fenêtre prend la hauteur de son contenu, sans grand vide,
+   et défile au-delà. Sur téléphone (sous 760 px, comme Feuille), la photo
+   passe en haut, pleine largeur, entre 200 et 300 px de haut. */
+
+.interieur {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  background: var(--color-papier);
+}
+
+.defile {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 26px 26px 20px;
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.haut {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 18px 28px;
+  align-items: center;
+}
+
+/* La plus grande taille qui tient dans --wmax × --hmax : la zone suit la
+   photo (--ratio = largeur / hauteur), sans vide autour. --marge et --haut
+   viennent de PhotoPlat. */
+.haut > .photo {
+  --wmax: 340px;
+  --hmax: 250px;
+  --w: min(var(--wmax), calc(var(--hmax) * var(--ratio)));
+  width: calc(var(--w) + 2 * var(--marge));
+  height: calc(var(--w) / var(--ratio) + var(--haut) + var(--marge));
+  border-radius: var(--radius-carte);
+}
+
+@media (width >= 960px) {
+  .haut > .photo {
+    --wmax: 400px;
+    --hmax: 290px;
+  }
+}
+
+/* La place du bouton fermer est gardée à droite du nom. */
+.tete {
+  display: grid;
+  gap: 6px;
+  padding-right: 44px;
+}
+
+.tete .prix {
+  align-items: center;
+}
+
+.tete .prix strong {
+  font-size: 20px;
+}
+
+/* Suppléments : liste sur deux colonnes dès 760 px. */
+.supps .corps {
+  display: grid;
+  padding: 0 10px 8px;
+}
+
+@media (width >= 760px) {
+  .supps .corps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 18px;
+  }
+}
+
+.supp {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 4px;
+  border-top: 1px solid var(--color-trait);
+}
+
+.pied {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 26px calc(14px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--color-trait);
+  background: #fff;
+  box-shadow: var(--shadow-haut);
+}
+
+/* Chargement : rien ne s'affiche avant un quart de seconde (réponse rapide :
+   aucun clignement). */
+.chargement {
+  animation: apparait 0.2s 0.25s both;
+}
+
+@keyframes apparait {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (width < 760px) {
+  .defile {
+    padding: 0 16px 18px;
+  }
+  .haut {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .haut > .photo {
+    width: auto;
+    margin-inline: -16px;
+    border-radius: 0;
+    height: clamp(
+      200px,
+      calc((100vw - 2 * var(--marge)) / var(--ratio) + var(--haut) + var(--marge)),
+      300px
+    );
+  }
+  .tete {
+    padding-right: 0;
+  }
+  .pied {
+    padding-inline: 16px;
+    gap: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chargement {
+    animation: none;
+  }
+}

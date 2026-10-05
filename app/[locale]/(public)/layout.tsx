@@ -4,13 +4,15 @@ import { BarrePanier } from "@/components/site/BarrePanier";
 import { Entete } from "@/components/site/entete/Entete";
 import { Annonce, MessageFlottant } from "@/components/site/MessageFlottant";
 import { PiedDePage } from "@/components/site/pied/PiedDePage";
+import { FenetresCommande } from "@/features/commande/components/FenetresCommande";
 
 export { metadata, viewport };
 
 /**
  * Mise en page des pages publiques : lien « Aller au contenu », en-tête
  * collant, contenu, pied de page, puis les îlots communs (barre du panier,
- * message flottant et zone lue par les lecteurs d'écran).
+ * fenêtres de la commande, message flottant et zone lue par les lecteurs
+ * d'écran).
  * Les aplats vont bord à bord : chaque section gère sa largeur de 1 200 px.
  */
 export default function PublicLayout({
@@ -41,7 +43,8 @@ export default function PublicLayout({
       </div>
       <BarrePanier />
       {/* Fenêtres de la commande (fiche plat, tiroir du panier), chargées à
-          la demande : montées ici au lot L11b. */}
+          la demande. */}
+      <FenetresCommande />
       <MessageFlottant />
       <Annonce />
     </>

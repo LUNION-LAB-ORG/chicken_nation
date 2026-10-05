@@ -10,7 +10,6 @@ import { cache } from "react";
 import { pageMetadata } from "../../../meta";
 
 import { destinationPlat } from "@/components/site/carte/adresse-plat";
-import { FicheProvisoire } from "@/components/site/carte/FicheProvisoire";
 import { PagePlat } from "@/components/site/carte/PagePlat";
 import {
   descriptionPlat,
@@ -116,7 +115,6 @@ export default async function PagePlatRoute({
         type="application/ld+json"
       />
       <PagePlat categorie={categorie} plat={plat} />
-      <FicheProvisoire />
     </>
   );
 }

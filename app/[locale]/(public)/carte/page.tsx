@@ -6,7 +6,6 @@ import { pageMetadata } from "../../meta";
 import { Ancre } from "@/components/site/Ancre";
 import { Conteneur, Section } from "@/components/site/Section";
 import { EnteteCarte } from "@/components/site/carte/EnteteCarte";
-import { FicheProvisoire } from "@/components/site/carte/FicheProvisoire";
 import { Pastilles } from "@/components/site/carte/Pastilles";
 import { RetraitDemande } from "@/components/site/carte/RetraitDemande";
 import { SectionCategorie } from "@/components/site/carte/SectionCategorie";
@@ -119,7 +118,6 @@ export default async function PageCarte({
       ) : (
         <CarteIndisponible />
       )}
-      <FicheProvisoire />
     </>
   );
 }

@@ -1,0 +1,122 @@
+/* Tiroir du panier (maquette, CSS 959-1022, 1145-1177). Tiroir à droite sur
+   ordinateur, feuille qui monte du bas sur téléphone (sous 760 px, comme
+   Feuille). */
+
+.interieur {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 100vh;
+  max-height: 100dvh;
+  min-height: 0;
+}
+
+.tete {
+  position: relative;
+  flex: none;
+  padding: 20px 70px 16px 20px;
+  background: var(--color-orange) var(--motif-clair) repeat;
+  background-size: 72px 72px;
+}
+
+.corps {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 20px 16px;
+}
+
+.pied {
+  flex: none;
+  display: grid;
+  gap: 12px;
+  padding: 14px 20px calc(16px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--color-trait);
+  background: #fff;
+  box-shadow: var(--shadow-haut);
+}
+
+/* Livraison ou retrait : pilule à deux choix. La vraie case reste dans la
+   page (clavier, lecteurs d'écran). */
+.mode {
+  display: flex;
+  gap: 2px;
+  min-width: 0;
+  margin: 0;
+  padding: 3px;
+  border: 1.5px solid var(--color-trait-fort);
+  border-radius: var(--radius-pilule);
+  background: #fff;
+}
+
+.mode input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+}
+
+.mode label {
+  flex: 1 1 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 44px;
+  padding: 2px 14px;
+  border-radius: var(--radius-pilule);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--color-encre-doux);
+  cursor: pointer;
+}
+
+.mode label small {
+  font-weight: 500;
+  font-size: 11px;
+}
+
+.mode label:hover {
+  color: var(--color-encre);
+}
+
+.mode input:checked + label {
+  background: var(--color-encre);
+  color: #fff;
+}
+
+.mode input:focus-visible + label {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (width < 760px) {
+  .interieur {
+    height: auto;
+    max-height: 94vh;
+    max-height: 94dvh;
+  }
+  .tete {
+    padding: 18px 70px 14px 16px;
+  }
+  .corps,
+  .pied {
+    padding-inline: 16px;
+  }
+}
+
+/* Petit téléphone couché ou très court : le pied se resserre, la note part. */
+@media (width < 760px) and (height <= 740px) {
+  .pied {
+    gap: 10px;
+    padding-top: 10px;
+  }
+  .note {
+    display: none;
+  }
+}
