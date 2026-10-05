@@ -27,7 +27,8 @@ export const categoryAPI = {
    */
   async getCategoryById(id: string): Promise<Category> {
     const data = await apiClient.request<Category>({
-      endpoint: `/categories/${id}`,
+      // Encodé : l'identifiant vient de l'adresse (?category=).
+      endpoint: `/categories/${encodeURIComponent(id)}`,
       method: "GET",
       service: "public",
     });

@@ -5,11 +5,13 @@
       {
         "appIDs": ["9KR55K67TG.com.chickennation.app"],
         "components": [
+          { "/": "/fr/app-mobile/deep-link", "exclude": true, "comment": "Page d'ouverture : elle lit ?product, ?category, ?order… et ouvre l'appli au bon écran" },
+          { "/": "/app-mobile/deep-link", "exclude": true, "comment": "Même page, sans langue" },
           { "/": "/app-mobile/*", "comment": "Liens vers l'appli, sans langue" },
           { "/": "/fr/app-mobile/*", "comment": "Liens vers l'appli du site (QR codes, parrainage, partages)" }
         ],
         "appID": "9KR55K67TG.com.chickennation.app",
-        "paths": ["/app-mobile/*", "/fr/app-mobile/*"]
+        "paths": ["NOT /fr/app-mobile/deep-link", "NOT /app-mobile/deep-link", "/app-mobile/*", "/fr/app-mobile/*"]
       }
     ]
   }

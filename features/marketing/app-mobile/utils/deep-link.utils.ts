@@ -92,6 +92,10 @@ export function lireCodeParrainage(brut: string | null): string | null {
 
 const ID_COMMANDE = /^[A-Za-z0-9_-]{1,64}$/;
 
+/** `?voucher=true`, `?loyalty=1` : oui ; absent, vide, `0`, `false` ou `non` : non. */
+const drapeau = (v: string | null) =>
+  !!v && !/^(0|false|non|no)$/i.test(v.trim()) && v.trim() !== "";
+
 /** Écran visé par le lien ; l'accueil si rien d'exploitable. */
 export function lireCibleDeepLink(params: {
   get(nom: string): string | null;
@@ -117,9 +121,9 @@ export function lireCibleDeepLink(params: {
       nom: `Commande ${order}`,
     };
   }
-  if (params.get("voucher")) return BONS;
-  if (params.get("loyalty")) return FIDELITE;
-  if (params.get("nation-card")) return CARTE_NATION;
+  if (drapeau(params.get("voucher"))) return BONS;
+  if (drapeau(params.get("loyalty"))) return FIDELITE;
+  if (drapeau(params.get("nation-card"))) return CARTE_NATION;
 
   const to = (params.get("to") ?? "").trim().toLowerCase();
 

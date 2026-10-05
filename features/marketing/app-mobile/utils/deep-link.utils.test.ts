@@ -244,3 +244,17 @@ describe("page de repli /app-mobile/deep-link", () => {
     }
   });
 });
+
+describe("drapeaux ?voucher, ?loyalty, ?nation-card (recette liens 8)", () => {
+  it("0, false, non ou vide n'ouvrent pas la cible", () => {
+    for (const v of ["0", "false", "FALSE", "non", " "]) {
+      expect(parcours(`voucher=${v}`).lien).toBe("chickennation://home");
+      expect(parcours(`loyalty=${v}`).lien).toBe("chickennation://home");
+      expect(parcours(`nation-card=${v}`).lien).toBe("chickennation://home");
+    }
+    expect(parcours("voucher=1").lien).toBe("chickennation://vouchers");
+    expect(parcours("nation-card=true").lien).toBe(
+      "chickennation://nation-card",
+    );
+  });
+});

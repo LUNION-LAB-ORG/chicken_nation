@@ -91,6 +91,26 @@ const versionIcones = createHash("sha256")
  * sont pas redirigés : ils répondent une vraie 404.
  */
 const redirections = [
+  // La racine mène à l'accueil français pour de bon (308, et non le 307 du
+  // module de langues) : les liens vers chicken-nation.com/ (fiches Google,
+  // réseaux) transmettent leur poids à /fr.
+  { source: "/", destination: "/fr", permanent: true },
+  // Ancien manifeste, cité par chaque page de l'ancien site.
+  { source: "/manifest.json", destination: "/manifest.webmanifest", permanent: true },
+  // Liens de partage fabriqués par l'appli (deeplink.manager.ts) : sans
+  // l'appli, ou sur Android tant que assetlinks.json manque, ils s'ouvrent
+  // dans le navigateur et finissaient en 404. Ils mènent à la page
+  // d'ouverture, qui ouvre l'appli au bon écran ou envoie au store. Sur
+  // iPhone avec l'appli, le lien universel /app-mobile/* l'ouvre directement.
+  // Temporaires : la cible peut changer avec l'appli. Les paramètres (utm…)
+  // sont gardés par Next.
+  { source: "/:langue(fr|en|ar)?/app-mobile/menu/:id", destination: "/fr/app-mobile/deep-link?product=:id", permanent: false },
+  { source: "/:langue(fr|en|ar)?/app-mobile/category/:id", destination: "/fr/app-mobile/deep-link?category=:id", permanent: false },
+  { source: "/:langue(fr|en|ar)?/app-mobile/order/:id", destination: "/fr/app-mobile/deep-link?order=:id", permanent: false },
+  { source: "/:langue(fr|en|ar)?/app-mobile/:cible(home|vouchers|loyalty|nation-card)", destination: "/fr/app-mobile/deep-link?to=:cible", permanent: false },
+  // Ancienne adresse de téléchargement (QR codes) : une seule redirection
+  // vers la page d'ouverture, au lieu de deux ou trois.
+  { source: "/:langue(fr|en|ar)?/app-mobile/download", destination: "/fr/app-mobile/deep-link", permanent: false },
   // Histoire et Franchise fusionnées en une page (décision du 03/10).
   { source: "/:langue(fr|en|ar)?/franchise", destination: "/fr/histoire#franchise", permanent: true },
   // Carte de la Nation : la seule page est l'adhésion.

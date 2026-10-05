@@ -244,13 +244,23 @@ describe("liens universels de l'appli iOS", () => {
 
     expect(applinks.details).toHaveLength(1);
     expect(detail.appIDs).toEqual(["9KR55K67TG.com.chickennation.app"]);
-    expect(detail.components.map((c) => c["/"])).toEqual([
-      "/app-mobile/*",
-      "/fr/app-mobile/*",
+    // La page d'ouverture est exclue, AVANT les jokers : ouverte par le lien
+    // universel, l'appli ne lit que ?to et ?ref, et ?product, ?category ou
+    // ?order l'ouvraient sans aller à l'écran visé (recette liens 3).
+    expect(detail.components.map((c) => [c["/"], c.exclude === true])).toEqual([
+      ["/fr/app-mobile/deep-link", true],
+      ["/app-mobile/deep-link", true],
+      ["/app-mobile/*", false],
+      ["/fr/app-mobile/*", false],
     ]);
     // Ancienne forme, lue par iOS 12 et avant.
     expect(detail.appID).toBe("9KR55K67TG.com.chickennation.app");
-    expect(detail.paths).toEqual(["/app-mobile/*", "/fr/app-mobile/*"]);
+    expect(detail.paths).toEqual([
+      "NOT /fr/app-mobile/deep-link",
+      "NOT /app-mobile/deep-link",
+      "/app-mobile/*",
+      "/fr/app-mobile/*",
+    ]);
   });
 
   it("servis sans passer par proxy.ts (aucune redirection vers /fr)", () => {
@@ -261,6 +271,22 @@ describe("liens universels de l'appli iOS", () => {
     expect(motif.test("/apple-app-site-association")).toBe(false);
     expect(motif.test("/.well-known/assetlinks.json")).toBe(false);
     for (const chemin of ["/", "/fr", "/carte", "/fr/app-mobile/deep-link"])
+      expect(motif.test(chemin)).toBe(true);
+    // Fichiers statiques à part ; une autre adresse avec un point passe par
+    // proxy.ts et finit sur la 404 française (recette rendu 14).
+    for (const chemin of [
+      "/icon.png",
+      "/robots.txt",
+      "/sitemap.xml",
+      "/manifest.webmanifest",
+      "/assets/videos/presentation-540.mp4",
+    ])
+      expect(motif.test(chemin)).toBe(false);
+    for (const chemin of [
+      "/foo.php",
+      "/wp-login.php",
+      "/fr/carte/big-chicken-e6f76a",
+    ])
       expect(motif.test(chemin)).toBe(true);
   });
 });

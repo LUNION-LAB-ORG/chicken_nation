@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { destinationPlat } from "./adresse-plat";
+import { redirectionAdressePlat } from "./redirection-plat";
 import { BoutonCommanderPlat } from "./BoutonCommanderPlat";
 import { DisponibiliteHoraire, texteCreneau } from "./DisponibiliteHoraire";
 import { EnteteCarte, introductionCarte, nomDansPhrase } from "./EnteteCarte";
@@ -292,6 +293,31 @@ describe("adresse d'une page plat", () => {
       chemin: "/fr/carte#burgers",
     });
     expect(destinationPlat("%E0%A4%A", PRODUCTION).type).toBe("redirection");
+  });
+
+  it("proxy.ts redirige toute adresse qui n'est pas exacte, la page ne redirige plus (recette liens 1)", () => {
+    const suffixe = boxNation.slug.split("-").pop();
+
+    expect(
+      redirectionAdressePlat(`/fr/carte/ancien-nom-${suffixe}`, PRODUCTION),
+    ).toBe(`/fr/carte/${boxNation.slug}`);
+    expect(
+      redirectionAdressePlat("/fr/carte/plat-inexistant-123456", PRODUCTION),
+    ).toBe("/fr/carte");
+    expect(redirectionAdressePlat("/fr/carte/burgers", PRODUCTION)).toBe(
+      "/fr/carte#burgers",
+    );
+    // Adresse exacte, autre page, carte illisible : rien à décider ici.
+    expect(
+      redirectionAdressePlat(`/fr/carte/${boxNation.slug}`, PRODUCTION),
+    ).toBeNull();
+    expect(redirectionAdressePlat("/fr/carte", PRODUCTION)).toBeNull();
+    expect(
+      redirectionAdressePlat("/fr/restaurants/zone-4", PRODUCTION),
+    ).toBeNull();
+    expect(redirectionAdressePlat("/fr/carte/a/b", PRODUCTION)).toBeNull();
+    expect(redirectionAdressePlat("/fr/carte/xyz", null)).toBeNull();
+    expect(redirectionAdressePlat("/fr/carte/xyz", [])).toBeNull();
   });
 
   it("noms en double : chaque plat garde sa page", () => {

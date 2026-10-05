@@ -30,7 +30,9 @@ export const dishAPI = {
    */
   async getDishById(id: string, customerId?: string): Promise<MappedDish> {
     const data = await apiClient.request({
-      endpoint: `/dishes/${id}`,
+      // Encodé : l'identifiant vient de l'adresse (?product=), « ../ » ou
+      // « ? » ne doivent pas viser une autre route de l'API.
+      endpoint: `/dishes/${encodeURIComponent(id)}`,
       method: "GET",
       searchParams: customerId ? { customerId } : {},
       service: customerId ? "private" : "public",

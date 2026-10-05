@@ -30,7 +30,11 @@ export const useDeepLinkRedirect = () => {
     const processRedirect = async () => {
       const userAgent = navigator.userAgent.toLowerCase();
       const isAndroid = userAgent.includes("android");
-      const isIOS = /iphone|ipad|ipod/.test(userAgent);
+      // Un iPad (iPadOS 13 et plus) se présente comme un Mac : seul l'écran
+      // tactile le distingue d'un ordinateur.
+      const isIOS =
+        /iphone|ipad|ipod/.test(userAgent) ||
+        (userAgent.includes("macintosh") && navigator.maxTouchPoints > 1);
 
       // 1. Construction de la route mobile (paramètres lus et contrôlés
       // dans deep-link.utils : liste blanche pour `to`, forme du code `ref`)
@@ -112,7 +116,9 @@ export const useDeepLinkRedirect = () => {
             process.env.NEXT_PUBLIC_APP_STORE_LINK ||
             "https://apps.apple.com/ci/app/chicken-nation/id6745905607";
         } else {
-          window.location.href = "https://chicken-nation.com/app-mobile";
+          // Ordinateur : la page de l'application de CE site (adresse
+          // relative, jamais le domaine de production depuis un test).
+          window.location.href = "/fr/app-mobile";
         }
       }, 2500);
     };
