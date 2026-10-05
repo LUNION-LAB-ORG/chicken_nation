@@ -1,20 +1,31 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@heroui/button";
-import { Input } from "@heroui/input";
 import type { IPointsFidelite } from "../types/commande.types";
+
+import { useId, useState } from "react";
+
 import {
   erreurPoints,
   maximumPointsUtiles,
   pointsLisibles,
+  pointsUtilisables,
   valeurLisible,
 } from "../utils/fidelite.utils";
-import { fcfa } from "../utils/panier.utils";
+
+import { reglesPoints, textePlafond } from "./caisse/textes-caisse";
+
+import { Bouton } from "@/components/site/Bouton";
+import { Lien } from "@/components/site/Lien";
+import { fcfa, INSECABLE, pluriel } from "@/lib/typo";
+
+/** Signe moins (U+2212), jamais un tiret. */
+const MOINS = "\u2212";
 
 /**
- * Bloc « Mes points » du panier. Le panier ne l'affiche que si le minimum
- * est atteignable sur ce panier (fidelite.utils, pointsUtilisables).
+ * Points de fidélité dans l'étape Avantages (maquette, JS 1144-1159) : solde
+ * et sa valeur, règles lues sur l'API (fidelite.utils), puis le choix des
+ * points pour cette commande. Points OU code, jamais les deux (la caisse
+ * retire l'un quand l'autre est appliqué et le dit dans `avis`).
  */
 export default function MesPoints({
   points: f,
@@ -31,19 +42,20 @@ export default function MesPoints({
   retenus: number;
   /** Remise estimée de ces points. */
   remise: number;
-  /** Phrase de non-cumul : appliquer les points a retiré le code. */
+  /** Phrase de non-cumul ou d'ajustement (« Points ajustés à 120 »). */
   avis: string | null;
   onUtiliser: (points: number) => void;
   onRetirer: () => void;
 }) {
+  const id = useId();
   const [saisie, setSaisie] = useState("");
   const [erreur, setErreur] = useState<string | null>(null);
   const max = maximumPointsUtiles(f, sousTotal);
-  // Le plafond, et non le solde, limite les points sur ce panier : on dit pourquoi.
-  const limiteParPlafond = max < f.solde && f.plafondPct > 0 && f.plafondPct < 100;
+  const minimum = Math.max(1, f.minimum);
 
   const utiliser = (n: number) => {
     const e = erreurPoints(n, f, sousTotal);
+
     setErreur(e);
     if (e) return;
     setSaisie("");
@@ -52,59 +64,108 @@ export default function MesPoints({
 
   return (
     <>
-      <p className="text-sm text-gray-700">
-        Vous avez <strong>{pointsLisibles(f.solde)}</strong>. 1 point vaut {valeurLisible(f.valeurPoint)}, à partir de{" "}
-        {pointsLisibles(f.minimum)} par commande.
+      <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <strong className="text-[28px] leading-[1.1] font-extrabold tabular-nums">
+          {pointsLisibles(f.solde)}
+        </strong>
+        {f.valeurPoint > 0 && f.solde > 0 ? (
+          <span className="text-sm text-encre-doux">
+            soit {fcfa(Math.floor(f.solde * f.valeurPoint))}
+          </span>
+        ) : null}
+      </p>
+      <p className="text-[13px] leading-[1.45] text-encre-doux">
+        {reglesPoints({
+          valeurPointTexte: valeurLisible(f.valeurPoint),
+          minimum: f.minimum,
+          plafondPct: f.plafondPct,
+          joursValidite: f.joursValidite,
+        })}
       </p>
       {retenus > 0 ? (
-        <div className="flex items-center justify-between rounded-xl bg-success-50 p-3 text-sm">
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-carte bg-ok-fond px-3.5 py-2 text-sm font-semibold text-ok">
           <span>
-            <strong>{pointsLisibles(retenus)}</strong> : environ − {fcfa(remise)}
+            {pluriel(retenus, "point utilisé", "points utilisés")}
+            {INSECABLE}: environ {MOINS}
+            {fcfa(remise)}
           </span>
-          <button
-            type="button"
-            className="font-semibold text-primary underline"
+          <Lien
+            className="text-encre"
             onClick={() => {
               setErreur(null);
               onRetirer();
             }}
           >
             Retirer
-          </button>
+          </Lien>
         </div>
-      ) : (
-        <>
-          <form
-            className="flex gap-2"
-            onSubmit={(e) => {
-              e.preventDefault();
-              utiliser(Number(saisie));
-            }}
-          >
-            <Input
-              aria-label="Nombre de points à utiliser"
-              placeholder="Nombre de points"
+      ) : pointsUtilisables(f, sousTotal) ? (
+        <form
+          noValidate
+          className="grid gap-1.5"
+          onSubmit={(e) => {
+            e.preventDefault();
+            utiliser(Number(saisie));
+          }}
+        >
+          <label className="text-sm font-semibold" htmlFor={`${id}-points`}>
+            Points à utiliser
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <input
+              aria-describedby={`${id}-aide${erreur ? ` ${id}-erreur` : ""}`}
+              aria-invalid={erreur ? true : undefined}
+              autoComplete="off"
+              className="min-h-12 w-full max-w-[200px] min-w-0 flex-[1_1_140px] rounded-xl border-[1.5px] border-trait-fort bg-white px-3.5 text-base text-encre tabular-nums placeholder:text-encre-doux/80 focus:border-encre focus-visible:outline-offset-1 aria-invalid:border-rouge"
+              id={`${id}-points`}
               inputMode="numeric"
+              placeholder={String(max)}
+              type="text"
               value={saisie}
-              onValueChange={(v) => {
-                setSaisie(v.replace(/\D/g, "").slice(0, 7));
+              onChange={(e) => {
+                setSaisie(e.target.value.replace(/\D/g, "").slice(0, 7));
                 setErreur(null);
               }}
             />
-            <Button type="submit" variant="bordered" isDisabled={!saisie}>
+            <Bouton disabled={!saisie} type="submit" variante="sombre">
               Utiliser
-            </Button>
-          </form>
-          <button type="button" className="self-start text-sm font-semibold text-primary underline" onClick={() => utiliser(max)}>
-            Utiliser le maximum ({pointsLisibles(max)})
-          </button>
-        </>
+            </Bouton>
+            <Bouton variante="secondaire" onClick={() => utiliser(max)}>
+              Utiliser le maximum
+            </Bouton>
+          </div>
+          {erreur ? (
+            <p
+              className="text-[13px] font-semibold text-rouge"
+              id={`${id}-erreur`}
+              role="alert"
+            >
+              {erreur}
+            </p>
+          ) : null}
+          <p
+            className="text-[13px] leading-[1.45] text-encre-doux"
+            id={`${id}-aide`}
+          >
+            Sur cette commande{INSECABLE}: jusqu&apos;à {pointsLisibles(max)},
+            soit {fcfa(Math.min(Math.floor(max * f.valeurPoint), sousTotal))}.
+          </p>
+        </form>
+      ) : (
+        <p className="rounded-carte bg-jaune-pale px-3.5 py-3 text-sm leading-[1.45]">
+          {f.solde < minimum
+            ? `Il faut au moins ${pointsLisibles(minimum)} pour payer avec vos points.`
+            : `Commande trop petite pour utiliser ${pointsLisibles(minimum)}${INSECABLE}: les points paient au plus ${textePlafond(f.plafondPct)} du prix des plats.`}
+        </p>
       )}
-      {limiteParPlafond && (
-        <p className="text-xs text-gray-500">Les points paient au plus {f.plafondPct} % des plats d&apos;une commande.</p>
-      )}
-      {erreur && <p role="alert" className="text-sm text-danger">{erreur}</p>}
-      {avis && <p role="status" className="text-sm text-warning-700">{avis}</p>}
+      {avis ? (
+        <p
+          className="rounded-carte bg-jaune-pale px-3.5 py-3 text-sm leading-[1.45]"
+          role="status"
+        >
+          {avis}
+        </p>
+      ) : null}
     </>
   );
 }
