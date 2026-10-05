@@ -183,6 +183,13 @@ export interface ICommande {
    */
   restaurant: { id: string; name: string; address: string | null } | null;
   adresse: string | null;
+  /** Repère saisi avec l'adresse de livraison (« portail bleu »), ou null. */
+  repere?: string | null;
+  /**
+   * Heure demandée, « HH:mm » à l'heure d'Abidjan (champ `time` de l'API) :
+   * créneau de retrait choisi, ou heure de la commande pour « dès que possible ».
+   */
+  heure?: string | null;
   heures: IHeuresCommande;
   lignes: ILigneCommande[];
 }

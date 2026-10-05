@@ -84,10 +84,14 @@ function versLigne(i: Brut): ILigneCommande {
  */
 export function versCommande(o: Brut): ICommande {
   let adresse: string | null = null;
+  let repere: string | null = null;
 
   if (typeof o.address === "string" && o.address) {
     try {
-      adresse = String(JSON.parse(o.address).address ?? "") || null;
+      const a = JSON.parse(o.address);
+
+      adresse = String(a.address ?? "") || null;
+      repere = texte(typeof a.note === "string" ? a.note.trim() : null);
     } catch {
       adresse = o.address;
     }
@@ -119,6 +123,11 @@ export function versCommande(o: Brut): ICommande {
         }
       : null,
     adresse,
+    repere,
+    heure:
+      typeof o.time === "string" && /^\d{2}:\d{2}$/.test(o.time)
+        ? o.time
+        : null,
     heures: Object.fromEntries(
       HEURES.map((h) => [h, texte(o[h])]),
     ) as unknown as IHeuresCommande,
