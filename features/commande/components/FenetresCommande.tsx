@@ -32,8 +32,9 @@ const OUVRE_FENETRE = '[aria-haspopup="dialog"]';
  *  - Monté, il passe les drapeaux « branchée » à vrai : « Ajouter » ouvre
  *    alors la fiche au lieu de suivre le lien de la page du plat, le panier
  *    ouvre le tiroir au lieu de mener à la caisse.
- *  - Le code des fenêtres n'est téléchargé qu'à l'intention (survol, appui,
- *    focus d'un bouton qui en ouvre une), puis rendu à la première demande.
+ *  - Le code des fenêtres est téléchargé au repos après le chargement d'une
+ *    page qui a un bouton pour les ouvrir, ou dès l'intention (survol,
+ *    appui, focus d'un tel bouton), puis rendu à la première demande.
  *  - Un changement de page ferme les deux fenêtres.
  *  - Focus : Feuille le rend à l'élément qui avait le focus. Safari ne donne
  *    pas le focus à un bouton cliqué : le dernier bouton qui a ouvert une
@@ -113,6 +114,35 @@ export function FenetresCommande() {
       }, 0);
     };
 
+    // Page avec des boutons « Ajouter » ou le panier : fiche et tiroir
+    // téléchargés au repos après le chargement, sans attendre l'appui (sur
+    // téléphone, il n'y a pas de survol : le code arrivait après l'appui,
+    // 0,6 s de plus en 4G lente, recette vitesse D6). Jamais avec
+    // l'économiseur de données.
+    let repos: number | undefined;
+    let minuteur: ReturnType<typeof setTimeout> | undefined;
+    const auRepos = () => {
+      const economie = (
+        navigator as Navigator & { connection?: { saveData?: boolean } }
+      ).connection?.saveData;
+
+      if (precharge || economie || !document.querySelector(OUVRE_FENETRE))
+        return;
+      const charger = () => {
+        if (precharge) return;
+        precharge = true;
+        chargerFiche().catch(() => {});
+        chargerTiroir().catch(() => {});
+      };
+
+      if (typeof window.requestIdleCallback === "function")
+        repos = window.requestIdleCallback(charger, { timeout: 4000 });
+      else minuteur = setTimeout(charger, 2000);
+    };
+
+    if (document.readyState === "complete") auRepos();
+    else window.addEventListener("load", auRepos, { once: true });
+
     document.addEventListener("pointerover", intention, { passive: true });
     document.addEventListener("pointerdown", intention, { passive: true });
     document.addEventListener("focusin", intention);
@@ -120,6 +150,13 @@ export function FenetresCommande() {
     document.addEventListener("close", fermeture, true);
 
     return () => {
+      window.removeEventListener("load", auRepos);
+      if (
+        repos !== undefined &&
+        typeof window.cancelIdleCallback === "function"
+      )
+        window.cancelIdleCallback(repos);
+      clearTimeout(minuteur);
       document.removeEventListener("pointerover", intention);
       document.removeEventListener("pointerdown", intention);
       document.removeEventListener("focusin", intention);

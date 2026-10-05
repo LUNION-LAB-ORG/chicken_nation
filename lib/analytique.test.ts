@@ -10,9 +10,11 @@ function executerChargeur({
 } = {}) {
   const ajoutes = [];
   const ecouteurs = {};
+  const minuteurs = [];
   const fenetre = {
     requestIdleCallback: (f) => f(),
     addEventListener: (type, f) => (ecouteurs[type] = f),
+    setTimeout: (f, ms) => minuteurs.push({ f, ms }),
   };
   const document = {
     readyState: etat,
@@ -37,7 +39,7 @@ function executerChargeur({
     (fenetre.dataLayer = []),
   );
 
-  return { fenetre, ajoutes, ecouteurs };
+  return { fenetre, ajoutes, ecouteurs, minuteurs };
 }
 
 describe("chargeur Google Analytics", () => {
@@ -53,6 +55,16 @@ describe("chargeur Google Analytics", () => {
     expect(ajoutes[0].src).toBe(
       `https://www.googletagmanager.com/gtag/js?id=${ID_GA}`,
     );
+  });
+
+  it("au plus 8 s après le début si la page ne finit pas de charger, une seule fois (recette vitesse D5)", () => {
+    const { ajoutes, ecouteurs, minuteurs } = executerChargeur();
+
+    expect(minuteurs.map((m) => m.ms)).toEqual([8000]);
+    minuteurs[0].f();
+    expect(ajoutes).toHaveLength(1);
+    ecouteurs.load();
+    expect(ajoutes).toHaveLength(1);
   });
 
   it("charge Google au repos si la page est déjà chargée", () => {

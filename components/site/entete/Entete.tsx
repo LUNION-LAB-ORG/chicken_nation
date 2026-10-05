@@ -35,7 +35,11 @@ export function Entete() {
         >
           {/* Chargé tout de suite mais sans préchargement : seule l'image
               principale de la page est préchargée. */}
+          {/* Servi tel quel (4 ko) : sa conversion AVIF par l'optimiseur
+              d'images restait parfois bloquée sans fin, et la page avec elle
+              (recette vitesse D5). */}
           <Image
+            unoptimized
             alt=""
             className="block size-[34px] md:size-[42px]"
             fetchPriority="low"

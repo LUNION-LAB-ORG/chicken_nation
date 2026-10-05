@@ -69,6 +69,12 @@ const enTetesCacheLong = [
   { key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=86400" },
 ];
 
+// Manifeste et icônes du site (adresses fixes, sans empreinte) : gardés un
+// jour au lieu d'être redemandés à chaque page (recette vitesse D7).
+const enTetesCacheJour = [
+  { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=86400" },
+];
+
 // La carte /fr/carte remplace /fr/restaurants/nos-menus. Tant que sa page
 // n'existe pas, l'ancienne carte reste servie : la rediriger vers une 404
 // couperait la commande en ligne. Lu à la construction (et au démarrage du
@@ -133,6 +139,8 @@ const nextConfig = {
       { source: "/:path*", headers: enTetesSecurite },
       { source: "/assets/:chemin*", headers: enTetesCacheLong },
       { source: "/:badge(download-[^/]+)", headers: enTetesCacheLong },
+      { source: "/seo/:chemin*", headers: enTetesCacheJour },
+      { source: "/:fichier(manifest.webmanifest|icon.png|apple-icon.png|favicon.ico)", headers: enTetesCacheJour },
       { source: "/.well-known/apple-app-site-association", headers: enTetesLiensAppli },
       { source: "/apple-app-site-association", headers: enTetesLiensAppli },
     ];
@@ -143,12 +151,19 @@ const nextConfig = {
   experimental: {
     // 404 entière dès le serveur pour les adresses inconnues (app/global-not-found.tsx).
     globalNotFound: true,
+    // CSS écrite dans la page au lieu de 3 à 5 fichiers bloquants : premier
+    // affichage de 2,2 s à 0,9 s en 4G lente (recette vitesse D3, plan 5.5.9).
+    // Coût : 22 à 25 ko de plus par page HTML (gzip), CSS non gardée entre
+    // deux pages chargées en entier.
+    inlineCss: true,
   },
   images: {
     // AVIF puis WebP selon ce que le navigateur accepte.
     formats: ["image/avif", "image/webp"],
     // Largeurs proposées au navigateur : téléphones courants (360, 414) en tête.
-    deviceSizes: [360, 414, 640, 750, 828, 1080, 1200, 1920],
+    // 1280 et 1440 : écrans d'ordinateur courants (l'en-tête de la carte
+    // chargeait le fichier de 1 920 px à 1 280 px, recette vitesse D9).
+    deviceSizes: [360, 414, 640, 750, 828, 1080, 1200, 1280, 1440, 1920],
     // Next 16 refuse toute qualité non déclarée ici (75 est la valeur par défaut).
     qualities: [60, 75],
     // Images optimisées gardées 30 jours : un fichier modifié change de nom.

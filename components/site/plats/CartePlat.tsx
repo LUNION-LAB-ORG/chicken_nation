@@ -17,10 +17,36 @@ const TAILLES_PHOTO = {
   // Promotions : rangée défilante (80 %, puis 44 %), 3 colonnes dès 900 px.
   vitrine:
     "(min-width: 1264px) 340px, (min-width: 900px) 28vw, (min-width: 600px) 42vw, 76vw",
-  // Carte : 128 px sous 600 px, puis 2, 3 et 4 colonnes.
-  carte:
-    "(min-width: 1264px) 260px, (min-width: 1100px) 21vw, (min-width: 800px) 30vw, (min-width: 600px) 45vw, 128px",
+  // Carte : voir taillesPhotoCarte (128 px sous 600 px, puis 2, 3 et 4 colonnes).
 } as const;
+
+/**
+ * Largeur affichée de la photo d'une carte de la grille. La zone a une hauteur
+ * fixe (204 px dès 1 100 px, 180 px avant, moins la bande de l'étiquette et
+ * la marge de 10 px) et la photo y est entière (contain) : une photo carrée
+ * ou haute est bornée par la hauteur, bien avant la largeur de la colonne.
+ * On l'annonce alors en pixels exacts (151 px au lieu de « 21vw », soit le
+ * fichier de 256 px et non de 384, recette vitesse D9). Photo large : la
+ * colonne décide, comme avant.
+ */
+export function taillesPhotoCarte(
+  photo: Pick<IPlatCarte["photo"], "ratio" | "etiquette">,
+) {
+  const ratio = photo.ratio > 0 ? photo.ratio : 1;
+  const largeur = (zone: number, etiquette: number, colonne: number) => {
+    const haut = photo.etiquette ? etiquette * 1.2 + 2 : 10;
+    const w = Math.ceil((zone - haut - 10) * ratio);
+
+    return w <= colonne ? `${w}px` : null;
+  };
+
+  return [
+    `(min-width: 1100px) ${largeur(204, 34, 200) ?? "21vw"}`,
+    `(min-width: 800px) ${largeur(180, 32, 190) ?? "30vw"}`,
+    `(min-width: 600px) ${largeur(180, 32, 240) ?? "45vw"}`,
+    "128px",
+  ].join(", ");
+}
 
 /** Prix payé, et prix barré lu « Au lieu de … » pour un plat en promotion. */
 export function PrixPlat({
@@ -83,7 +109,11 @@ export function CartePlat({
         etiquette={plat.photo.etiquette}
         fond={plat.photo.fond}
         preload={preload}
-        sizes={TAILLES_PHOTO[variante]}
+        sizes={
+          variante === "carte"
+            ? taillesPhotoCarte(plat.photo)
+            : TAILLES_PHOTO.vitrine
+        }
         src={plat.photo.src}
       >
         {remise > 0 ? (

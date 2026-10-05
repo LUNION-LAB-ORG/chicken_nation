@@ -112,12 +112,14 @@ export function Accroche({
             sizes="(min-width: 900px) 470px, (min-width: 720px) 290px, min(450px, calc(100vw - 44px))"
             src="/assets/site/fond-ardoise-poulet.webp"
           />
+          {/* Ni préchargé ni prioritaire : l'image principale mesurée (LCP)
+              est le fond, et le seau (25 ko) lui prenait du débit
+              (recette vitesse D8). */}
           <Image
-            preload
             alt={`Seau Chicken Nation ${CENT_POUR_CENT} halal rempli de poulet pané`}
             className={styles.seau}
-            fetchPriority="high"
             height={700}
+            loading="eager"
             sizes="(min-width: 900px) 210px, (min-width: 720px) 130px, 240px"
             src="/assets/site/seau.webp"
             width={586}

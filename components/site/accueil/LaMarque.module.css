@@ -39,6 +39,16 @@
   object-fit: cover;
 }
 
+/* Affiche de la vidéo quand JavaScript ne tourne pas (l'attribut poster est
+   posé par le lecteur à l'approche de la section). */
+.afficheSansScript {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .collant {
   position: absolute;
   z-index: 2;

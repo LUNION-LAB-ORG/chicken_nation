@@ -26,11 +26,14 @@ export const SCRIPT_GA = [
   // Poste de développement : les événements restent dans dataLayer (lisibles
   // pour les essais) mais rien n'est envoyé à Google.
   "if(/^(localhost|127\\.0\\.0\\.1|\\[::1\\])$/.test(location.hostname))return;",
+  "var fait=false;",
   "function charger(){var s=document.createElement('script');",
   `s.async=true;s.src='${ADRESSE_GTAG}';document.head.appendChild(s)}`,
-  "function auRepos(){if('requestIdleCallback' in window)window.requestIdleCallback(charger,{timeout:5000});else setTimeout(charger,1)}",
+  "function auRepos(){if(fait)return;fait=true;if('requestIdleCallback' in window)window.requestIdleCallback(charger,{timeout:5000});else setTimeout(charger,1)}",
   "if(document.readyState==='complete')auRepos();",
-  "else window.addEventListener('load',auRepos,{once:true})",
+  // Une image qui ne répond jamais retarde l'événement load sans fin (vu avec
+  // l'optimiseur d'images, recette vitesse D5) : au plus 8 s après le début.
+  "else{window.addEventListener('load',auRepos,{once:true});if(window.setTimeout)window.setTimeout(auRepos,8000)}",
   "})();",
 ].join("");
 

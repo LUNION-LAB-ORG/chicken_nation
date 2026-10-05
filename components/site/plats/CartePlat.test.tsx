@@ -88,3 +88,19 @@ describe("PrixPlat", () => {
     expect(html).not.toContain("<s>");
   });
 });
+
+describe("taille annoncée de la photo d'une carte (recette vitesse D9)", () => {
+  const { taillesPhotoCarte } = require("./CartePlat");
+
+  it("photo carrée : bornée par la hauteur de la zone, en pixels exacts", () => {
+    expect(taillesPhotoCarte({ ratio: 1, etiquette: true })).toBe(
+      "(min-width: 1100px) 152px, (min-width: 800px) 130px, (min-width: 600px) 130px, 128px",
+    );
+  });
+
+  it("photo large : la colonne décide, comme avant", () => {
+    expect(taillesPhotoCarte({ ratio: 2.4, etiquette: false })).toBe(
+      "(min-width: 1100px) 21vw, (min-width: 800px) 30vw, (min-width: 600px) 45vw, 128px",
+    );
+  });
+});

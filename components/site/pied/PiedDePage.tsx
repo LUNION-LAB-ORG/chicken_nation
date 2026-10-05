@@ -41,11 +41,12 @@ export function PiedDePage() {
             </span>
           </p>
           <p className="flex min-w-0 items-center gap-2.5 text-sm leading-[1.35] font-semibold">
+            {/* Petite icône (3 ko) servie telle quelle, sans l'optimiseur. */}
             <Image
+              unoptimized
               alt=""
               className="size-6 shrink-0 object-contain"
               height={50}
-              sizes="24px"
               src="/assets/site/icone-horloge.png"
               width={52}
             />

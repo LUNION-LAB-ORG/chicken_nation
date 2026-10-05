@@ -14,6 +14,12 @@ export const poppins = Poppins({
   weight: ["400", "500", "600", "700", "800"],
   display: "swap",
   variable: "--police-poppins",
+  // Pas de préchargement : les cinq graisses préchargées en priorité haute
+  // prenaient le débit de la CSS et de l'image principale en 4G lente
+  // (recette vitesse D3). La CSS étant dans la page (inlineCss), chaque
+  // graisse est demandée dès que le texte en a besoin ; en attendant, la
+  // police de repli ajustée par next/font évite tout décalage.
+  preload: false,
 });
 
 /**

@@ -26,12 +26,26 @@ export function MesureSignaux() {
       else setPret(true);
     };
 
-    if (document.readyState === "complete") lancer();
-    else window.addEventListener("load", lancer, { once: true });
+    // Une image qui ne répond jamais retarde l'événement load sans fin
+    // (recette vitesse D5) : au plus 8 s après le montage.
+    let secours: number | undefined;
+    let lance = false;
+    const unefois = () => {
+      if (lance) return;
+      lance = true;
+      lancer();
+    };
+
+    if (document.readyState === "complete") unefois();
+    else {
+      window.addEventListener("load", unefois, { once: true });
+      secours = window.setTimeout(unefois, 8000);
+    }
 
     return () => {
       annule = true;
-      window.removeEventListener("load", lancer);
+      window.removeEventListener("load", unefois);
+      window.clearTimeout(secours);
       if (repos !== undefined && "cancelIdleCallback" in window)
         window.cancelIdleCallback(repos);
     };

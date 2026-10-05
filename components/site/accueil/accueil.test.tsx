@@ -15,6 +15,7 @@ import {
 import { BandeInfos } from "./BandeInfos";
 import { CommanderEnLigne } from "./CommanderEnLigne";
 import { LaMarque } from "./LaMarque";
+import { reseauPermetLectureAuto } from "./LecteurVideo";
 import { OffresDuMoment } from "./OffresDuMoment";
 import { Promotions } from "./Promotions";
 import { phraseCarte, TuilesCategories } from "./TuilesCategories";
@@ -299,12 +300,40 @@ describe("Textes de l'accueil", () => {
 
     expect(marque).toContain('id="la-marque"');
     expect(marque).toContain('src="/assets/videos/presentation-540.mp4"');
-    expect(marque).toContain(
-      'poster="/assets/videos/presentation-affiche.webp"',
-    );
+    // Affiche posée à l'approche de la section, pas dans le HTML (recette
+    // vitesse D2) ; sans JavaScript, une image la remplace.
+    expect(marque).not.toMatch(/<video[^>]*poster=/);
+    expect(marque).toContain('<noscript><img alt=""');
+    expect(marque).toContain('src="/assets/videos/presentation-affiche.webp"');
     expect(marque).toContain('preload="none"');
     expect(marque).not.toMatch(/<video[^>]*autoplay/i);
     expect(marque).toContain('aria-describedby="la-marque-video"');
     expect(marque).toContain('href="/fr/histoire"');
+  });
+});
+
+describe("lecture automatique de la vidéo selon le réseau (recette vitesse D1)", () => {
+  it("jamais sur 4G lente, 3G ou avec l'économiseur de données", () => {
+    // 4G lente : Chrome annonce « 4g » dès 0,7 Mbit/s.
+    expect(
+      reseauPermetLectureAuto({ effectiveType: "4g", downlink: 1.6 }),
+    ).toBe(false);
+    expect(reseauPermetLectureAuto({ effectiveType: "3g", downlink: 10 })).toBe(
+      false,
+    );
+    expect(
+      reseauPermetLectureAuto({
+        effectiveType: "4g",
+        downlink: 10,
+        saveData: true,
+      }),
+    ).toBe(false);
+  });
+
+  it("permise sur un bon réseau, ou quand le navigateur ne dit rien", () => {
+    expect(
+      reseauPermetLectureAuto({ effectiveType: "4g", downlink: 8.5 }),
+    ).toBe(true);
+    expect(reseauPermetLectureAuto(undefined)).toBe(true);
   });
 });
