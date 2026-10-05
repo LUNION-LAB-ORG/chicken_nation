@@ -95,20 +95,49 @@ export const viewport: Viewport = {
     initialScale: 1,
 };
 
+/** Image de partage (Open Graph et Twitter) d'une page. */
+export type ImagePartage = {
+    url: string;
+    width?: number;
+    height?: number;
+    alt?: string;
+};
+
 /**
- * Métadonnées propres à une page. Le contenu est en français sur toutes les
- * langues : l'adresse de référence est donc toujours la version /fr, pour que
- * Google ne compte pas /en et /ar comme des doublons.
+ * Métadonnées propres à une page. Le site est en français seulement :
+ * l'adresse de référence est toujours la version /fr.
  * Next remplace l'objet openGraph du parent au lieu de le fusionner : il faut
  * redonner ici l'image et le nom du site.
+ *
+ * - `titre` : complété par le gabarit « %s | CHICKEN NATION » ;
+ * - `titreAbsolu` : titre complet, sans gabarit (accueil, page d'un restaurant) ;
+ * - sans l'un ni l'autre : titre de l'accueil ;
+ * - `image` : image de partage de la page (par défaut l'image générale) ;
+ * - `indexable: false` : `noindex` (les liens de la page restent suivis).
  */
-export function pageMetadata({ chemin, titre, description }: { chemin: string; titre?: string; description: string }): Metadata {
+export function pageMetadata({
+    chemin,
+    titre,
+    titreAbsolu,
+    description,
+    image = IMAGE_PARTAGE,
+    indexable = true,
+}: {
+    chemin: string;
+    titre?: string;
+    titreAbsolu?: string;
+    description: string;
+    image?: ImagePartage;
+    indexable?: boolean;
+}): Metadata {
     const url = `${SITE_URL}/fr${chemin === "/" ? "" : chemin}`;
-    const titrePartage = titre ? `${titre} | CHICKEN NATION` : TITRE_ACCUEIL;
+    const titrePartage = titreAbsolu ?? (titre ? `${titre} | CHICKEN NATION` : TITRE_ACCUEIL);
     return {
-        ...(titre ? { title: titre } : { title: { absolute: TITRE_ACCUEIL } }),
+        title: titreAbsolu ? { absolute: titreAbsolu } : titre ? titre : { absolute: TITRE_ACCUEIL },
         description,
         alternates: { canonical: url },
+        // Remplace tout l'objet robots du parent (googleBot compris).
+        ...(indexable ? {} : { robots: { index: false, follow: true } }),
         openGraph: {
             type: "website",
             locale: "fr_CI",
@@ -116,13 +145,13 @@ export function pageMetadata({ chemin, titre, description }: { chemin: string; t
             url,
             title: titrePartage,
             description,
-            images: [IMAGE_PARTAGE],
+            images: [image],
         },
         twitter: {
             card: "summary_large_image",
             title: titrePartage,
             description,
-            images: [IMAGE_PARTAGE.url],
+            images: [image.url],
         },
     };
 }

@@ -1,13 +1,16 @@
-import Download from "@/components/(public)/common/download";
+import { metadata, organizationSchema, viewport } from "../meta";
+
 import Footer from "@/components/(public)/common/footer";
 import Header from "@/components/(public)/common/header";
-import Main from "@/components/primitives/Main";
-import "@/styles/globals.css";
-import { metadata, organizationSchema, viewport } from "../meta";
 
 export { metadata, viewport };
 
-export default async function PublicLayout({
+/**
+ * Mise en page des pages publiques. Plus de largeur plafonnée (les aplats vont
+ * bord à bord) ni de bloc « Télécharger l'application » sur toutes les pages.
+ * L'en-tête et le pied de page actuels restent jusqu'au nouveau gabarit (lot L5).
+ */
+export default function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -15,15 +18,16 @@ export default async function PublicLayout({
   return (
     <>
       <script
-        type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        type="application/ld+json"
       />
-      <Main className="max-w-screen-2xl mx-auto">
+      <div className="relative flex min-h-screen w-full flex-col overflow-hidden">
         <Header />
-        {children}
-        <Download />
+        <main className="flex flex-1 flex-col" id="contenu">
+          {children}
+        </main>
         <Footer />
-      </Main>
+      </div>
     </>
   );
 }

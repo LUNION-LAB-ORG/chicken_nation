@@ -5,9 +5,13 @@ import { pageMetadata } from "../../../meta";
 
 import AdhesionForm from "@/components/(public)/common/carte-nation/AdhesionForm";
 import NationCardVisual from "@/components/(public)/common/carte-nation/NationCardVisual";
+import { setRequestLocale } from "next-intl/server";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("carte-nation.adhesion");
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  // Langue passée explicitement : sans elle, next-intl lirait les en-têtes et
+  // la page ne serait plus pré-construite.
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "carte-nation.adhesion" });
   return pageMetadata({
     chemin: "/carte-nation/adhesion",
     titre: t("meta_title"),
@@ -25,7 +29,10 @@ export async function generateMetadata(): Promise<Metadata> {
  * — obtenu par grid à 3 enfants placés explicitement (l'ordre du source =
  * l'ordre mobile).
  */
-export default async function CarteNationAdhesionPage() {
+export default async function CarteNationAdhesionPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   const t = await getTranslations("carte-nation.adhesion");
 
   const benefits = [t("benefit_free"), t("benefit_whatsapp"), t("benefit_app")];

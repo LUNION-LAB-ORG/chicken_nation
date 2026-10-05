@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { pageMetadata } from "../../meta";
+import { setRequestLocale } from "next-intl/server";
 
 export const metadata = pageMetadata({
   chemin: "/privacy-rules",
@@ -8,7 +9,10 @@ export const metadata = pageMetadata({
     "Quelles données l'application CHICKEN NATION collecte, pourquoi, et comment exercer vos droits sur vos données personnelles.",
 });
 
-export default function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   return (
     <div className="container mx-auto max-w-4xl p-4 bg-white min-h-screen">
       <header className="flex items-center justify-between mb-8 px-4 py-2">

@@ -7,6 +7,7 @@ import Team from "@/components/(public)/history/team";
 import OderFood from "@/components/(public)/home/oder-food";
 import HeroSection from "@/components/(public)/common/hero-section";
 import { pageMetadata } from "../../meta";
+import { setRequestLocale } from "next-intl/server";
 
 export const metadata = pageMetadata({
   chemin: "/histoire",
@@ -15,7 +16,10 @@ export const metadata = pageMetadata({
     "L'histoire de CHICKEN NATION : un poulet 100% local, élevé dans nos propres fermes en Côte d'Ivoire et servi croustillant ou grillé à Abidjan.",
 });
 
-export default function History() {
+export default async function History({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   return (
     <>
       <HeroSection

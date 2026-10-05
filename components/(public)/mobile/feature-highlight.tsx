@@ -2,7 +2,6 @@
 "use client";
 
 import Section from "@/components/primitives/Section";
-import { buttonVariants } from "@/components/ui/button";
 import { easeOutCubic } from "@/lib/animation";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -125,7 +124,7 @@ function Feature({
             <Link
               href="#"
               className={cn(
-                buttonVariants({ variant: "default", size: "lg" }),
+                "inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap bg-primary px-6 font-medium transition-all hover:bg-primary/90",
                 "text-white rounded-full group text-lg",
                 "mx-auto lg:mx-0"
               )}

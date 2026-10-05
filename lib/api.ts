@@ -1,8 +1,8 @@
 import { Api, ApiConfig } from "ak-api-http";
 import { baseURL } from "@/config/api";
 
-// Réglages communs au client public (ci-dessous) et aux clients du personnel
-// (lib/api.server.ts).
+// Réglages communs au client du serveur (ci-dessous) et à celui du navigateur
+// (lib/api.client.ts).
 export const reglagesApi = {
   baseUrl: baseURL, // Base URL de l'API
   timeout: 10000, // Timeout de la requête
@@ -22,8 +22,9 @@ export const reglagesApi = {
  * ensuite pour toutes les requêtes privées : sur un serveur, c'était le jeton
  * du premier membre du personnel connecté, prêté à tous les appelants suivants.
  * Ici la session vaut toujours `null` : rien à garder, et un appel privé passé
- * par erreur avec ce client part sans jeton (refusé par l'API). Les routes
- * privées passent par `exigerSessionPersonnel()` (lib/api.server.ts).
+ * par erreur avec ce client part sans jeton (refusé par l'API). Le site n'a plus
+ * d'espace du personnel ; la commande en ligne passe par son propre client
+ * (features/commande/apis/api-client.server.ts).
  */
 export const api = new Api({
   ...reglagesApi,

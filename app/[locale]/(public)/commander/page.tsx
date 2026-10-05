@@ -3,13 +3,17 @@ import Panier from "@/features/commande/components/Panier";
 import { obtenirClientAction } from "@/features/commande/actions/connexion.action";
 import { livraisonDisponibleAction } from "@/features/commande/actions/commande.action";
 import { obtenirRestaurantsPublics } from "@/features/restaurants/restaurant.api";
+import { setRequestLocale } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "Mon panier",
   robots: { index: false, follow: false },
 };
 
-export default async function CommanderPage() {
+export default async function CommanderPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   const [client, restaurants, livraison] = await Promise.all([
     obtenirClientAction(),
     obtenirRestaurantsPublics(),

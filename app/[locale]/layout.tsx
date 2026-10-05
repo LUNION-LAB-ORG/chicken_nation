@@ -1,21 +1,25 @@
 import "@/styles/globals.css";
-import { ToastProvider } from "@heroui/toast";
-import { Metadata } from "next";
 
-import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { fontSans, fontTitle } from "@/config/fonts";
-import { routing } from "@/i18n/routing";
-import { cn } from "@/lib/utils";
-import AuthProvider from "@/providers/auth.provider";
-import DirectionProvider from "@/providers/direction-provider";
-import QueryProvider from "@/providers/query-provider";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { getLangDir } from "rtl-detect";
 
-// Define default layout
+import { cn } from "@/lib/utils";
+import { routing } from "@/i18n/routing";
+import { fontSans, fontTitle } from "@/config/fonts";
+
+// Une seule langue, connue à la construction : les pages qui ne lisent ni
+// cookie ni paramètre d'adresse sont pré-construites (statiques ou revalidées).
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+/**
+ * Mise en page racine, réduite au strict nécessaire : plus aucun fournisseur
+ * global (requêtes, session, notifications, sens de lecture). Chacun est posé
+ * au plus près de la page qui s'en sert.
+ */
 export default async function RootLayout({
   children,
   params,
@@ -24,44 +28,28 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+
   if (!hasLocale(routing.locales, locale)) {
-    return notFound();
+    notFound();
   }
-  const messages = await getMessages();
-  const direction = getLangDir(locale);
+  setRequestLocale(locale);
 
   return (
-    <html lang="fr" dir={direction} suppressHydrationWarning>
+    <html lang="fr">
       <body
         className={cn(
           "min-h-screen text-foreground bg-background font-sans antialiased",
           fontSans.className,
-          fontTitle.variable
+          fontTitle.variable,
         )}
       >
-        {/* <GoogleTagManager gtmId="G-W7K9L1RZ8E" /> */}
         <GoogleAnalytics gaId="G-W7K9L1RZ8E" />
 
-        <NextIntlClientProvider messages={messages} locale={locale}>
-          <QueryProvider>
-            {/* <ThemeProviders
-              themeProps={{ attribute: "class", defaultTheme: "light" }}
-            > */}
-            <ToastProvider
-              placement="top-center"
-              toastProps={{ shouldShowTimeoutProgress: true }}
-            />
-            <NuqsAdapter>
-              <AuthProvider>
-                {/* <MountedProvider> */}
-                <DirectionProvider direction={direction}>
-                  {children}
-                </DirectionProvider>
-                {/* </MountedProvider> */}
-              </AuthProvider>
-            </NuqsAdapter>
-            {/* </ThemeProviders> */}
-          </QueryProvider>
+        {/* Aucun message envoyé au navigateur (`null` coupe l'héritage) : seul
+            le formulaire d'adhésion en a besoin et reçoit les siens
+            (carte-nation/adhesion/layout.tsx). */}
+        <NextIntlClientProvider locale={locale} messages={null}>
+          {children}
         </NextIntlClientProvider>
       </body>
     </html>

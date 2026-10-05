@@ -5,6 +5,7 @@ import { obtenirClientAction } from "@/features/commande/actions/connexion.actio
 import { listerCommandesAction } from "@/features/commande/actions/commande.action";
 import { fcfa } from "@/features/commande/utils/panier.utils";
 import { couleurStatut, libelleStatut } from "@/features/commande/utils/statut.utils";
+import { setRequestLocale } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "Mes commandes",
@@ -14,7 +15,10 @@ export const metadata: Metadata = {
 const dateLisible = (iso: string) =>
   new Date(iso).toLocaleString("fr-FR", { timeZone: "Africa/Abidjan", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
 
-export default async function MesCommandesPage() {
+export default async function MesCommandesPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   const client = await obtenirClientAction();
   /**
    * Connecté sans prénom ou nom : connexion inachevée. Le cookie posé au code

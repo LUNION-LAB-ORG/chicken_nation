@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { pageMetadata } from "../../meta";
+import { setRequestLocale } from "next-intl/server";
 
 export const metadata = pageMetadata({
   chemin: "/confidentiality-none-disclosure-agreement",
@@ -8,7 +9,10 @@ export const metadata = pageMetadata({
     "Engagement de confidentialité et de non-divulgation de CHICKEN NATION.",
 });
 
-export default function ConfidentialityDocumentPage() {
+export default async function ConfidentialityDocumentPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   return (
     <div className="container mx-auto max-w-4xl p-4 bg-white min-h-screen">
      <header className="flex items-center justify-between mb-8 px-4 py-2">

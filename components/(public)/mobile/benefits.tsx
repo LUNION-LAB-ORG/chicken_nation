@@ -2,7 +2,6 @@
 "use client";
 
 import Section from "@/components/primitives/Section";
-import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Image from "next/image";
@@ -86,24 +85,22 @@ export function Benefits() {
       </div>
       <div className="flex justify-center md:justify-end mt-4 md:mt-8 md:pr-32">
         <div className="flex gap-4">
-          <Button
+          <button
+            type="button"
             onClick={scrollPrev}
-            className="size-8 rounded-full"
-            variant="outline"
-            size="icon"
+            className="inline-flex size-8 shrink-0 items-center justify-center rounded-full border bg-background shadow-xs outline-none transition-all hover:bg-accent hover:text-accent-foreground focus-visible:ring-[3px]"
           >
             <ArrowLeft className="h-4 w-4" />
             <span className="sr-only">Précédent</span>
-          </Button>
-          <Button
+          </button>
+          <button
+            type="button"
             onClick={scrollNext}
-            className="size-8 rounded-full"
-            variant="outline"
-            size="icon"
+            className="inline-flex size-8 shrink-0 items-center justify-center rounded-full border bg-background shadow-xs outline-none transition-all hover:bg-accent hover:text-accent-foreground focus-visible:ring-[3px]"
           >
             <ArrowRight className="h-4 w-4" />
             <span className="sr-only">Suivant</span>
-          </Button>
+          </button>
         </div>
       </div>
     </Section>
