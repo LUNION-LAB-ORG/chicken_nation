@@ -15,8 +15,6 @@ const resto = (id, name, extra = {}) => ({
   address: null,
   latitude: null,
   longitude: null,
-  phone: null,
-  email: null,
   image: null,
   schedule: null,
   entity_status: "ACTIVE",

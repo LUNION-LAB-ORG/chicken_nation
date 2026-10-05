@@ -561,46 +561,40 @@ Le flux de données suit un chemin clair et sécurisé, en tirant parti des capa
 
 ## 5\. Technologies Utilisées
 
+Site public de Chicken Nation (refonte d'octobre 2026), en français seulement.
+
 ### Framework Principal
 
-  * **Next.js 14** - Framework React avec App Router
-  * **React 18** - Bibliothèque UI
-  * **TypeScript** - Typage statique
+  * **Next.js 16** (App Router, sortie `standalone`) et **React 19**
+  * **TypeScript**
 
 ### Styling et UI
 
-  * **Tailwind CSS** - Framework CSS utilitaire
-  * **shadcn/ui** - Composants UI réutilisables (construits sur [Radix UI](https://www.radix-ui.com/))
-  * **Radix UI** - Composants primitifs accessibles
-  * **Lucide React** - Icônes
-  * **@heroui/react** - Bibliothèque de composants UI
-  * **sonner** - Pour les notifications toast
+  * **Tailwind CSS 4** : jetons du design dans `styles/globals.css` (bloc `@theme`)
+  * **tailwind-variants**, **clsx** et **tailwind-merge** : variantes et fusion des classes
+  * Composants du site dans `components/site/` (boutons, fenêtres, icônes en sprite SVG `public/assets/site/icones.svg`, image optimisée `components/site/Image.tsx`)
+  * Modules CSS (`*.module.css`) pour les décors de la maquette
 
 ### Gestion d'État et Données
 
-  * **TanStack Query** - Gestion des requêtes et cache
-  * **Jotai** - Gestion d'état atomique (si utilisé pour l'état global)
-  * **React Hook Form** - Gestion des formulaires
-  * **Zod** - Validation de schémas
-  * **nuqs** - Synchronisation des paramètres d'URL avec l'état React
-  * **ak-api-http** - Client HTTP basé sur Axios pour les requêtes API
-  * **ak-zod-form-kit** - Utilitaire pour la validation de données de formulaire basée sur Zod
+  * **Jotai** : panier (`cn-panier`), caisse, fenêtres
+  * **TanStack Query** : seulement l'adhésion à la Carte de la Nation et la page d'ouverture de l'appli
+  * **React Hook Form** et **Zod** : formulaires
+  * **ak-api-http** et **ak-zod-form-kit**
+  * Lectures publiques en `fetch` natif mis en cache par Next (carte, restaurants, fidélité, avis)
 
-### Authentification et Sécurité
+### Commande et Sécurité
 
-  * **NextAuth.js** - Authentification complète (si intégré)
-  * **Server Actions** - Pour les opérations côté serveur sécurisées
+  * **Server Actions** (`features/commande/actions/`), jeton client dans le cookie httpOnly `cn_client`
+  * Paiement KKiaPay chargé à la demande sur la caisse
 
 ### Internationalisation
 
-  * **next-intl** - Support multilingue (EN/AR)
-  * **RTL Support** - Support des langues de droite à gauche
+  * **next-intl** : préfixe `/fr` gardé, `/en` et `/ar` redirigés vers le français
 
-### Autres Bibliothèques Notables
+### Mesure d'audience
 
-  * **@tanstack/react-table** - Tableaux de données avancés
-  * **FullCalendar** - Calendrier interactif (si intégré)
-  * **ApexCharts / Chart.js / Recharts** - Pour les graphiques et visualisations (si intégrés)
+  * Google Analytics 4 chargé après la page, au repos (`lib/analytique.ts`), signaux web et événements de commerce
 
 -----
 
@@ -608,29 +602,28 @@ Le flux de données suit un chemin clair et sécurisé, en tirant parti des capa
 
 ### Prérequis
 
-  * Node.js 18+
-  * pnpm (recommandé) ou npm
-  * Eslint (obligatoire)
+  * Node.js 20+ et Bun (gestionnaire de paquets, `bun.lock`)
 
 ### Installation
 
-1.  **Cloner le projet**
+1.  **Installer les dépendances**
     ```bash
-    git clone <repository-url>
-    cd start
+    bun install --frozen-lockfile
     ```
-2.  **Installer les dépendances**
+2.  **Lancer le serveur de développement**
     ```bash
-    pnpm install
+    bun run dev
     ```
-3.  **Configuration des variables d'environnement**
+3.  **Construire et vérifier** (construction lancée avec Node en local)
     ```bash
-    cp .env.example .env.local
+    node node_modules/next/dist/bin/next build
+    node node_modules/typescript/bin/tsc --noEmit --incremental false
+    bun test
+    node scripts/budget-js.mjs        # budgets JavaScript et CSS
+    node scripts/controle-site.mjs    # contrôle des pages servies
     ```
-4.  **Lancer le serveur de développement**
-    ```bash
-    pnpm dev
-    ```
+
+La mise en ligne se fait avec `docker compose up -d --build` (le `Dockerfile` installe les paquets avec Bun).
 
 -----
 

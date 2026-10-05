@@ -7,8 +7,6 @@ import { construireCarte } from "../carte";
 import { baseURL } from "@/config/api";
 
 export type { ICategorieCarte, IPlatCarte } from "../types/carte.types";
-// Ancienne carte (/fr/restaurants/nos-menus) jusqu'à la nouvelle (lot L7).
-export { menuSchemaOrg as carteSchemaOrg } from "@/lib/seo/menu";
 
 /** Étiquette de cache de la carte (à passer à `revalidateTag` après un changement au backoffice). */
 export const ETIQUETTE_CARTE = "carte";

@@ -40,8 +40,6 @@ const resto = (id, name, extra = {}) => ({
   address: null,
   latitude: null,
   longitude: null,
-  phone: null,
-  email: null,
   image: null,
   schedule: semaine("10:00-00:00"),
   entity_status: "ACTIVE",

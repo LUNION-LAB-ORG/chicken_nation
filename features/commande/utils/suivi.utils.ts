@@ -337,8 +337,6 @@ export function restaurantDeCommande(c: Pick<ICommande, "restaurant">) {
     address: c.restaurant.address,
     latitude: null,
     longitude: null,
-    phone: null,
-    email: null,
     image: null,
     schedule: null,
     entity_status: "ACTIVE",

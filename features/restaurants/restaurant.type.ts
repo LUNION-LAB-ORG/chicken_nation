@@ -9,15 +9,6 @@ export interface IRestaurantPublic {
   address: string | null;
   latitude: number | null;
   longitude: number | null;
-  /**
-   * Toujours `null` : le site n'affiche ni ne publie aucun numéro de
-   * restaurant (retouche 6), seulement le 27 21 71 21 30.
-   * @deprecated Retiré à la lecture ; le champ disparaîtra du type avec
-   * l'ancienne liste des restaurants (`components/(public)/restaurant/list.tsx`, lot L8).
-   */
-  phone: string | null;
-  /** Toujours `null`, comme `phone`. @deprecated */
-  email: string | null;
   image: string | null;
   // JSON en texte : [{"1":"10:00-00:00"}, ...], 1 = lundi, 7 = dimanche.
   schedule: string | null;

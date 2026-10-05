@@ -13,7 +13,6 @@ import {
 import { construireCarte, fourchettePrix } from "@/features/menus/carte";
 import platsProduction from "@/features/menus/tests/plats-production-0210.json";
 import { restaurantsDuSite } from "@/features/restaurants/restaurants.site";
-import { restaurantsSchemaOrg } from "@/features/restaurants/restaurant.utils";
 
 const ZONE_4 = {
   id: "cdf609d7-d064-405a-bee4-4abe769f3647",
@@ -21,8 +20,6 @@ const ZONE_4 = {
   address: "488 Av. N'guetta Timothée Ahoua, Abidjan, Côte d'Ivoire",
   latitude: 5.2860442,
   longitude: -3.9737121,
-  phone: null,
-  email: null,
   image: "chicken-nation/restaurants/1777032453359-zone_4.webp",
   schedule:
     '[{"1":"10:00-00:00"},{"2":"10:00-00:00"},{"3":"10:00-00:00"},{"4":"10:00-00:00"},{"5":"10:00-00:30"},{"6":"10:00-00:30"},{"7":"10:00-00:45"}]',
@@ -160,9 +157,10 @@ describe("restaurants", () => {
     expect(noeud.priceRange).toBeUndefined();
     expect(noeud.openingHoursSpecification).toBeUndefined();
     expect(noeud.telephone).toBe("+225 27 21 71 21 30");
+    // Un numéro qui arriverait quand même de l'API ne doit sortir nulle part.
     const avecNumero = { ...ZONE_4, phone: "0720353535" };
     const tout = JSON.stringify([
-      restaurantsSchemaOrg([avecNumero, YOPOUGON]),
+      listeRestaurantsSchemaOrg(restaurantsDuSite([avecNumero, YOPOUGON])),
       pageRestaurantSchemaOrg(restaurantsDuSite([avecNumero])[0]),
     ]);
 

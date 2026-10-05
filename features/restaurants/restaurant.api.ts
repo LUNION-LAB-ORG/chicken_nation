@@ -25,8 +25,6 @@ function versRestaurantPublic(r: RestaurantApi): IRestaurantPublic {
     address: texteOuNull(r.address),
     latitude: nombreOuNull(r.latitude),
     longitude: nombreOuNull(r.longitude),
-    phone: null,
-    email: null,
     image: texteOuNull(r.image),
     schedule: texteOuNull(r.schedule),
     entity_status: String(r.entity_status ?? ""),
