@@ -120,7 +120,8 @@ export function Accroche({
             className={styles.seau}
             height={700}
             loading="eager"
-            sizes="(min-width: 900px) 210px, (min-width: 720px) 130px, 240px"
+            // Sur téléphone, le seau fait 53 % de la tuile (100vw - 44 px).
+            sizes="(min-width: 900px) 210px, (min-width: 720px) 130px, calc(53vw - 23px)"
             src="/assets/site/seau.webp"
             width={586}
           />

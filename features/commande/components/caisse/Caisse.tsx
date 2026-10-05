@@ -1130,17 +1130,20 @@ export function Caisse({
   let contenu: ReactNode;
 
   if (!monte || redirection) {
-    // Panneau d'attente au moins aussi haut que l'écran : l'étape qui le
-    // remplace ne pousse plus le pied de page visible (CLS de 0,11 mesuré à
-    // 375 px, recette vitesse D4).
+    // Panneau d'attente au moins aussi haut que l'écran sur téléphone :
+    // l'étape qui le remplace ne pousse plus le pied de page visible (CLS de
+    // 0,11 mesuré à 375 px, recette vitesse D4). Dès 1 000 px, la hauteur de
+    // l'étape Panier avec un plat (environ 380 px), pied de page visible.
     contenu = (
       <section
         aria-busy="true"
         aria-label="Votre commande"
         className={cn(
           classePanneau,
-          "min-h-[max(280px,calc(100svh-var(--h-entete)))] content-center",
+          "min-h-[max(280px,calc(100svh-var(--h-entete)))] content-center min-[1000px]:min-h-[380px]",
         )}
+        // Panier vide : 280 px (feuille posée par la page avant l'affichage).
+        id="attente-caisse"
       >
         <p
           className="flex items-center gap-2.5 text-sm text-encre-doux"
@@ -1392,7 +1395,11 @@ export function Caisse({
         ) : !monte ? (
           // Place du volet du récapitulatif (téléphone) réservée pendant le
           // chargement : il apparaît sans décaler l'étape.
-          <div aria-hidden="true" className="h-[54px] min-[1000px]:hidden" />
+          <div
+            aria-hidden="true"
+            className="h-[54px] min-[1000px]:hidden"
+            id="place-recap"
+          />
         ) : null}
         {contenu}
       </div>

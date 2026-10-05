@@ -104,3 +104,19 @@ describe("taille annoncée de la photo d'une carte (recette vitesse D9)", () => 
     );
   });
 });
+
+describe("taille annoncée de la photo d'une promotion (recette vitesse D2)", () => {
+  const { taillesPhotoVitrine } = require("./CartePlat");
+
+  it("photo de l'API, carrée : 176 px sur téléphone au lieu de 76vw", () => {
+    expect(taillesPhotoVitrine({ ratio: 1, etiquette: false })).toBe(
+      "(min-width: 900px) 222px, (min-width: 600px) 176px, 176px",
+    );
+  });
+
+  it("photo très large : la colonne décide", () => {
+    expect(taillesPhotoVitrine({ ratio: 3, etiquette: true })).toBe(
+      "(min-width: 900px) 28vw, (min-width: 600px) 42vw, 76vw",
+    );
+  });
+});

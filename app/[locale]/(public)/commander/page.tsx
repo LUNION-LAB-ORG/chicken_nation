@@ -84,6 +84,17 @@ export default async function CommanderPage({
           <BarreEtapes />
         </div>
       </section>
+      {/* Avant le premier affichage : panier vide, l'attente de la caisse
+          reprend sa hauteur de base et la place du récapitulatif n'est pas
+          réservée (sinon le pied de page remontait d'un écran entier quand
+          le panier vide s'affichait). Le panier ne vit que dans le
+          navigateur : le serveur ne peut pas le savoir. */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            'try{if(!JSON.parse(localStorage.getItem("cn-panier")||"[]").length){var s=document.createElement("style");s.textContent="#attente-caisse{min-height:280px!important}#place-recap{display:none}";document.head.appendChild(s)}}catch(e){}',
+        }}
+      />
       <Caisse
         clientInitial={client}
         conditions={conditions}

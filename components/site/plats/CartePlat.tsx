@@ -12,14 +12,6 @@ import { cheminPlat } from "@/features/menus/plats.slug";
 import { cn } from "@/lib/utils";
 import { fcfa, INSECABLE, nombre, phrase, typo } from "@/lib/typo";
 
-// Largeurs réellement affichées de la photo, selon la grille qui porte la carte.
-const TAILLES_PHOTO = {
-  // Promotions : rangée défilante (80 %, puis 44 %), 3 colonnes dès 900 px.
-  vitrine:
-    "(min-width: 1264px) 340px, (min-width: 900px) 28vw, (min-width: 600px) 42vw, 76vw",
-  // Carte : voir taillesPhotoCarte (128 px sous 600 px, puis 2, 3 et 4 colonnes).
-} as const;
-
 /**
  * Largeur affichée de la photo d'une carte de la grille. La zone a une hauteur
  * fixe (204 px dès 1 100 px, 180 px avant, moins la bande de l'étiquette et
@@ -45,6 +37,34 @@ export function taillesPhotoCarte(
     `(min-width: 800px) ${largeur(180, 32, 190) ?? "30vw"}`,
     `(min-width: 600px) ${largeur(180, 32, 240) ?? "45vw"}`,
     "128px",
+  ].join(", ");
+}
+
+/**
+ * Même calcul pour les promotions de l'accueil (zone de 196 px de haut, 250 px
+ * au plus dès 900 px) : la photo d'une promotion se chargeait en 640 px pour
+ * 260 px affichés (recette vitesse D2).
+ */
+export function taillesPhotoVitrine(
+  photo: Pick<IPlatCarte["photo"], "ratio" | "etiquette">,
+) {
+  const ratio = photo.ratio > 0 ? photo.ratio : 1;
+  const largeur = (
+    zone: number,
+    etiquette: number,
+    marge: number,
+    colonne: number,
+  ) => {
+    const haut = photo.etiquette ? etiquette * 1.2 + 2 : marge;
+    const w = Math.ceil((zone - haut - marge) * ratio);
+
+    return w <= colonne ? `${w}px` : null;
+  };
+
+  return [
+    `(min-width: 900px) ${largeur(250, 38, 14, 240) ?? "28vw"}`,
+    `(min-width: 600px) ${largeur(196, 34, 10, 230) ?? "42vw"}`,
+    largeur(196, 34, 10, 250) ?? "76vw",
   ].join(", ");
 }
 
@@ -112,7 +132,7 @@ export function CartePlat({
         sizes={
           variante === "carte"
             ? taillesPhotoCarte(plat.photo)
-            : TAILLES_PHOTO.vitrine
+            : taillesPhotoVitrine(plat.photo)
         }
         src={plat.photo.src}
       >

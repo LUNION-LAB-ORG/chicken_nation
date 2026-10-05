@@ -65,7 +65,8 @@ export function CommanderEnLigne() {
                 alt=""
                 className={styles.icone}
                 height={etape.icone.hauteur}
-                sizes="76px"
+                // 60 px sur téléphone (fichier de 128 px et non de 256 px).
+                sizes="(min-width: 720px) 76px, 60px"
                 src={etape.icone.src}
                 width={etape.icone.largeur}
               />
