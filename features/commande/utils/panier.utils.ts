@@ -51,6 +51,57 @@ export const sousTotal = (lignes: ILignePanier[]) =>
 export const nombreArticles = (lignes: ILignePanier[]) =>
   lignesACommander(lignes).reduce((s, l) => s + l.quantite, 0);
 
+/** Lignes d'un panier envoyé à la commande, au plus (aucun vrai panier n'en approche). */
+export const LIGNES_MAX = 30;
+
+const entierEntre = (n: unknown, min: number, max: number) =>
+  typeof n === "number" && Number.isInteger(n) && n >= min && n <= max;
+
+/**
+ * Contrôle des lignes reçues du navigateur avant de créer une commande. Une
+ * action serveur s'appelle avec n'importe quels arguments, et le serveur
+ * acceptait une quantité de supplément de 0,01 ou de −3 (prix de la commande
+ * baissé d'autant, puis validé au paiement) : toute quantité doit être un
+ * entier dans ses bornes. Plat : 1 à 50 ; supplément : 0 (non pris) à
+ * 50 × 20 (deux ajouts identiques additionnent leurs suppléments).
+ * Renvoie la phrase à montrer, ou null si tout est bon.
+ */
+export function erreurLignesRecues(lignes: unknown): string | null {
+  if (!Array.isArray(lignes) || lignes.length === 0)
+    return "Votre panier est vide.";
+  if (lignes.length > LIGNES_MAX)
+    return `Votre panier compte trop de lignes (${LIGNES_MAX} au plus). Regroupez ou retirez des plats.`;
+  for (const brut of lignes) {
+    const l = brut as Partial<ILignePanier> | null;
+
+    if (
+      !l ||
+      typeof l !== "object" ||
+      typeof l.dish_id !== "string" ||
+      typeof l.epice !== "boolean" ||
+      !Array.isArray(l.options) ||
+      !Array.isArray(l.supplements) ||
+      l.options.some((o) => !o || typeof o.item_id !== "string")
+    )
+      return "Votre panier n'a pas pu être lu. Videz-le puis ajoutez de nouveau vos plats.";
+    const nom = typeof l.nom === "string" && l.nom ? l.nom : "Un plat";
+
+    if (!entierEntre(l.quantite, 1, QUANTITE_MAX))
+      return `« ${nom} »${INSECABLE}: quantité non valable (de 1 à ${QUANTITE_MAX}). Corrigez-la dans le panier.`;
+    if (
+      l.supplements.some(
+        (x) =>
+          !x ||
+          typeof x.id !== "string" ||
+          !entierEntre(x.quantite, 0, QUANTITE_MAX * QUANTITE_SUPPLEMENT_MAX),
+      )
+    )
+      return `« ${nom} »${INSECABLE}: quantité de supplément non valable. Retirez cette ligne et ajoutez le plat de nouveau.`;
+  }
+
+  return null;
+}
+
 /**
  * Lignes payantes telles que POST /orders/create-v2 les attend. Partagé par
  * l'action de commande et le panier, qui place les suppléments offerts sur

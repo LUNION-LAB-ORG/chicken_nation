@@ -5,3 +5,6 @@ npm-debug.log
 README.md
 .next
 .git
+# Secrets du serveur : jamais dans l'image (lus au démarrage par env_file).
+.env
+.env.*

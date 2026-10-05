@@ -18,6 +18,17 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:${DOCKER_PORT}:3000"
+    # Durcissement (incident du 19/09 : un programme déposé dans /tmp puis lancé
+    # par le serveur) : /tmp en mémoire et sans exécution, aucun privilège
+    # gagné, aucune capacité Linux, nombre de processus et mémoire bornés.
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 200
+    mem_limit: 1g
     volumes:
       # Images optimisées par next/image gardées d'un déploiement à l'autre :
       # sinon chaque mise en ligne les refait toutes à la première visite.

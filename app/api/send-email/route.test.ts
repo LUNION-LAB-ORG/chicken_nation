@@ -106,7 +106,8 @@ describe("POST /api/send-email", () => {
 
     expect(sansMessage.status).toBe(400);
     expect(telephoneFaux.status).toBe(400);
-    expect(pasDuJson.status).toBe(400);
+    // Pas du JSON : refusé avant même d'être lu (envoi d'un autre site).
+    expect(pasDuJson.status).toBe(403);
     expect(envois).toHaveLength(0);
   });
 
@@ -149,5 +150,73 @@ describe("POST /api/send-email", () => {
     expect(statuts).toEqual([200, 200, 200, 200, 200, 429]);
     // 5 messages et leurs 5 accusés ; rien pour le sixième.
     expect(envois).toHaveLength(10);
+  });
+});
+
+describe("POST /api/send-email : envois venus d'un autre site (recette sécurité I1)", () => {
+  const brut = (entetes, corps = FORMULAIRE) =>
+    new Request("http://localhost:3099/api/send-email", {
+      method: "POST",
+      headers: { "X-Real-IP": `41.207.${compteurIp++}.30`, ...entetes },
+      body: JSON.stringify(corps),
+    });
+
+  it("text/plain (fetch d'un autre site sans contrôle préalable) : 403, rien n'est envoyé", async () => {
+    const r = await POST(
+      brut({
+        "Content-Type": "text/plain;charset=UTF-8",
+        Origin: "https://evil.example",
+        "Sec-Fetch-Site": "cross-site",
+      }),
+    );
+
+    expect(r.status).toBe(403);
+    expect(envois).toHaveLength(0);
+  });
+
+  it("JSON mais d'une autre origine : 403", async () => {
+    expect(
+      (
+        await POST(
+          brut({
+            "Content-Type": "application/json",
+            Origin: "https://evil.example",
+            Host: "localhost:3099",
+          }),
+        )
+      ).status,
+    ).toBe(403);
+    expect(
+      (
+        await POST(
+          brut({
+            "Content-Type": "application/json",
+            "Sec-Fetch-Site": "same-site",
+          }),
+        )
+      ).status,
+    ).toBe(403);
+    expect(envois).toHaveLength(0);
+  });
+
+  it("le formulaire du site (même origine, ou www) passe", async () => {
+    const r1 = await POST(
+      brut({
+        "Content-Type": "application/json",
+        Origin: "http://localhost:3099",
+        Host: "localhost:3099",
+        "Sec-Fetch-Site": "same-origin",
+      }),
+    );
+    const r2 = await POST(
+      brut({
+        "Content-Type": "application/json",
+        Origin: "https://www.chicken-nation.com",
+        Host: "127.0.0.1:3000",
+      }),
+    );
+
+    expect(r1.status).toBe(200);
+    expect(r2.status).toBe(200);
   });
 });

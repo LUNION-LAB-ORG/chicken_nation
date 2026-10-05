@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+// Pas de test « new Function() » au chargement (zod 4 vérifie s'il peut
+// compiler ses validations) : une politique de sécurité (CSP) sans
+// 'unsafe-eval' le signalerait à chaque visite de l'adhésion.
+z.config({ jitless: true });
+
 import { isValidPhoneCI } from "./utils/phone";
 
 /**

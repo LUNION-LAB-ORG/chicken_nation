@@ -18,6 +18,42 @@ const enTetesSecurite = [
   { key: "Content-Security-Policy", value: "frame-ancestors 'self'; base-uri 'self'; object-src 'none'" },
 ];
 
+/**
+ * Politique de sécurité complète (scripts, connexions, cadres), d'abord en
+ * observation seulement (« Report-Only ») : le navigateur signale dans sa
+ * console ce qu'elle bloquerait, sans rien bloquer. Testée sur 15 pages avec
+ * le script KKiaPay (recette sécurité I3) ; Google Analytics et la fenêtre de
+ * paiement ne se testent qu'en production. Une fois la console propre en
+ * production, renommer l'en-tête en Content-Security-Policy.
+ * Pas en développement : Next y utilise eval pour le rechargement à chaud.
+ */
+const origineApi = (() => {
+  try {
+    return new URL(process.env.NEXT_PUBLIC_API_BACKEND_URL ?? "").origin;
+  } catch {
+    return "https://api-private.chicken-nation.com";
+  }
+})();
+const cspObservee = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.kkiapay.me",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://dvsxt5681pvqm.cloudfront.net https://*.google-analytics.com https://*.googletagmanager.com",
+  "font-src 'self'",
+  "media-src 'self'",
+  `connect-src 'self' ${origineApi} https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com`,
+  "frame-src https://widget-v3.kkiapay.me",
+  "worker-src 'self' blob:",
+  "manifest-src 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+].join("; ");
+
+if (process.env.NODE_ENV !== "development")
+  enTetesSecurite.push({ key: "Content-Security-Policy-Report-Only", value: cspObservee });
+
 // Liens universels de l'appli iOS (public/.well-known/apple-app-site-association
 // et sa copie à la racine) : fichier sans extension, que Next servirait en
 // application/octet-stream ; Apple attend du JSON. Exclus de proxy.ts : aucune
@@ -97,18 +133,30 @@ const nextConfig = {
     qualities: [60, 75],
     // Images optimisées gardées 30 jours : un fichier modifié change de nom.
     minimumCacheTTL: 2592000,
+    // Images de l'API seulement, sans paramètre : sinon chaque « ?v=N » inventé
+    // déclenchait une conversion (AVIF, la plus coûteuse) et un fichier gardé
+    // 30 jours dans le volume cache-images (recette sécurité I2). Toutes les
+    // photos de la base sont sous chicken-nation/ sur CloudFront ; les deux
+    // autres hôtes ne servent qu'aux anciens chemins uploads/
+    // (utils/formatImageUrl.ts).
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "chicken.turbodeliveryapp.com",
+        hostname: "dvsxt5681pvqm.cloudfront.net",
+        pathname: "/chicken-nation/**",
+        search: "",
       },
       {
         protocol: "https",
         hostname: "api-private.chicken-nation.com",
+        pathname: "/uploads/**",
+        search: "",
       },
       {
         protocol: "https",
-        hostname: "dvsxt5681pvqm.cloudfront.net",
+        hostname: "chicken.turbodeliveryapp.com",
+        pathname: "/uploads/**",
+        search: "",
       },
     ],
   },

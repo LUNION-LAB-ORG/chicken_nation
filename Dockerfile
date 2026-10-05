@@ -1,14 +1,28 @@
 FROM node:24-alpine AS base
 
+# Variables publiques écrites dans le code à la construction. Elles viennent
+# des « args » de compose.yml (lus dans le .env du serveur) : le .env lui-même
+# n'entre plus dans l'image (.dockerignore), il ne sert qu'au démarrage
+# (env_file), pour les secrets (Resend).
 ARG NEXT_PUBLIC_URL
 ARG NEXT_PUBLIC_API_BACKEND_URL
 ARG NEXT_PUBLIC_API_FILE_URL
 ARG NEXT_PUBLIC_CLOUDFRONT_URL
+ARG NEXT_PUBLIC_PLAY_STORE_LINK
+ARG NEXT_PUBLIC_APP_STORE_LINK
+ARG NEXT_PUBLIC_APP_SCHEMA
 
 ENV NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL}
 ENV NEXT_PUBLIC_API_BACKEND_URL=${NEXT_PUBLIC_API_BACKEND_URL}
 ENV NEXT_PUBLIC_API_FILE_URL=${NEXT_PUBLIC_API_FILE_URL}
 ENV NEXT_PUBLIC_CLOUDFRONT_URL=${NEXT_PUBLIC_CLOUDFRONT_URL}
+ENV NEXT_PUBLIC_PLAY_STORE_LINK=${NEXT_PUBLIC_PLAY_STORE_LINK}
+ENV NEXT_PUBLIC_APP_STORE_LINK=${NEXT_PUBLIC_APP_STORE_LINK}
+ENV NEXT_PUBLIC_APP_SCHEMA=${NEXT_PUBLIC_APP_SCHEMA}
+
+# Version de Bun figée (celle qui a écrit bun.lock) : une nouvelle version
+# ne change plus l'installation d'un déploiement à l'autre.
+ARG BUN_VERSION=1.3.9
 
 ENV NODE_ENV="production"
 
@@ -25,7 +39,7 @@ RUN \
     if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
     elif [ -f package-lock.json ]; then npm ci; \
     elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
-    elif [ -f bun.lockb ] || [ -f bun.lock ]; then npm install -g bun && bun install --frozen-lockfile; \
+    elif [ -f bun.lockb ] || [ -f bun.lock ]; then npm install -g bun@${BUN_VERSION} && bun install --frozen-lockfile; \
     else echo "Lockfile not found." && exit 1; \
     fi
 
@@ -48,14 +62,10 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED=1
 
-# 💡 CORRECTION ICI : Remplacement des commandes d'installation par les commandes "run build" pour npm et yarn
-RUN \
-    if [ -f yarn.lock ]; then yarn run build; \
-    elif [ -f package-lock.json ]; then npm run build; \
-    elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
-    elif [ -f bun.lockb ] || [ -f bun.lock ]; then npm install -g bun && bun run build; \
-    else echo "Lockfile not found." && exit 1; \
-    fi
+# Construction par Node, comme les contrôles du projet (plan, règle 9) :
+# « bun run build » lance Next sous Bun, dont certaines versions plantent la
+# construction. Node 24 est déjà dans l'image.
+RUN node node_modules/next/dist/bin/next build
 
 # Production image, copy all the files and run next
 FROM base AS runner
@@ -72,11 +82,15 @@ COPY --from=builder /app/public ./public
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-# Cache des images optimisées (volume de compose.yml) : le dossier existe dans
-# l'image avec le bon propriétaire, le volume en hérite à sa création.
-RUN mkdir -p .next/cache/images && chown -R nextjs:nodejs .next/cache
+# Code du serveur à root, en lecture seule pour l'utilisateur qui le fait
+# tourner : un intrus ne peut ni le modifier ni y déposer un programme
+# (incident du 19/09). Seuls les dossiers où Next écrit en marche lui
+# appartiennent : .next/server/app (pages refaites toutes les N minutes) et
+# .next/cache (données et images optimisées, volume de compose.yml).
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+RUN mkdir -p .next/cache/images \
+    && chown -R nextjs:nodejs .next/cache .next/server/app
 
 USER nextjs
 

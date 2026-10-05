@@ -30,6 +30,8 @@ import {
 import {
   articlesPayants,
   assietteCodePromo,
+  erreurLignesRecues,
+  LIGNES_MAX,
   lignesACommander,
   platsNonProposes,
   problemesLigne,
@@ -91,9 +93,11 @@ export async function obtenirPlatAction(
 export async function revaliderPanierAction(
   ids: string[],
 ): Promise<Record<string, IPlatDetail | null>> {
+  // Identifiants de plats seulement, autant qu'un panier peut en avoir :
+  // sinon un appel sans connexion déclenchait 40 lectures de l'API.
   const uniques = Array.from(
-    new Set((Array.isArray(ids) ? ids : []).map(String)),
-  ).slice(0, 40);
+    new Set((Array.isArray(ids) ? ids : []).map(String).filter(estUuid)),
+  ).slice(0, LIGNES_MAX);
   const resultats = await Promise.all(
     uniques.map(async (id) => [id, await obtenirPlatAction(id)] as const),
   );
@@ -137,6 +141,7 @@ export async function rechercherAdressesAction(
   saisie: string,
   session: string,
 ): Promise<ISuggestionAdresse[]> {
+  if (typeof saisie !== "string" || typeof session !== "string") return [];
   const q = saisie.trim();
 
   if (q.length < 3 || q.length > 120) return [];
@@ -161,6 +166,8 @@ export async function detailsAdresseAction(
   placeId: string,
   session: string,
 ): Promise<Resultat<{ libelle: string; latitude: number; longitude: number }>> {
+  if (typeof placeId !== "string" || typeof session !== "string" || !placeId)
+    return { ok: false, message: "Adresse introuvable." };
   const res = await appelApi<Brut>(
     `/maps/places/details/${encodeURIComponent(placeId)}?sessionToken=${encodeURIComponent(session)}`,
   );
@@ -216,10 +223,12 @@ export async function calculerFraisAction(
   longitude: number,
   montantPanier: number,
 ): Promise<Resultat<IFraisLivraison>> {
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude))
+    return { ok: false, message: "Position invalide." };
   const params = new URLSearchParams({
     lat: String(latitude),
     long: String(longitude),
-    order_amount: String(Math.max(0, Math.round(montantPanier))),
+    order_amount: String(Math.max(0, Math.round(Number(montantPanier) || 0))),
   });
   const res = await appelApi<Brut>(`/orders/frais-livraison?${params}`, {
     public: true,
@@ -423,9 +432,14 @@ export async function verifierCodeReductionAction(
   lignes: ILignePanier[],
   montantPanier: number,
 ): Promise<Resultat<{ code: string; remise: number }>> {
+  // Une action serveur s'appelle avec n'importe quels arguments : on filtre.
+  if (typeof code !== "string" || !Array.isArray(lignes))
+    return { ok: false, message: "Code invalide." };
   const c = code.trim().toUpperCase();
 
   if (!/^[A-Z0-9_-]{3,40}$/.test(c))
+    return { ok: false, message: "Code invalide." };
+  if (!Number.isFinite(montantPanier) || montantPanier < 0)
     return { ok: false, message: "Code invalide." };
   const promo = await appelApi<Brut>("/promo-code/apply", {
     methode: "POST",
@@ -593,6 +607,36 @@ export async function creerCommandeAction(c: ICreationCommande): Promise<
     paiement: IConfigPaiement | null;
   }>
 > {
+  // Une action serveur s'appelle avec n'importe quels arguments : forme et
+  // quantités contrôlées avant tout (le serveur ne refuse pas une quantité
+  // de supplément de 0,01 ou de −3, qui baisserait le prix de la commande).
+  if (!c || typeof c !== "object")
+    return { ok: false, message: "Votre panier est vide." };
+  const erreurLignes = erreurLignesRecues(c.lignes);
+
+  if (erreurLignes) return { ok: false, message: erreurLignes };
+  if (c.mode !== "DELIVERY" && c.mode !== "PICKUP")
+    return { ok: false, message: "Choisissez la livraison ou le retrait." };
+  if (
+    c.mode === "DELIVERY" &&
+    c.adresse &&
+    (!Number.isFinite(c.adresse.latitude) ||
+      !Number.isFinite(c.adresse.longitude) ||
+      typeof c.adresse.libelle !== "string" ||
+      typeof c.adresse.repere !== "string")
+  )
+    return { ok: false, message: "Choisissez l'adresse de livraison." };
+  if (c.mode === "PICKUP" && c.restaurantId && !estUuid(String(c.restaurantId)))
+    return { ok: false, message: "Choisissez le restaurant de retrait." };
+  if (
+    c.heureRetrait !== null &&
+    c.heureRetrait !== undefined &&
+    (typeof c.heureRetrait !== "string" ||
+      Number.isNaN(Date.parse(c.heureRetrait)))
+  )
+    return { ok: false, message: "Choisissez une heure de retrait." };
+  if (c.code !== null && c.code !== undefined && typeof c.code !== "string")
+    return { ok: false, message: "Code invalide." };
   const lignes = lignesACommander(c.lignes);
 
   if (lignes.length === 0)

@@ -5,6 +5,7 @@ import { Entete } from "@/components/site/entete/Entete";
 import { Annonce, MessageFlottant } from "@/components/site/MessageFlottant";
 import { PiedDePage } from "@/components/site/pied/PiedDePage";
 import { FenetresCommande } from "@/features/commande/components/FenetresCommande";
+import { jsonLd } from "@/lib/seo/commun";
 
 export { metadata, viewport };
 
@@ -23,7 +24,7 @@ export default function PublicLayout({
   return (
     <>
       <script
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(organizationSchema) }}
         type="application/ld+json"
       />
       <a

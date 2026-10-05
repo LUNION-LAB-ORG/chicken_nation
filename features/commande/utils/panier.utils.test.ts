@@ -7,6 +7,8 @@ import {
   basculerOption,
   commandableEnLigne,
   construireLigne,
+  erreurLignesRecues,
+  LIGNES_MAX,
   detailsLigne,
   epiceDeLigne,
   fcfa,
@@ -473,5 +475,38 @@ describe("fiche plat", () => {
         spice_level: "ALWAYS",
       }).choix,
     ).toBe("Épicé");
+  });
+});
+
+describe("lignes reçues du navigateur (recette sécurité B2)", () => {
+  it("un panier normal passe", () => {
+    expect(erreurLignesRecues([ligne({ supplements: [coca(2)] })])).toBeNull();
+  });
+
+  it("quantités de supplément ou de plat non entières, nulles ou négatives : refusées", () => {
+    for (const q of [0.01, -3, 1.5, Number.NaN, "2"]) {
+      expect(
+        erreurLignesRecues([
+          ligne({ supplements: [{ ...coca(), quantite: q }] }),
+        ]),
+      ).toContain("supplément non valable");
+    }
+    for (const q of [0, 1.5, -1, 51, "1"]) {
+      expect(erreurLignesRecues([ligne({ quantite: q })])).toContain(
+        "quantité non valable",
+      );
+    }
+  });
+
+  it("forme abîmée, panier vide ou trop long : refusé sans erreur", () => {
+    expect(erreurLignesRecues(null)).toBe("Votre panier est vide.");
+    expect(erreurLignesRecues([])).toBe("Votre panier est vide.");
+    expect(erreurLignesRecues([null])).toContain("n'a pas pu être lu");
+    expect(erreurLignesRecues([{ ...ligne(), options: "x" }])).toContain(
+      "n'a pas pu être lu",
+    );
+    expect(
+      erreurLignesRecues(Array.from({ length: LIGNES_MAX + 1 }, () => ligne())),
+    ).toContain("trop de lignes");
   });
 });

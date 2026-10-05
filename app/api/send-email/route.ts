@@ -4,7 +4,14 @@ import { z } from "zod";
 import { adresseIpVisiteur } from "@/features/commande/utils/adresse-ip.utils";
 import { INSECABLE } from "@/lib/typo";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+/**
+ * Client Resend créé au premier envoi, et non au chargement du module : la
+ * clé n'existe qu'au démarrage du conteneur (env_file de compose.yml), pas
+ * pendant `next build`, qui charge ce fichier (le .env n'entre plus dans
+ * l'image Docker). `new Resend()` sans clé lève une erreur.
+ */
+let client: Resend | null = null;
+const resend = () => (client ??= new Resend(process.env.RESEND_API_KEY));
 
 const contactSchema = z.object({
   nom: z.string().trim().min(1).max(80),
@@ -42,8 +49,17 @@ const MAX_PAR_IP = 5;
 const MAX_TOTAL = 60;
 const envois = new Map<string, number[]>();
 
+/** Les adresses qui n'ont rien envoyé depuis 15 min sont oubliées : la table ne grossit pas sans fin. */
+function menage(maintenant: number) {
+  envois.forEach((dates, cle) => {
+    if (dates.every((t) => maintenant - t >= FENETRE_MS)) envois.delete(cle);
+  });
+}
+
 function depasseLaLimite(cle: string, max: number) {
   const maintenant = Date.now();
+
+  menage(maintenant);
   const recents = (envois.get(cle) ?? []).filter(
     (t) => maintenant - t < FENETRE_MS,
   );
@@ -68,7 +84,46 @@ function echapper(texte: string) {
     .replace(/'/g, "&#39;");
 }
 
+/** Le site lui-même, et lui seul, envoie ce formulaire. */
+const ORIGINES = new Set([
+  "https://www.chicken-nation.com",
+  "https://chicken-nation.com",
+]);
+
+/**
+ * Envoi venu d'un autre site : refusé. Sans ce contrôle, n'importe quelle
+ * page pouvait faire envoyer le formulaire par chacun de ses visiteurs
+ * (fetch en text/plain, sans contrôle préalable du navigateur) : un envoi
+ * par adresse IP de visiteur, la limite par IP ne protégeait plus, et la
+ * limite globale bloquait ensuite le formulaire pour tout le monde.
+ *  - le formulaire du site envoie du JSON : tout autre type est refusé (un
+ *    autre site ne peut pas envoyer de JSON sans l'accord du navigateur) ;
+ *  - navigateur récent : Sec-Fetch-Site doit valoir same-origin ;
+ *  - en-tête Origin présent : le site lui-même (même hôte, ou www).
+ */
+function provenanceRefusee(req: Request): boolean {
+  const type = req.headers.get("content-type") ?? "";
+
+  if (!/^application\/json\s*(;|$)/i.test(type)) return true;
+  const site = req.headers.get("sec-fetch-site");
+
+  if (site && site !== "same-origin") return true;
+  const origine = req.headers.get("origin");
+
+  if (!origine) return false;
+  if (ORIGINES.has(origine)) return false;
+  try {
+    const hote = req.headers.get("x-forwarded-host") ?? req.headers.get("host");
+
+    return new URL(origine).host !== hote;
+  } catch {
+    return true;
+  }
+}
+
 export async function POST(req: Request) {
+  if (provenanceRefusee(req))
+    return Response.json({ success: false }, { status: 403 });
   const body = await req.json().catch(() => null);
   const parsed = contactSchema.safeParse(body);
 
@@ -110,7 +165,7 @@ export async function POST(req: Request) {
 
   try {
     // Resend ne lève pas d'exception en cas d'échec : il renvoie `error`.
-    const versAdmin = await resend.emails.send({
+    const versAdmin = await resend().emails.send({
       from: `Chicken Nation <${process.env.EMAIL_FROM}>`,
       to: [process.env.EMAIL_ADMIN!],
       // Insécable avant le deux-points ; aucun retour à la ligne venu du formulaire.
@@ -135,7 +190,7 @@ export async function POST(req: Request) {
     // Accusé de réception volontairement sans aucun texte saisi dans le
     // formulaire : sinon n'importe qui pourrait faire envoyer, au nom de
     // Chicken Nation, le contenu de son choix à l'adresse de son choix.
-    await resend.emails.send({
+    await resend().emails.send({
       from: `Chicken Nation <${process.env.EMAIL_FROM}>`,
       to: [email],
       subject: ACCUSES[sujet],
