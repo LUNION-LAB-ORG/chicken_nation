@@ -120,7 +120,7 @@ export function obstacleAvantages(e: {
   sansEpice: string[];
 }): string | null {
   if (e.cadeauxBloques.length)
-    return `Retirez le cadeau «${INSECABLE}${e.cadeauxBloques[0]}${INSECABLE}» : il ne peut pas être servi avec cette commande.`;
+    return `Retirez le cadeau «${INSECABLE}${e.cadeauxBloques[0]}${INSECABLE}»${INSECABLE}: il ne peut pas être servi avec cette commande.`;
   if (e.sansEpice.length)
     return `Choisissez épicé ou non épicé pour votre ${e.sansEpice[0]} offert.`;
 

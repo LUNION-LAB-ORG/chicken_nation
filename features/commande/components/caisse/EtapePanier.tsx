@@ -13,7 +13,7 @@ import { Icone } from "@/components/site/Icone";
 import { Lien } from "@/components/site/Lien";
 import { PhotoPlat } from "@/components/site/PhotoPlat";
 import { photoPlat } from "@/features/menus/photo-plat";
-import { INSECABLE, joli } from "@/lib/typo";
+import { INSECABLE } from "@/lib/typo";
 import { cn } from "@/lib/utils";
 
 /** Panneau d'une étape (maquette, CSS 1243-1254). */
@@ -61,7 +61,7 @@ export function AlerteMode({
   onRetirer,
 }: {
   mode: ModeCommande;
-  /** Articles qui ne se vendent pas dans ce mode. */
+  /** Articles qui ne se vendent pas dans ce mode, noms déjà mis en forme. */
   noms: string[];
   /** Tout le panier se vend dans l'autre mode (et la livraison est ouverte). */
   basculePossible: boolean;
@@ -70,7 +70,7 @@ export function AlerteMode({
 }) {
   if (!noms.length) return null;
   const plusieurs = noms.length > 1;
-  const liste = noms.map((n) => joli(n)).join(", ");
+  const liste = noms.join(", ");
 
   return (
     <div

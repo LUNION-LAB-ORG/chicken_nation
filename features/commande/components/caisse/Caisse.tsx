@@ -89,6 +89,7 @@ import {
 import { fraisServiceEstimes } from "../../utils/reponses-api.utils";
 import { creneauxRetrait, plageOuverte } from "../../utils/retrait.utils";
 import { aPayer } from "../../utils/statut.utils";
+import { nomsHorsMode } from "../../utils/tiroir.utils";
 import { lignesRecapDuPanier } from "../RecapitulatifPhotos";
 
 import { barreCaisseAtom, etapeDemandeeAtom } from "./BarreEtapes";
@@ -592,6 +593,9 @@ export function Caisse({
 
   const autreMode: ModeCommande = mode === "DELIVERY" ? "PICKUP" : "DELIVERY";
   const horsMode = articlesHorsMode(lignes, mode);
+  // Noms de l'alerte, écrits comme dans le tiroir du panier et sur les
+  // lignes : plat tel qu'enregistré, supplément passé par joli().
+  const nomsAlerte = nomsHorsMode(lignes, mode);
   const basculePossible =
     (autreMode === "PICKUP" || livraison.disponible) &&
     articlesHorsMode(lignes, autreMode).length === 0;
@@ -910,7 +914,7 @@ export function Caisse({
       <AlerteMode
         basculePossible={basculePossible}
         mode={mode}
-        noms={horsMode}
+        noms={nomsAlerte}
         onBasculer={() => {
           setMode(autreMode);
           setErreurEtape(null);
@@ -1099,7 +1103,12 @@ export function Caisse({
           .map(nomCadeau)}
         onModifier={
           ficheBranchee
-            ? (i) => demanderFiche({ platId: lignes[i].dish_id, indexLigne: i })
+            ? (i) =>
+                demanderFiche({
+                  platId: lignes[i].dish_id,
+                  indexLigne: i,
+                  cleLigne: lignes[i].cle,
+                })
             : undefined
         }
         onQuantite={(l: ILignePanier, quantite: number) =>
@@ -1107,7 +1116,7 @@ export function Caisse({
         }
         onRetirer={(l: ILignePanier) => {
           changerQuantite({ cle: l.cle, quantite: 0 });
-          afficherMessage(`${joli(l.nom)} retiré du panier.`);
+          afficherMessage(`${l.nom} retiré du panier.`);
         }}
         onVider={() => {
           vider();

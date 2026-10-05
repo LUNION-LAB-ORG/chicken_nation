@@ -136,7 +136,7 @@ export default function Connexion({
         return allerA("profil");
       }
       afficherMessage(
-        `Connecté : ${res.data.first_name} ${res.data.last_name}.`,
+        `Connecté${INSECABLE}: ${res.data.first_name} ${res.data.last_name}.`,
       );
       onConnecte(res.data);
     });
@@ -178,7 +178,7 @@ export default function Connexion({
           envoyerCode();
         }}
       >
-        {titre("Connectez-vous pour commander")}
+        {titre("Connexion")}
         <p className="text-sm leading-normal text-encre-doux">
           Pas de mot de passe{INSECABLE}: nous vous envoyons un code à 4
           chiffres sur WhatsApp. Si vous avez l&apos;application Chicken Nation,

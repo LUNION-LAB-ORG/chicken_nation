@@ -222,7 +222,7 @@ describe("écrans de la caisse", () => {
       />,
     );
 
-    expect(texte(html)).toContain("Livraison impossible avec : Babatchê.");
+    expect(texte(html)).toContain("Livraison impossible avec : BABATCHÊ.");
     expect(texte(html)).toContain("Passer en retrait");
     expect(texte(html)).toContain("Retirer cet article");
     const seule = renderToStaticMarkup(

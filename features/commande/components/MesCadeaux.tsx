@@ -116,7 +116,7 @@ export default function MesCadeaux({
                 <p className="text-[12.5px] text-encre-doux">
                   {c.type === "SUPPLEMENT"
                     ? "Ajouté au premier plat payant de la commande"
-                    : "Plat offert, ajouté à 0 FCFA"}
+                    : `Plat offert, ajouté à 0${INSECABLE}FCFA`}
                   {jusquau ? `, valable jusqu'au ${jusquau}` : ""}
                 </p>
                 {raisons.map((r) => (
