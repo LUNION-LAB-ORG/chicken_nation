@@ -43,6 +43,7 @@ export function SectionRestaurants({
   niveauTitre = "h2",
   titre,
   className,
+  preload = false,
 }: {
   restaurants: readonly IRestaurantSite[];
   id?: string;
@@ -50,6 +51,11 @@ export function SectionRestaurants({
   /** Titre en police d'affiche, sans accent (par défaut « Nos N restaurants »). */
   titre?: string;
   className?: string;
+  /**
+   * Photo d'en-tête préchargée : seulement quand la section ouvre la page
+   * (`/fr/restaurants`), où cette photo est l'image principale du premier écran.
+   */
+  preload?: boolean;
 }) {
   if (restaurants.length === 0) return null;
   const titreId = `${id}-titre`;
@@ -66,6 +72,7 @@ export function SectionRestaurants({
           fill
           alt=""
           className={styles.teteFond}
+          preload={preload}
           sizes="(min-width: 1264px) 1136px, (min-width: 720px) calc(100vw - 64px), calc(100vw - 32px)"
           src="/assets/site/fond-seau-gris.webp"
         />
