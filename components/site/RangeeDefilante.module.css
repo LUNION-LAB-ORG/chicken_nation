@@ -1,0 +1,57 @@
+/* Rangée qui défile au doigt sous 900 px, avec accroche ; grille au-delà
+   (maquette, CSS 502-533 et 777-788). */
+
+.rangee {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(200px, 62%);
+  gap: 12px;
+  margin: 0 calc(var(--gouttiere) * -1);
+  padding: 4px var(--gouttiere) 12px;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gouttiere);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-trait-fort) transparent;
+}
+
+.rangee > * {
+  scroll-snap-align: start;
+}
+
+/* Promotions : grandes cartes. */
+.promos {
+  grid-auto-columns: minmax(240px, 80%);
+  gap: 14px;
+  padding-block: 4px 16px;
+}
+
+/* Avis : colonnes de textes. */
+.avis {
+  grid-auto-columns: minmax(240px, 82%);
+  align-items: start;
+}
+
+@media (width >= 600px) {
+  .promos {
+    grid-auto-columns: minmax(270px, 44%);
+  }
+}
+
+@media (width >= 900px) {
+  .rangee {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(var(--colonnes, 3), minmax(0, 1fr));
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+  /* Place de l'ombre décalée des cartes en aplat. */
+  .promos {
+    gap: 22px;
+    padding: 0 3px 3px 0;
+  }
+}

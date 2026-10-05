@@ -5,9 +5,8 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
-import { cn } from "@/lib/utils";
 import { routing } from "@/i18n/routing";
-import { fontSans, fontTitle } from "@/config/fonts";
+import { classesPolices } from "@/config/fonts";
 
 // Une seule langue, connue à la construction : les pages qui ne lisent ni
 // cookie ni paramètre d'adresse sont pré-construites (statiques ou revalidées).
@@ -35,14 +34,10 @@ export default async function RootLayout({
   setRequestLocale(locale);
 
   return (
-    <html lang="fr">
-      <body
-        className={cn(
-          "min-h-screen text-foreground bg-background font-sans antialiased",
-          fontSans.className,
-          fontTitle.variable,
-        )}
-      >
+    // Variables des polices sur <html> : les jetons --font-texte et
+    // --font-affiche (styles/globals.css) y sont résolus.
+    <html className={classesPolices} lang="fr">
+      <body className="min-h-screen bg-papier font-texte text-encre antialiased">
         <GoogleAnalytics gaId="G-W7K9L1RZ8E" />
 
         {/* Aucun message envoyé au navigateur (`null` coupe l'héritage) : seul

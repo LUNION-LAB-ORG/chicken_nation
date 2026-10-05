@@ -8,9 +8,8 @@ import { setRequestLocale } from "next-intl/server";
 import PublicLayout from "./[locale]/(public)/layout";
 import PageIntrouvable from "./[locale]/(public)/not-found";
 
-import { fontSans, fontTitle } from "@/config/fonts";
+import { classesPolices } from "@/config/fonts";
 import { routing } from "@/i18n/routing";
-import { cn } from "@/lib/utils";
 
 // Next ajoute lui-même `noindex` à toute réponse 404.
 export const metadata: Metadata = {
@@ -29,20 +28,15 @@ export const metadata: Metadata = {
  * vide (<html id="__next_error__">, sans langue) complété dans le navigateur.
  * Ici la page est entière dès le serveur, avec le code 404.
  *
- * Les classes du <body> doivent rester celles de app/[locale]/layout.tsx.
+ * Les classes de <html> et du <body> doivent rester celles de
+ * app/[locale]/layout.tsx.
  */
 export default function GlobalNotFound() {
   setRequestLocale(routing.defaultLocale);
 
   return (
-    <html lang="fr">
-      <body
-        className={cn(
-          "min-h-screen text-foreground bg-background font-sans antialiased",
-          fontSans.className,
-          fontTitle.variable,
-        )}
-      >
+    <html className={classesPolices} lang="fr">
+      <body className="min-h-screen bg-papier font-texte text-encre antialiased">
         <NextIntlClientProvider locale={routing.defaultLocale} messages={null}>
           <PublicLayout>
             <PageIntrouvable />

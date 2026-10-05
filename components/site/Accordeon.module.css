@@ -1,0 +1,51 @@
+/* Volet dépliable <details>/<summary> (maquette, CSS 1125-1143) : FAQ,
+   suppléments par catégorie. Remplace l'Accordion de HeroUI. */
+
+.volet {
+  border: 1px solid var(--color-trait);
+  border-radius: var(--radius-carte);
+  background: #fff;
+}
+
+.titre {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 6px 14px;
+  list-style: none;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.titre::-webkit-details-marker {
+  display: none;
+}
+
+/* Chevron dessiné, tourné quand le volet est ouvert. */
+.titre::after {
+  content: "";
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-left: auto;
+  border-right: 2px solid var(--color-encre);
+  border-bottom: 2px solid var(--color-encre);
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform 0.15s;
+}
+
+.volet[open] > .titre::after {
+  transform: rotate(-135deg) translate(-2px, -2px);
+}
+
+.titre small {
+  font-weight: 500;
+  font-size: 12.5px;
+  color: var(--color-encre-doux);
+}
+
+.corps {
+  padding: 0 14px 14px;
+}

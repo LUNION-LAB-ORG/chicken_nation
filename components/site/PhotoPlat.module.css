@@ -1,0 +1,66 @@
+/* Photos des plats (maquette, CSS 434-466, retouche 5).
+   Photo toujours entière (contain, jamais cover), posée sur la couleur de son
+   fond (--fond) : zone et photo se confondent. Dans une zone à hauteur fixe,
+   la photo est centrée dans la place qui reste ; avec l'étiquette étoile, une
+   bande en haut lui garde sa place, elle ne cache jamais le plat. */
+
+.photo {
+  --marge: 12px; /* air autour de la photo */
+  --etiq: 32px; /* largeur de l'étiquette étoile */
+  --haut: var(--marge);
+  position: relative;
+  display: block;
+  flex: none;
+  overflow: hidden;
+  border-radius: var(--radius-photo);
+  background: var(--fond, var(--color-fond-photo));
+}
+
+.avecEtiquette {
+  --haut: calc(var(--etiq) * 1.2 + 2px);
+}
+
+.cadre {
+  position: absolute;
+  left: var(--marge);
+  top: var(--haut);
+  width: calc(100% - 2 * var(--marge));
+  height: calc(100% - var(--haut) - var(--marge));
+}
+
+.image {
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Étiquette des photos d'origine, redessinée : onglet ouvert en haut, bord
+   orange de 2 px, coins bas arrondis, étoile du logo au centre. */
+.etiquette {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: var(--marge);
+  width: var(--etiq);
+  height: calc(var(--etiq) * 1.2);
+  border: 2px solid var(--color-orange);
+  border-top: 0;
+  border-radius: 0 0 calc(var(--etiq) * 0.24) calc(var(--etiq) * 0.24);
+  pointer-events: none;
+}
+
+.etiquette::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 70%;
+  aspect-ratio: 203 / 201;
+  transform: translate(-50%, -44%);
+  background: url("/assets/site/logo-orange.png") center top / 100% auto no-repeat;
+}
+
+/* Étiquette à gauche (fiche sur téléphone : le bouton fermer prend le coin droit). */
+.etiquetteGauche .etiquette {
+  right: auto;
+  left: var(--marge);
+}

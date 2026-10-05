@@ -1,0 +1,42 @@
+/* Bord de papier déchiré (maquette, CSS 421-433 et 859).
+   Masque à canal alpha (bord-dechire.webp, tiré de fond-papier-dechire.webp) :
+   il marche sans mask-mode, que Chrome ignore avant la version 120. Les
+   propriétés -webkit-mask-* servent à Safari avant 15.4 et aux anciens Chrome. */
+
+.bord {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  z-index: 1;
+  height: max(100px, 7.2vw);
+  background: var(--couleur-bord, var(--color-papier));
+  pointer-events: none;
+  -webkit-mask-image: url("/assets/site/bord-dechire.webp");
+  mask-image: url("/assets/site/bord-dechire.webp");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center top;
+  mask-position: center top;
+  -webkit-mask-size: max(1600px, 115%) auto;
+  mask-size: max(1600px, 115%) auto;
+}
+
+/* Même tracé retourné, pour ne pas répéter le dessin d'une section à l'autre. */
+.inverse {
+  transform: scaleX(-1);
+}
+
+/* Posé au-dessus du bloc (haut du pied de page sombre). */
+.haut {
+  top: auto;
+  bottom: 100%;
+  margin-bottom: -2px;
+}
+
+/* Bord plus bas, même tracé aplati (pied de page). */
+.aplati {
+  height: 60px;
+  -webkit-mask-size: max(1600px, 115%) 640px;
+  mask-size: max(1600px, 115%) 640px;
+}
