@@ -1,10 +1,12 @@
 import type { ICategorieCarte, IPlatApi } from "../types/carte.types";
+import type { IPlatDetail } from "@/features/commande/types/commande.types";
 
 import { cache } from "react";
 
 import { construireCarte } from "../carte";
 
 import { baseURL } from "@/config/api";
+import { versPlatDetail } from "@/features/commande/utils/reponses-api.utils";
 
 export type { ICategorieCarte, IPlatCarte } from "../types/carte.types";
 
@@ -63,4 +65,28 @@ async function lirePlatsApi(): Promise<IPlatApi[]> {
  */
 export const obtenirCartePublique = cache(
   async (): Promise<ICategorieCarte[]> => construireCarte(await lirePlatsApi()),
+);
+
+/**
+ * Détail public d'un plat (épicé, choix d'un menu composable, suppléments),
+ * pour écrire sa composition dans le HTML de sa page : sans lui, ces
+ * informations n'existaient que dans la fiche chargée au clic, invisibles des
+ * moteurs de recherche (recette référencement, contenu des pages plats).
+ * Même cadence que la carte. API muette : null, la page se passe du bloc.
+ */
+export const obtenirDetailPlatPublic = cache(
+  async (id: string): Promise<IPlatDetail | null> => {
+    try {
+      const res = await fetch(`${baseURL}/dishes/${encodeURIComponent(id)}`, {
+        next: { revalidate: REVALIDATION_CARTE, tags: [ETIQUETTE_CARTE] },
+        headers: { "x-app-composable": "1" },
+      });
+
+      if (!res.ok) return null;
+
+      return versPlatDetail((await res.json()) as Record<string, unknown>);
+    } catch {
+      return null;
+    }
+  },
 );

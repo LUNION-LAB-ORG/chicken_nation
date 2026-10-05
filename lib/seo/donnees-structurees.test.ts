@@ -3,7 +3,7 @@ import { describe, expect, it } from "bun:test";
 
 import { ID_MENU, ID_ORGANISATION, adresseAbsolue, jsonLd } from "./commun";
 import { filArianeSchemaOrg } from "./fil-ariane";
-import { menuSchemaOrg } from "./menu";
+import { menuItemSchemaOrg, menuSchemaOrg } from "./menu";
 import {
   fourchetteTexte,
   listeRestaurantsSchemaOrg,
@@ -47,15 +47,24 @@ describe("menu de la carte", () => {
   it("publie une section par catégorie, avec l'ancre de la carte", () => {
     expect(menu["@id"]).toBe(ID_MENU);
     expect(menu.url).toBe("https://www.chicken-nation.com/fr/carte");
+    // Sans la section Promotions : ses plats sont déjà dans leur catégorie
+    // (recette SEO 8).
     expect(menu.hasMenuSection.map((s) => s.url)).toEqual(
-      carte.map((c) => `https://www.chicken-nation.com/fr/carte#${c.cle}`),
+      carte
+        .filter((c) => c.cle !== "promotions")
+        .map((c) => `https://www.chicken-nation.com/fr/carte#${c.cle}`),
     );
+    const noms = menu.hasMenuSection.flatMap((s) =>
+      s.hasMenuItem.map((i) => i.url),
+    );
+
+    expect(new Set(noms).size).toBe(noms.length);
   });
 
   it("décrit chaque plat avec sa page, sa photo et son prix en XOF", () => {
-    const box = menu.hasMenuSection[1].hasMenuItem.find(
-      (i) => i.name === "BOX DE LA NATION",
-    );
+    const box = menu.hasMenuSection
+      .flatMap((section) => section.hasMenuItem)
+      .find((i) => i.name === "BOX DE LA NATION");
 
     expect(box).toEqual({
       "@type": "MenuItem",
@@ -73,6 +82,17 @@ describe("menu de la carte", () => {
       },
     });
     expect(JSON.stringify(menu)).not.toMatch(/aggregateRating|"Review"/);
+    // Plat sans photo : pas d'image, jamais le logo de repli (recette SEO 8).
+    const sansPhoto = menuItemSchemaOrg({
+      ...carte[1].plats[0],
+      photo: {
+        ...carte[1].plats[0].photo,
+        src: "/assets/images/logo.png",
+        recadree: false,
+      },
+    });
+
+    expect("image" in sansPhoto).toBe(false);
   });
 
   it("reste lisible par JSON.parse et ne peut pas fermer la balise script", () => {
@@ -113,7 +133,8 @@ describe("restaurants", () => {
       telephone: "+225 27 21 71 21 30",
       priceRange: "2 000 à 22 000 FCFA",
       servesCuisine: ["Fast-food", "Poulet frit", "Burgers"],
-      hasMenu: { "@id": ID_MENU },
+      // L'adresse de la carte : le nœud Menu n'est pas sur la page (recette SEO 7).
+      hasMenu: "https://www.chicken-nation.com/fr/carte",
       parentOrganization: { "@id": ID_ORGANISATION },
     });
     expect(
@@ -121,6 +142,8 @@ describe("restaurants", () => {
         "/chicken-nation/restaurants/1777032453359-zone_4.webp",
       ),
     ).toBe(true);
+    expect("inLanguage" in noeud.potentialAction.target).toBe(false);
+    expect("menu" in noeud).toBe(false);
     expect(noeud.potentialAction.target.urlTemplate).toBe(
       "https://www.chicken-nation.com/fr/carte",
     );

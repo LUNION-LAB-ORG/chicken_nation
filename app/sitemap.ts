@@ -19,8 +19,9 @@ type Frequence = Entree["changeFrequency"];
  * Pages fixes indexables, toutes en /fr (adresses de référence). Les trois
  * premières gardent leur place : plats et restaurants sont rangés après elles.
  * Absentes à dessein : /fr/franchise et /fr/restaurants/nos-menus (redirigées
- * vers l'histoire et la carte), l'accord de confidentialité (noindex), la
- * caisse, le suivi et les pages de passage vers l'appli (robots.ts).
+ * vers l'histoire et la carte), l'accord de confidentialité et les termes et
+ * conditions (noindex), la caisse, le suivi et les pages de passage vers
+ * l'appli (robots.ts).
  */
 const PAGES_FIXES: {
   chemin: string;
@@ -35,7 +36,6 @@ const PAGES_FIXES: {
   { chemin: "/fr/carte-nation/adhesion", priorite: 0.7, frequence: "monthly" },
   { chemin: "/fr/faq", priorite: 0.5, frequence: "monthly" },
   { chemin: "/fr/contact", priorite: 0.5, frequence: "yearly" },
-  { chemin: "/fr/politique", priorite: 0.2, frequence: "yearly" },
   { chemin: "/fr/privacy-rules", priorite: 0.2, frequence: "yearly" },
   { chemin: "/fr/deletion-of-account", priorite: 0.2, frequence: "yearly" },
 ];
@@ -70,6 +70,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: page.priorite,
     }),
   );
+
+  // Carte et accueil changent avec les plats : leur date est celle du plat
+  // modifié le plus récemment.
+  const datesPlats = platsDeLaCarte(carte)
+    .map((p) => dateValide(p.modifieLe))
+    .filter((d): d is string => !!d)
+    .sort();
+  const carteModifiee = datesPlats[datesPlats.length - 1];
+
+  if (carteModifiee) {
+    accueil.lastModified = carteModifiee;
+    pageCarte.lastModified = carteModifiee;
+  }
 
   const plats: Entree[] = platsDeLaCarte(carte).map((plat) => {
     const modifie = dateValide(plat.modifieLe);

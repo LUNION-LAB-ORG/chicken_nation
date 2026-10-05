@@ -71,7 +71,8 @@ export function SectionCategorie({
           className={promo ? "rounded-lg bg-jaune px-2.5 py-0.5" : undefined}
         >
           {categorie.nom}
-        </span>
+        </span>{" "}
+        {/* Espace : le titre se lit « Promotions 1 plat », et non « Promotions1 plat ». */}
         <small className="text-sm font-medium text-encre-doux">
           {pluriel(categorie.plats.length, "plat", "plats")}
         </small>

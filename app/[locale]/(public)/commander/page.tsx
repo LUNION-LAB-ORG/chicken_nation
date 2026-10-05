@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { preconnect } from "react-dom";
 
+import { pageNonIndexee } from "../../meta";
+
 import { slugValide } from "@/components/site/carte/retrait-demande";
 import { Lien } from "@/components/site/Lien";
 import { TitreAffiche } from "@/components/site/TitreAffiche";
@@ -17,10 +19,10 @@ import { BarreEtapes } from "@/features/commande/components/caisse/BarreEtapes";
 import { Caisse } from "@/features/commande/components/caisse/Caisse";
 import { obtenirRestaurantsDuSite } from "@/features/restaurants/restaurant.api";
 
-export const metadata: Metadata = {
-  title: "Votre commande",
-  robots: { index: false, follow: false },
-};
+export const metadata: Metadata = pageNonIndexee({
+  chemin: "/commander",
+  titre: "Votre commande",
+});
 
 /**
  * Caisse en 5 étapes (lot L11c) : page dynamique (cookie `cn_client`), jamais

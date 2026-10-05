@@ -1,6 +1,5 @@
 import {
   CHEMIN_CARTE,
-  ID_MENU,
   ID_ORGANISATION,
   TELEPHONE_SCHEMA,
   adresseAbsolue,
@@ -103,8 +102,9 @@ export function restaurantSchemaOrg(
     ...(options.prix ? { priceRange: fourchetteTexte(options.prix) } : {}),
     servesCuisine: ["Fast-food", "Poulet frit", "Burgers"],
     ...(horaires.length ? { openingHoursSpecification: horaires } : {}),
-    menu: adresseAbsolue(CHEMIN_CARTE),
-    hasMenu: { "@id": ID_MENU },
+    // L'adresse de la carte (le nœud Menu n'est publié que sur /fr/carte :
+    // un @id seul ne se résolvait pas ici). `menu` est l'ancien nom de hasMenu.
+    hasMenu: adresseAbsolue(CHEMIN_CARTE),
     // Commande en ligne : la carte du site, le restaurant se choisit à la caisse.
     // Pas de deliveryMethod : une partie des livraisons passe par Turbo.
     potentialAction: {
@@ -112,7 +112,6 @@ export function restaurantSchemaOrg(
       target: {
         "@type": "EntryPoint",
         urlTemplate: adresseAbsolue(CHEMIN_CARTE),
-        inLanguage: "fr",
         actionPlatform: [
           "https://schema.org/DesktopWebPlatform",
           "https://schema.org/MobileWebPlatform",

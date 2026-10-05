@@ -199,10 +199,16 @@ describe("pied de page", () => {
       "/fr/histoire#franchise",
       "/fr/contact",
       "/fr/faq",
-      "/fr/politique",
+      "/fr/privacy-rules",
       "/fr/deletion-of-account",
     ])
       expect(html).toContain(`href="${href}"`);
+    // « Politique de confidentialité » mène à la politique de confidentialité,
+    // plus aux termes et conditions (recette SEO 2).
+    expect(html).toMatch(
+      /href="\/fr\/privacy-rules"[^>]*>Politique de confidentialité</,
+    );
+    expect(html).not.toContain('href="/fr/politique"');
     expect(html).toContain(">La franchise est possible.</a>");
     expect(html).toMatch(
       /href="https:\/\/lunion-lab\.com" target="_blank" rel="noopener noreferrer"[^>]*>LUNION-LAB<span class="sr-only">, nouvel onglet<\/span><\/a>/,

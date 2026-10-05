@@ -14,7 +14,10 @@ import {
   descriptionPlat,
   titrePlat,
 } from "@/components/site/carte/textes-plat";
-import { obtenirCartePublique } from "@/features/menus/apis/menu-public.api";
+import {
+  obtenirCartePublique,
+  obtenirDetailPlatPublic,
+} from "@/features/menus/apis/menu-public.api";
 import { platsDeLaCarte } from "@/features/menus/carte";
 import { cheminPlat } from "@/features/menus/plats.slug";
 import { CHEMIN_CARTE, jsonLd } from "@/lib/seo/commun";
@@ -129,6 +132,7 @@ export default async function PagePlatRoute({
     return <Renvoi chemin={destination.chemin} />;
   const plat = destination.plat;
   const categorie = carte.find((c) => c.cle === plat.categorie.cle) ?? null;
+  const detail = await obtenirDetailPlatPublic(plat.id);
 
   return (
     <>
@@ -147,7 +151,7 @@ export default async function PagePlatRoute({
         }}
         type="application/ld+json"
       />
-      <PagePlat categorie={categorie} plat={plat} />
+      <PagePlat categorie={categorie} detail={detail} plat={plat} />
     </>
   );
 }

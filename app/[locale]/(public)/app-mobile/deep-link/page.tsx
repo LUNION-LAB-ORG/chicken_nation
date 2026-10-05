@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 
+import { pageNonIndexee } from "../../../meta";
+
 import { PageAppliOuverture } from "@/components/site/appli/PageAppliOuverture";
 import { Section } from "@/components/site/Section";
 
 // noindex posé par la mise en page du dossier : page technique.
-export const metadata: Metadata = {
-  title: "Ouverture de l'application",
-};
+export const metadata: Metadata = pageNonIndexee({
+  chemin: "/app-mobile/deep-link",
+  titre: "Ouverture de l'application",
+});
 
 /**
  * Page de repli des liens vers l'application (QR codes imprimés, backoffice,

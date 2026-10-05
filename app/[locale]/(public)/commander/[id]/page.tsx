@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import { setRequestLocale } from "next-intl/server";
 
+import { pageNonIndexee } from "../../../meta";
+
 import { Conteneur } from "@/components/site/Section";
 import {
   lireReglagesFideliteAction,
@@ -12,10 +14,10 @@ import ConnexionRequise from "@/features/commande/components/ConnexionRequise";
 import { EnteteEcran } from "@/features/commande/components/EnteteEcran";
 import SuiviCommande from "@/features/commande/components/SuiviCommande";
 
-export const metadata: Metadata = {
-  title: "Suivi de commande",
-  robots: { index: false, follow: false },
-};
+export const metadata: Metadata = pageNonIndexee({
+  chemin: "/commander",
+  titre: "Suivi de commande",
+});
 
 export default async function SuiviPage({
   params,

@@ -3,12 +3,13 @@
 import { Bouton } from "../Bouton";
 import { afficherMessage } from "../MessageFlottant";
 
+import { SITE_URL } from "@/lib/seo/commun";
 import { INSECABLE } from "@/lib/typo";
 
 /**
  * « Partager » la page d'un plat : feuille de partage du téléphone (WhatsApp
  * et les autres applications), sinon copie du lien. L'adresse partagée est
- * celle de la page, sans paramètre ni ancre.
+ * celle de la page sur www.chicken-nation.com, sans paramètre ni ancre.
  */
 export function BoutonPartager({
   titre,
@@ -20,7 +21,9 @@ export function BoutonPartager({
   className?: string;
 }) {
   const partager = async () => {
-    const url = `${window.location.origin}${window.location.pathname}`;
+    // Toujours l'adresse de référence (www) : un visiteur arrivé par le
+    // domaine nu ne doit pas propager une seconde adresse de la page.
+    const url = `${SITE_URL}${window.location.pathname}`;
 
     if (typeof navigator.share === "function") {
       try {

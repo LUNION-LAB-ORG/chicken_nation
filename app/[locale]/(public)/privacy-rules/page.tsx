@@ -27,7 +27,9 @@ export default async function PolitiqueConfidentialite({
   return (
     <TexteLong
       fondEntete="jaune"
-      miseAJour={`Dernière mise à jour${INSECABLE}: ${new Date().toLocaleDateString("fr-FR")}`}
+      // Date du dernier changement du texte (commit e990f3c « maj policy »), et non celle de la
+      // construction : chaque déploiement la changeait.
+      miseAJour={`Dernière mise à jour${INSECABLE}: 5${INSECABLE}mars${INSECABLE}2026`}
       surtitre="Application CHICKEN NATION"
       titre="Politique de confidentialité"
     >

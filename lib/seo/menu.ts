@@ -5,6 +5,7 @@ import type {
 
 import { CHEMIN_CARTE, ID_MENU, adresseAbsolue } from "./commun";
 
+import { CLE_PROMOTIONS } from "@/features/menus/carte.categories";
 import { cheminPlat } from "@/features/menus/plats.slug";
 
 /**
@@ -20,7 +21,11 @@ export function menuItemSchemaOrg(plat: IPlatCarte) {
     name: plat.nom,
     url: adresseAbsolue(cheminPlat(plat)),
     ...(plat.description ? { description: plat.description } : {}),
-    image: adresseAbsolue(plat.photo.src),
+    // Photo recadrée du site ou photo de l'API ; jamais le logo de repli
+    // d'un plat sans photo (49 × 69 px), comme le sitemap.
+    ...(plat.photo.recadree || /^https?:\/\//.test(plat.photo.src)
+      ? { image: adresseAbsolue(plat.photo.src) }
+      : {}),
     suitableForDiet: "https://schema.org/HalalDiet",
     offers: {
       "@type": "Offer",
@@ -43,11 +48,14 @@ export function menuSchemaOrg(categories: readonly ICategorieCarte[]) {
     name: "La carte CHICKEN NATION",
     url: adresseAbsolue(CHEMIN_CARTE),
     inLanguage: "fr",
-    hasMenuSection: categories.map((c) => ({
-      "@type": "MenuSection",
-      name: c.nom,
-      url: adresseAbsolue(`${CHEMIN_CARTE}#${c.cle}`),
-      hasMenuItem: c.plats.map(menuItemSchemaOrg),
-    })),
+    // Pas de section Promotions : ses plats figurent déjà dans leur catégorie.
+    hasMenuSection: categories
+      .filter((c) => c.cle !== CLE_PROMOTIONS)
+      .map((c) => ({
+        "@type": "MenuSection",
+        name: c.nom,
+        url: adresseAbsolue(`${CHEMIN_CARTE}#${c.cle}`),
+        hasMenuItem: c.plats.map(menuItemSchemaOrg),
+      })),
   };
 }

@@ -51,7 +51,10 @@ export const LIENS_PIED: readonly ILienSite[] = [
   { href: "/fr/histoire#franchise", libelle: "Devenir franchisé" },
   { href: "/fr/contact", libelle: "Contact" },
   { href: "/fr/faq", libelle: "FAQ" },
-  { href: "/fr/politique", libelle: "Politique de confidentialité" },
+  // La vraie politique de confidentialité. Les « Termes et conditions »
+  // (/fr/politique) ne sont plus liés : leur texte est un modèle jamais
+  // rempli (autre restaurant, prix en euros), à remplacer par le client.
+  { href: "/fr/privacy-rules", libelle: "Politique de confidentialité" },
   // Demandé par Google Play pour la fiche de l'application.
   { href: "/fr/deletion-of-account", libelle: "Supprimer mon compte" },
 ];

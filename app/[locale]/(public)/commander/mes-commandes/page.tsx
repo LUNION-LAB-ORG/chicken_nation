@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import { setRequestLocale } from "next-intl/server";
 
+import { pageNonIndexee } from "../../../meta";
+
 import { Conteneur } from "@/components/site/Section";
 import { listerCommandesAction } from "@/features/commande/actions/commande.action";
 import { lireCompteAction } from "@/features/commande/actions/compte.action";
@@ -10,10 +12,10 @@ import ConnexionRequise from "@/features/commande/components/ConnexionRequise";
 import { EnteteEcran } from "@/features/commande/components/EnteteEcran";
 import { MesCommandes } from "@/features/commande/components/MesCommandes";
 
-export const metadata: Metadata = {
-  title: "Mes commandes",
-  robots: { index: false, follow: false },
-};
+export const metadata: Metadata = pageNonIndexee({
+  chemin: "/commander/mes-commandes",
+  titre: "Mes commandes",
+});
 
 export default async function MesCommandesPage({
   params,

@@ -37,7 +37,9 @@ export default async function SuppressionCompte({
   return (
     <TexteLong
       fondEntete="jaune"
-      miseAJour={`Dernière mise à jour${INSECABLE}: ${new Date().toLocaleDateString("fr-FR")}`}
+      // Date du dernier changement du texte (commit 1c243c6), et non celle de la
+      // construction : chaque déploiement la changeait.
+      miseAJour={`Dernière mise à jour${INSECABLE}: 6${INSECABLE}août${INSECABLE}2025`}
       surtitre="Supprimer mon compte"
       titre="Suppression de compte client"
     >

@@ -57,6 +57,21 @@ describe("SectionRestaurants", () => {
     expect(rendre(PRODUCTION.slice(0, 1))).toContain(">Notre restaurant</h2>");
   });
 
+  it("titres dans l'ordre : sous un h1, les restaurants sont des h2 (recette rendu 5)", () => {
+    const page = renderToStaticMarkup(
+      <SectionRestaurants
+        niveauTitre="h1"
+        restaurants={PRODUCTION}
+        titre="Nos restaurants"
+      />,
+    );
+
+    expect(page).toContain(">Nos restaurants</h1>");
+    expect(page.match(/<h2/g)).toHaveLength(PRODUCTION.length);
+    expect(page).not.toContain("<h3");
+    expect(rendre(PRODUCTION).match(/<h3/g)).toHaveLength(PRODUCTION.length);
+  });
+
   it("section masquée sans restaurant", () => {
     expect(rendre([])).toBe("");
   });

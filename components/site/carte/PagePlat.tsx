@@ -1,3 +1,4 @@
+import type { IPlatDetail } from "@/features/commande/types/commande.types";
 import type {
   ICategorieCarte,
   IPlatCarte,
@@ -14,6 +15,7 @@ import { Conteneur, Section } from "../Section";
 
 import { BoutonCommanderPlat } from "./BoutonCommanderPlat";
 import { BoutonPartager } from "./BoutonPartager";
+import { CompositionPlat } from "./CompositionPlat";
 import styles from "./Carte.module.css";
 import { DisponibiliteHoraire } from "./DisponibiliteHoraire";
 import { GrillePlats } from "./SectionCategorie";
@@ -133,16 +135,20 @@ function Modes({ plat }: { plat: IPlatCarte }) {
  * taille, catégorie (lien vers sa section de la carte), nom en h1 (Poppins,
  * jamais la police d'affiche : les noms viennent de la base), mention des
  * modes, description, prix, créneau, « Choisir et commander » (fiche plat),
- * « Partager », puis les autres plats de la catégorie. Composant serveur ;
+ * « Partager », composition et choix (épicé, sauces, suppléments), puis les
+ * autres plats de la catégorie. Composant serveur ;
  * les boutons sont des îlots.
  */
 export function PagePlat({
   plat,
   categorie,
+  detail = null,
 }: {
   plat: IPlatCarte;
   /** Section de la carte qui porte la catégorie du plat (autres plats). */
   categorie: ICategorieCarte | null;
+  /** Détail public du plat (composition écrite dans la page), ou null. */
+  detail?: IPlatDetail | null;
 }) {
   const remise =
     plat.prixAvantPromo !== null ? plat.prixAvantPromo - plat.prix : 0;
@@ -228,6 +234,7 @@ export function PagePlat({
               </a>
               .
             </p>
+            <CompositionPlat detail={detail} />
           </div>
         </article>
       </Conteneur>

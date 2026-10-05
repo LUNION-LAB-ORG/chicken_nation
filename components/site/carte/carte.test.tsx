@@ -509,3 +509,92 @@ describe("retrait choisi sur la carte", () => {
     );
   });
 });
+
+describe("composition d'un plat dans sa page (recette référencement, contenu)", () => {
+  const { lignesComposition, phraseEpice } = require("./CompositionPlat");
+  const N = " ";
+  const detail = {
+    spice_level: "OPTIONAL",
+    groupes: [
+      {
+        id: "g1",
+        name: "Sauce",
+        description: null,
+        min_select: 1,
+        max_select: 1,
+        position: 0,
+        items: [
+          {
+            id: "a",
+            label: "Barbecue",
+            price_delta: 0,
+            is_default: true,
+            available: true,
+            position: 0,
+          },
+          {
+            id: "b",
+            label: "Cheddar",
+            price_delta: 500,
+            is_default: false,
+            available: true,
+            position: 1,
+          },
+          {
+            id: "c",
+            label: "Pop corn",
+            price_delta: 0,
+            is_default: false,
+            available: false,
+            position: 2,
+          },
+        ],
+      },
+    ],
+    supplements: [
+      {
+        id: "s1",
+        name: "COCA",
+        price: 1000,
+        category: "DRINK",
+        available_order_types: [],
+        image: null,
+        position: 0,
+      },
+      {
+        id: "s2",
+        name: "BARBECUE",
+        price: 1000,
+        category: "FOOD",
+        available_order_types: [],
+        image: null,
+        position: 0,
+      },
+    ],
+  };
+
+  it("épicé, choix disponibles et suppléments par catégorie, avec leur prix", () => {
+    expect(phraseEpice("OPTIONAL")).toBe(
+      "Épicé ou non, au choix à la commande.",
+    );
+    expect(phraseEpice("NEVER")).toBeNull();
+    expect(lignesComposition(detail)).toEqual([
+      {
+        titre: "Sauce (1 au choix)",
+        texte: `Barbecue ou Cheddar (+500${N}FCFA)`,
+      },
+      { titre: "Sauces en supplément", texte: `Barbecue (+1${N}000${N}FCFA)` },
+      { titre: "Boissons en supplément", texte: `Coca (+1${N}000${N}FCFA)` },
+    ]);
+  });
+
+  it("rendu serveur : un titre h2, rien sans détail", () => {
+    const { CompositionPlat } = require("./CompositionPlat");
+
+    expect(renderToStaticMarkup(<CompositionPlat detail={null} />)).toBe("");
+    const html = renderToStaticMarkup(<CompositionPlat detail={detail} />);
+
+    expect(html).toContain(">Composition et choix</h2>");
+    expect(html).toContain("Épicé ou non, au choix à la commande.");
+  });
+});

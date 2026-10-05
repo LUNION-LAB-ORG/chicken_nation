@@ -5,11 +5,16 @@ import { pageMetadata } from "../../meta";
 import { TexteLong } from "@/components/site/TexteLong";
 import { INSECABLE } from "@/lib/typo";
 
+// Non indexée, hors du sitemap et du pied de page : le texte est un modèle
+// jamais rempli (« Saveur Express », prix en euros, livraison à 5 km,
+// « [email] », « [date] »), faux et contraire à la FAQ. À réindexer
+// (indexable, sitemap, lien « Conditions générales ») quand le client aura
+// fourni le vrai texte.
 export const metadata = pageMetadata({
   chemin: "/politique",
   titre: "Termes et conditions",
-  description:
-    "Conditions générales d'utilisation des services CHICKEN NATION : commandes, livraison, paiement et données personnelles.",
+  description: `Conditions générales d'utilisation des services CHICKEN NATION${INSECABLE}: commandes, livraison, paiement et données personnelles.`,
+  indexable: false,
 });
 
 // Contenu juridique repris tel quel de l'ancienne page (seules la typographie

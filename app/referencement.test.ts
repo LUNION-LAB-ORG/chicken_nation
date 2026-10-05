@@ -139,7 +139,6 @@ describe("sitemap", () => {
       "/fr/carte-nation/adhesion",
       "/fr/faq",
       "/fr/contact",
-      "/fr/politique",
       "/fr/privacy-rules",
       "/fr/deletion-of-account",
       "/fr/restaurants/zone-4",
@@ -147,6 +146,18 @@ describe("sitemap", () => {
     ])
       expect(adresses).toContain(`${SITE}${chemin}`);
     expect(adresses).not.toContain(`${SITE}/fr/restaurants/abobo`);
+    // Termes et conditions : modèle jamais rempli, hors du sitemap (recette SEO 1).
+    expect(adresses).not.toContain(`${SITE}/fr/politique`);
+    // Accueil et carte datés du plat modifié le plus récemment (recette SEO 9).
+    const dates = entrees
+      .filter((e) => e.url.startsWith(`${SITE}/fr/carte/`))
+      .map((e) => e.lastModified)
+      .filter(Boolean)
+      .sort();
+
+    expect(dates.length).toBeGreaterThan(0);
+    expect(entrees[0].lastModified).toBe(dates[dates.length - 1]);
+    expect(entrees[1].lastModified).toBe(dates[dates.length - 1]);
 
     const interdits =
       /franchise|nos-menus|confidentiality|commander|deep-link|download|dashboard|auth|\/(en|ar)\//;

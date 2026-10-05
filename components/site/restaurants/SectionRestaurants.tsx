@@ -17,14 +17,17 @@ export const PHRASE_HORAIRES = `Ouverts 7${INSECABLE}j/7 dès 10${INSECABLE}h, j
 export function GrilleRestaurants({
   restaurants,
   libelle = "Nos restaurants",
+  niveauTitre = "h3",
 }: {
   restaurants: readonly IRestaurantSite[];
   libelle?: string;
+  /** Niveau du nom de chaque restaurant : juste sous le titre de la section. */
+  niveauTitre?: "h2" | "h3";
 }) {
   return (
     <ul aria-label={libelle} className={styles.grille}>
       {restaurants.map((r) => (
-        <CarteRestaurant key={r.id} restaurant={r} />
+        <CarteRestaurant key={r.id} niveauTitre={niveauTitre} restaurant={r} />
       ))}
     </ul>
   );
@@ -93,7 +96,12 @@ export function SectionRestaurants({
           </span>
         </p>
       </div>
-      <GrilleRestaurants restaurants={restaurants} />
+      {/* Titres dans l'ordre : sous un h1 (page /fr/restaurants), les
+          restaurants sont des h2, sous un h2 (accueil), des h3. */}
+      <GrilleRestaurants
+        niveauTitre={niveauTitre === "h1" ? "h2" : "h3"}
+        restaurants={restaurants}
+      />
     </Section>
   );
 }

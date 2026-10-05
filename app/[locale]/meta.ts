@@ -165,6 +165,41 @@ export function pageMetadata({
   };
 }
 
+/**
+ * Page jamais indexée (caisse, suivi, mes commandes, ouverture de l'appli) :
+ * son adresse de partage est la sienne, et non l'accueil hérité de la mise
+ * en page (un aperçu partagé montrait l'accueil). Rien n'est suivi par les
+ * robots.
+ */
+export function pageNonIndexee({
+  chemin,
+  titre,
+}: {
+  chemin: string;
+  titre: string;
+}): Metadata {
+  const url = `${SITE_URL}/fr${chemin}`;
+  const titrePartage = `${titre} | CHICKEN NATION`;
+
+  return {
+    title: titre,
+    robots: { index: false, follow: false },
+    openGraph: {
+      type: "website",
+      locale: "fr_CI",
+      siteName: "CHICKEN NATION",
+      url,
+      title: titrePartage,
+      images: [IMAGE_PARTAGE],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: titrePartage,
+      images: [IMAGE_PARTAGE.url],
+    },
+  };
+}
+
 /** Nœud `WebSite` du graphe (nom du site dans les résultats de Google). */
 export const ID_SITE_WEB = `${SITE_URL}/#website`;
 
