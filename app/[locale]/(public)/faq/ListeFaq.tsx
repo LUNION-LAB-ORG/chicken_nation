@@ -75,9 +75,11 @@ function Bloc({ bloc }: { bloc: BlocFaq }) {
 export function ListeFaq({ rubriques }: { rubriques: RubriqueFaq[] }) {
   return (
     <>
-      {/* Rubriques : rangée qui défile au doigt sur téléphone, à la ligne ensuite. */}
+      {/* Rubriques à la ligne à toutes les largeurs : dans une rangée qui
+          défilait, une pastille à moitié cachée recevait le focus sans
+          apparaître (le navigateur ne la faisait pas défiler). */}
       <nav aria-label="Rubriques de la FAQ">
-        <ul className="-mx-(--gouttiere) flex gap-2 overflow-x-auto px-(--gouttiere) pb-1 [scrollbar-width:thin] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
+        <ul className="flex flex-wrap gap-2">
           {rubriques.map((r) => (
             <li key={r.id}>
               <Pastille className="min-h-11" href={`#${r.id}`}>

@@ -81,7 +81,7 @@ export function BoutonPanier() {
         ) : null}
       </span>
       {/* Largeur réservée : « Panier » et « 12 500 FCFA » (82 px) prennent la même place. */}
-      <span className="hidden min-w-[84px] text-sm font-semibold whitespace-nowrap tabular-nums md:inline">
+      <span className="hidden min-w-[84px] text-left text-sm font-semibold whitespace-nowrap tabular-nums md:inline">
         {nombre ? fcfa(total) : "Panier"}
       </span>
     </>

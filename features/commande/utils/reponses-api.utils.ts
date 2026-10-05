@@ -32,7 +32,8 @@ const TOUS_LES_MODES = ["DELIVERY", "PICKUP", "TABLE"];
 export const modesDeVente = (v: unknown) =>
   Array.isArray(v) && v.length ? (v as string[]) : TOUS_LES_MODES;
 
-export const IMAGE_PAR_DEFAUT = "/assets/images/logo.png";
+/** Logo de 203 × 300 px (l'ancien, de 49 × 69 px, était flou une fois agrandi). */
+export const IMAGE_PAR_DEFAUT = "/assets/site/logo-orange.png";
 
 // ── Plat ──────────────────────────────────────────────────────────────────
 

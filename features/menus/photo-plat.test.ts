@@ -98,7 +98,8 @@ describe("repli sur la photo de l'API", () => {
 
   it("montre le logo sur fond crème pour un plat sans photo", () => {
     expect(photoPlat("sans-photo", null)).toMatchObject({
-      src: "/assets/images/logo.png",
+      // 203 × 300 px : jamais agrandi au point d'être flou.
+      src: "/assets/site/logo-orange.png",
       fond: FOND_PHOTO_PLAT,
       etiquette: false,
       recadree: false,

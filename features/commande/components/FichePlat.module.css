@@ -132,6 +132,12 @@
   .tete {
     padding-right: 0;
   }
+  /* Photo de l'API : son étiquette étoile est dans l'image, en haut à droite,
+     sous le bouton fermer. Une bande de 56 px en haut garde l'image hors de
+     son chemin (les photos recadrées ont leur étiquette dessinée à gauche). */
+  .haut > .photoApi {
+    --haut: 56px;
+  }
   .pied {
     padding-inline: 16px;
     gap: 10px;

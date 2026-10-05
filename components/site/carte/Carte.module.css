@@ -158,9 +158,14 @@
   max-height: 300px;
 }
 
+/* De 600 à 899 px, la photo prend aussi sa largeur à elle (380 px de haut au
+   plus), au lieu de toute la ligne : une photo carrée laissait la moitié de
+   la zone vide (retouche 5, « sans trop de vide »). */
 @media (width >= 600px) {
   .photo {
+    width: min(100%, calc(380px * var(--ratio)));
     max-height: 380px;
+    margin-inline: auto;
   }
 }
 

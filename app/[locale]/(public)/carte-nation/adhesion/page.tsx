@@ -63,12 +63,12 @@ export default async function CarteNationAdhesionPage({
 
       <Section
         motif
-        classeConteneur="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,500px)] lg:gap-14"
+        classeConteneur="grid grid-cols-[minmax(0,1fr)] items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,500px)] lg:gap-14"
         fond="surface"
         libelle={t("title")}
       >
         {/* Formulaire : premier dans la page, colonne de droite sur ordinateur. */}
-        <div className="rounded-panneau border border-trait bg-white p-5 shadow-1 md:p-7 lg:col-start-2 lg:row-start-1">
+        <div className="rounded-panneau border border-trait bg-white p-4 shadow-1 min-[360px]:p-5 md:p-7 lg:col-start-2 lg:row-start-1">
           <AdhesionForm />
         </div>
 

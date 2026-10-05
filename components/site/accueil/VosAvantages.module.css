@@ -329,9 +329,11 @@
   scrollbar-color: var(--color-trait-sombre) transparent;
 }
 
+/* Les cartes d'une rangée ont la même hauteur : les conditions descendent en
+   bas de la carte au lieu de laisser un vide sous elles. */
 .offre {
-  display: grid;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
   gap: 6px;
   min-width: 0;
   padding: 16px 18px;
@@ -365,8 +367,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin: 4px 0 0;
-  padding: 0;
+  margin: auto 0 0;
+  padding: 4px 0 0;
   list-style: none;
 }
 

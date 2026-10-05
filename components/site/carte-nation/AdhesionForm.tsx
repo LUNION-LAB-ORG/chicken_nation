@@ -123,6 +123,7 @@ export default function AdhesionForm() {
   };
 
   const envoyer = async (donnees: AdhesionDTO) => {
+    if (isPending) return;
     setErreurEnvoi(null);
     try {
       await mutateAsync({ data: donnees, photo });
@@ -243,7 +244,8 @@ export default function AdhesionForm() {
             {t("photo_optional")}
           </span>
         </p>
-        <div className="flex items-center gap-3.5">
+        {/* À la ligne sous 345 px : vignette et bouton ne tiennent pas côte à côte. */}
+        <div className="flex flex-wrap items-center gap-3.5">
           {apercu ? (
             // Aperçu local (adresse blob:) : next/image ne s'y applique pas.
             // eslint-disable-next-line @next/next/no-img-element
@@ -365,10 +367,11 @@ export default function AdhesionForm() {
       />
 
       <div className="grid gap-3">
+        {/* aria-disabled : le bouton garde le focus pendant l'envoi. */}
         <Bouton
           bloc
           aria-busy={isPending || undefined}
-          disabled={isPending}
+          aria-disabled={isPending || undefined}
           taille="grand"
           type="submit"
         >

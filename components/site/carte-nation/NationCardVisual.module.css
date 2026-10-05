@@ -3,9 +3,12 @@
    orange, rayures, puce jaune, carte jaune décalée derrière, logo orange sur
    une tuile blanche. */
 
+/* Pas de largeur ici : la CSS des modules est hors couche et l'emportait sur
+   la classe de largeur posée par la page (w-[min(320px,86%)], couche
+   utilities de Tailwind 4) ; la carte faisait 704 px de large à 768 px.
+   Élément de bloc : toute la largeur, sauf si la page en décide autrement. */
 .carte {
   position: relative;
-  width: 100%;
 }
 
 /* Carte jaune décalée derrière : effet de pile. */

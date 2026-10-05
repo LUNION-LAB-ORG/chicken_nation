@@ -30,11 +30,14 @@ export const FOND_PHOTO_PLAT = "#FBEACA";
 // Les photos de l'API font 1080 × 1080.
 const COTE_PHOTO_API = 1080;
 
-// Plat sans aucune photo : le logo, petit, au centre de la zone crème.
+// Plat sans aucune photo : le logo au centre de la zone crème. Fichier de
+// 203 × 300 px : l'ancien logo de 49 × 69 px était agrandi jusqu'à 2,7 fois,
+// donc flou (recette rendu 12).
+export const IMAGE_DEFAUT_PLAT = "/assets/site/logo-orange.png";
 const IMAGE_DEFAUT = {
-  src: "/assets/images/logo.png",
-  largeur: 49,
-  hauteur: 69,
+  src: IMAGE_DEFAUT_PLAT,
+  largeur: 203,
+  hauteur: 300,
 };
 
 export const aPhotoRecadree = (id: string) =>

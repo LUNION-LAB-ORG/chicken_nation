@@ -203,7 +203,7 @@ export function ContenuFiche({
             etiquetteGauche
             preload
             alt={plat.name}
-            className={styles.photo}
+            className={cn(styles.photo, !photo.recadree && styles.photoApi)}
             etiquette={photo.etiquette}
             fond={photo.fond}
             marge={14}

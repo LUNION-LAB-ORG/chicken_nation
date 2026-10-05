@@ -15,7 +15,8 @@ import { TELEPHONE, telLien } from "@/lib/typo";
 /**
  * Menu du téléphone, sous 960 px : volet sous l'en-tête. Échap le ferme et
  * rend le focus au bouton ; il se ferme aussi au choix d'un lien, à un clic
- * en dehors de l'en-tête et à tout changement de page.
+ * en dehors de l'en-tête, quand le focus quitte l'en-tête et à tout
+ * changement de page.
  */
 export function MenuMobile() {
   const chemin = usePathname();
@@ -37,12 +38,23 @@ export function MenuMobile() {
         setOuvertSur(null);
     };
 
+    // Le focus quitte l'en-tête (Tab après le dernier lien) : le menu se
+    // ferme, sinon le focus passait sous le volet, sur des liens cachés
+    // (critère WCAG 2.4.11).
+    const surSortieFocus = (e: FocusEvent) => {
+      const vers = e.relatedTarget;
+
+      if (vers instanceof Node && !entete?.contains(vers)) setOuvertSur(null);
+    };
+
     document.addEventListener("keydown", surTouche);
     document.addEventListener("pointerdown", surPointeur);
+    entete?.addEventListener("focusout", surSortieFocus);
 
     return () => {
       document.removeEventListener("keydown", surTouche);
       document.removeEventListener("pointerdown", surPointeur);
+      entete?.removeEventListener("focusout", surSortieFocus);
     };
   }, [ouvert]);
 

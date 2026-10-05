@@ -12,7 +12,7 @@ import {
   nomComparable,
   type ICategorieSite,
 } from "./carte.categories";
-import { photoPlat } from "./photo-plat";
+import { IMAGE_DEFAUT_PLAT, photoPlat } from "./photo-plat";
 import { slugPlat } from "./plats.slug";
 
 import { formatImageUrl } from "@/utils/formatImageUrl";
@@ -61,7 +61,7 @@ export function reduirePlat(
     description: (p.description ?? "").replace(/\s+/g, " ").trim(),
     prix: promo ? p.promotion_price! : p.price,
     prixAvantPromo: promo ? p.price : null,
-    image: formatImageUrl(p.image ?? undefined, "/assets/images/logo.png"),
+    image: formatImageUrl(p.image ?? undefined, IMAGE_DEFAUT_PLAT),
     photo: photoPlat(p.id, p.image),
     categorie: {
       cle: categorie.cle,

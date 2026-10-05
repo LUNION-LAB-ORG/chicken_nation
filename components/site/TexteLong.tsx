@@ -153,7 +153,9 @@ export function TexteLong({
       >
         {intro}
       </EntetePage>
-      <Section classeConteneur={COLONNE_TEXTE} libelle={titre}>
+      {/* Sans nom : l'en-tête porte déjà le titre de la page, deux régions
+          du même nom gênaient les lecteurs d'écran (axe, landmark-unique). */}
+      <Section classeConteneur={COLONNE_TEXTE}>
         <div className={styles.texte}>{children}</div>
         {miseAJour ? (
           <p className="mt-10 border-t border-trait pt-4 text-[13px] text-encre-doux">

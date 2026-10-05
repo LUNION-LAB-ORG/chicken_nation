@@ -99,6 +99,14 @@
   transform: translateY(-50%);
 }
 
+/* Zone de clic de 44 px autour du rond de 34 px (cible tactile du plan, 5.6). */
+.pause::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+}
+
 .pause svg {
   width: 14px;
   height: 14px;

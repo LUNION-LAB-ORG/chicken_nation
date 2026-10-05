@@ -67,6 +67,11 @@
   line-height: 0.8;
   color: var(--color-orange);
   text-shadow: 2px 2px 0 var(--color-encre);
+  /* Contour encre (sous le remplissage, 1 px visible) : l'orange seul sur
+     blanc n'a qu'un contraste de 2,5 pour 1, il en faut 3 pour un grand
+     chiffre (recette rendu 15). */
+  -webkit-text-stroke: 2px var(--color-encre);
+  paint-order: stroke fill;
 }
 
 .etape p {
