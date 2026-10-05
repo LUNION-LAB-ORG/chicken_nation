@@ -114,10 +114,13 @@ export function Accroche({
           />
           {/* Ni préchargé ni prioritaire : l'image principale mesurée (LCP)
               est le fond, et le seau (25 ko) lui prenait du débit
-              (recette vitesse D8). */}
+              (recette vitesse D8). fetchPriority="low" est nécessaire :
+              sans lui, React précharge de lui-même dans l'en-tête toute
+              image qui n'est pas en chargement différé. */}
           <Image
             alt={`Seau Chicken Nation ${CENT_POUR_CENT} halal rempli de poulet pané`}
             className={styles.seau}
+            fetchPriority="low"
             height={700}
             loading="eager"
             // Sur téléphone, le seau fait 53 % de la tuile (100vw - 44 px).

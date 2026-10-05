@@ -104,7 +104,7 @@ function motifsInterdits() {
 }
 
 describe("Accroche", () => {
-  it("un seul h1, seau préchargé avec son texte alternatif, numéro unique cliquable", () => {
+  it("un seul h1, fond prioritaire, seau avec son texte alternatif, numéro unique cliquable", () => {
     const html = renderToStaticMarkup(
       <Accroche nombreRestaurants={5} vedette={platEnVedette(carte)} />,
     );
@@ -114,7 +114,14 @@ describe("Accroche", () => {
     expect(html).toContain(
       `alt="Seau Chicken Nation 100${NBSP}% halal rempli de poulet pané"`,
     );
-    expect(html).toContain('fetchPriority="high"');
+    // Seule l'image de fond est prioritaire (image principale mesurée).
+    expect(html).toMatch(
+      /<img[^>]*fetchPriority="high"[^>]*fond-ardoise-poulet/,
+    );
+    // Le seau ne l'est pas, et React ne le précharge donc pas (recette
+    // vitesse D8) : sans fetchPriority="low", toute image non différée est
+    // préchargée dans l'en-tête.
+    expect(html).toMatch(/<img[^>]*fetchPriority="low"[^>]*seau\.webp/);
     expect(html).toContain('href="tel:+2252721712130"');
     expect(html).toContain(`dans l&#x27;un de nos 5${NBSP}restaurants`);
     expect(html).toContain('href="/fr/carte"');
