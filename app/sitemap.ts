@@ -38,6 +38,9 @@ const PAGES_FIXES: {
   { chemin: "/fr/contact", priorite: 0.5, frequence: "yearly" },
   { chemin: "/fr/privacy-rules", priorite: 0.2, frequence: "yearly" },
   { chemin: "/fr/deletion-of-account", priorite: 0.2, frequence: "yearly" },
+  // Adresse imposée par la déclaration « Data safety » de Google Play
+  // (com.chickennation.app). Ne pas renommer sans changer la Play Console.
+  { chemin: "/fr/request/deletion-of-delivery-account", priorite: 0.2, frequence: "yearly" },
 ];
 
 /** Date de l'API gardée seulement si elle est lisible (sinon pas de `lastModified`). */
