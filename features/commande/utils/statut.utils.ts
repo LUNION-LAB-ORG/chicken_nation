@@ -99,12 +99,14 @@ const AVANT_REMISE: ICommande["status"][] = [
 /**
  * Livraison à payer au livreur, pas encore remise. Une commande remise
  * (COLLECTED) attend seulement la confirmation de l'encaissement du livreur :
- * on n'y écrit plus « à payer ». Un retrait n'est jamais « à la livraison ».
+ * on n'y écrit plus « à payer ». Un retrait n'est jamais « à la livraison »,
+ * ni une commande sur place de l'application (type TABLE du serveur) : seule
+ * une livraison l'est.
  */
 export const aPayerALaLivraison = (
   c: Pick<ICommande, "status" | "paied" | "payment_method" | "type">,
 ) =>
   c.payment_method === "OFFLINE" &&
   !c.paied &&
-  c.type !== "PICKUP" &&
+  c.type === "DELIVERY" &&
   AVANT_REMISE.includes(c.status);

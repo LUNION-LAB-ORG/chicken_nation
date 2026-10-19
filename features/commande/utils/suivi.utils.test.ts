@@ -225,6 +225,8 @@ describe("paiement à la livraison", () => {
     );
     expect(aPayerALaLivraison({ ...A_CONFIRMER, paied: true })).toBe(false);
     expect(aPayerALaLivraison({ ...A_CONFIRMER, type: "PICKUP" })).toBe(false);
+    // Sur place, en espèces, depuis l'application : rien à payer au livreur.
+    expect(aPayerALaLivraison({ ...A_CONFIRMER, type: "TABLE" })).toBe(false);
     // Une commande de l'application en espèces aussi (ni « À confirmer » ni « Modifier »).
     expect(aPayerALaLivraison({ ...A_CONFIRMER, canal: "APP" })).toBe(true);
     // « Payer » reste réservé au paiement en ligne.
