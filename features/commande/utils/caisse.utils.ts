@@ -231,3 +231,19 @@ export function panierDeLaCommande(
     return false;
   }
 }
+
+/**
+ * À la livraison : total enregistré par le serveur, arrondi comme
+ * l'affichage, s'il diffère du total affiché au clic ; null sinon. Le suivi
+ * le dit (`IEcartMontant`).
+ */
+export function ecartMontant(
+  montantServeur: number,
+  totalAffiche: number,
+): { affiche: number; enregistre: number } | null {
+  const enregistre = Math.ceil(Number(montantServeur));
+
+  return Number.isFinite(enregistre) && enregistre !== totalAffiche
+    ? { affiche: totalAffiche, enregistre }
+    : null;
+}

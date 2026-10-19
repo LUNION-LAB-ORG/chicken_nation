@@ -3,6 +3,7 @@ import { describe, expect, it } from "bun:test";
 
 import {
   decisionPaiement,
+  ecartMontant,
   ETAPES_CAISSE,
   etapeAccessible,
   etapeMaximale,
@@ -257,5 +258,29 @@ describe("moyen de paiement", () => {
     // Valeur inconnue : en ligne.
     expect(moyenPaiementRetenu(undefined, "DELIVERY", true)).toBe("ONLINE");
     expect(moyenPaiementRetenu("CASH", "DELIVERY", true)).toBe("ONLINE");
+  });
+});
+
+/**
+ * Revue du 19/10 : à la livraison, la commande part au clic sur « Valider ma
+ * commande » ; le montant du serveur n'était jamais comparé au total affiché.
+ */
+describe("ecartMontant : total enregistré contre total affiché au clic", () => {
+  it("écart : les deux montants, celui du serveur arrondi comme l'affichage", () => {
+    expect(ecartMontant(9100, 7600)).toEqual({
+      affiche: 7600,
+      enregistre: 9100,
+    });
+    expect(ecartMontant(7600.2, 7600)).toEqual({
+      affiche: 7600,
+      enregistre: 7601,
+    });
+  });
+
+  it("même total, ou montant illisible : rien", () => {
+    expect(ecartMontant(7600, 7600)).toBeNull();
+    expect(ecartMontant(7599.5, 7600)).toBeNull();
+    expect(ecartMontant(Number.NaN, 7600)).toBeNull();
+    expect(ecartMontant(undefined, 7600)).toBeNull();
   });
 });

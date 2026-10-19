@@ -24,9 +24,11 @@ import { articlesDeCommande } from "../utils/analytique.utils";
 import { pointsLisibles } from "../utils/fidelite.utils";
 import {
   etatPaiement,
+  type IEcartMontant,
   type IEcartPoints,
   lireCommandeEnAttente,
   lireCommandeEnvoyee,
+  lireEcartMontant,
   lireEcartPoints,
   lireMarquePaiement,
   oublierCommandeEnAttente,
@@ -49,6 +51,7 @@ import {
   peutRecommander,
   pointsCredites,
   restaurantDeCommande,
+  texteEcartMontant,
   textePointsCredites,
   texteTranche,
 } from "../utils/suivi.utils";
@@ -189,6 +192,8 @@ export default function SuiviCommande({
   const [horloge, setHorloge] = useState(() => Date.now());
   // Remise des points plus faible que celle estimée au panier (cf. caisse).
   const [ecartPoints, setEcartPoints] = useState<IEcartPoints | null>(null);
+  // À la livraison : total enregistré différent du total affiché à la validation.
+  const [ecartTotal, setEcartTotal] = useState<IEcartMontant | null>(null);
   // Payée juste après une tentative faite dans ce navigateur.
   const [justePaye, setJustePaye] = useState(false);
   // À payer à la livraison, tout juste envoyée depuis la caisse de ce navigateur.
@@ -268,6 +273,7 @@ export default function SuiviCommande({
 
   useEffect(() => {
     setEcartPoints(lireEcartPoints(id));
+    setEcartTotal(lireEcartMontant(id));
   }, [id]);
 
   const reference = commande?.reference ?? null;
@@ -502,6 +508,10 @@ export default function SuiviCommande({
   const attendAppel = aConfirmer(commande);
   // « Commande reçue, notre équipe vous appelle » : tant qu'elle attend l'appel.
   const blocEnvoyee = justeEnvoyee && attendAppel;
+  // Total enregistré (relu sur le serveur) différent de celui validé au clic.
+  const ecartAffiche = aPayerALaLivraison(commande)
+    ? texteEcartMontant(commande.amount, ecartTotal)
+    : null;
   const creneau = creneauRetrait(commande);
   const lieu = lieuCommande(commande);
   const payantes = commande.lignes.filter((l) => !l.offert);
@@ -587,6 +597,15 @@ export default function SuiviCommande({
                 </strong>{" "}
                 à la livraison.
               </p>
+              {ecartAffiche ? (
+                <p
+                  className="w-full rounded-carte bg-jaune-pale px-3.5 py-3 text-sm"
+                  role="status"
+                >
+                  {ecartAffiche} Vous pouvez modifier votre commande tant
+                  qu&apos;elle n&apos;est pas confirmée.
+                </p>
+              ) : null}
               <p className="text-sm text-encre-doux">
                 <AppelSite />
               </p>
@@ -615,6 +634,18 @@ export default function SuiviCommande({
                 </strong>{" "}
                 au livreur, en espèces ou par Mobile Money.
               </p>
+              {ecartAffiche ? (
+                <p
+                  className="rounded-carte bg-jaune-pale px-3.5 py-3 text-sm"
+                  role="status"
+                >
+                  {ecartAffiche}
+                  {/* Écart de points aussi : la phrase suit celui-ci, une fois. */}
+                  {attendAppel && !ecartPoints
+                    ? " Vous pouvez modifier votre commande tant qu'elle n'est pas confirmée."
+                    : ""}
+                </p>
+              ) : null}
               {ecartPoints ? (
                 <p
                   className="rounded-carte bg-jaune-pale px-3.5 py-3 text-sm"

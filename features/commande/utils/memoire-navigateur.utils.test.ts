@@ -10,12 +10,15 @@ import {
   etatPaiement,
   lireCommandeEnAttente,
   lireCommandeEnvoyee,
+  lireEcartMontant,
   lireMarquePaiement,
   lirePanierCommande,
   noterCommandeEnAttente,
   noterCommandeEnvoyee,
+  noterEcartMontant,
   oublierCommandeEnAttente,
   oublierCommandeEnvoyee,
+  oublierEcartMontant,
   sauverPanierCommande,
 } from "./memoire-navigateur.utils";
 
@@ -202,5 +205,47 @@ describe("commande à payer à la livraison, envoyée", () => {
     expect(() => noterCommandeEnvoyee("ORD-7")).not.toThrow();
     expect(lireCommandeEnvoyee("ORD-7")).toBe(false);
     expect(() => oublierCommandeEnvoyee()).not.toThrow();
+  });
+});
+
+/**
+ * Revue du 19/10 : à la livraison, le client valide le total affiché, puis
+ * le serveur enregistre le sien. L'écart est gardé le temps de l'onglet pour
+ * que le suivi le dise.
+ */
+describe("total enregistré différent du total affiché (à la livraison)", () => {
+  it("le temps de l'onglet, par commande, puis oublié", () => {
+    noterEcartMontant("c1", { affiche: 7600, enregistre: 9100 });
+    expect(session.cles()).toEqual(["cn-ecart-montant-c1"]);
+    expect(local.cles()).toEqual([]);
+    expect(lireEcartMontant("c1")).toEqual({ affiche: 7600, enregistre: 9100 });
+    expect(lireEcartMontant("c2")).toBeNull();
+    oublierEcartMontant("c1");
+    expect(lireEcartMontant("c1")).toBeNull();
+  });
+
+  it("valeur abîmée, sans écart, ou stockage bloqué : rien, sans erreur", () => {
+    session.setItem("cn-ecart-montant-c1", "{pas du json");
+    expect(lireEcartMontant("c1")).toBeNull();
+    session.setItem(
+      "cn-ecart-montant-c1",
+      JSON.stringify({ affiche: 7600, enregistre: 7600 }),
+    );
+    expect(lireEcartMontant("c1")).toBeNull();
+    session.setItem("cn-ecart-montant-c1", JSON.stringify({ affiche: "7600" }));
+    expect(lireEcartMontant("c1")).toBeNull();
+    globalThis.window = {
+      get sessionStorage() {
+        throw new Error("bloqué");
+      },
+      get localStorage() {
+        throw new Error("bloqué");
+      },
+    };
+    expect(() =>
+      noterEcartMontant("c1", { affiche: 7600, enregistre: 9100 }),
+    ).not.toThrow();
+    expect(lireEcartMontant("c1")).toBeNull();
+    expect(() => oublierEcartMontant("c1")).not.toThrow();
   });
 });

@@ -22,6 +22,7 @@ import {
   inconnusDuTotal,
   libelleTotal,
   libelleValidation,
+  lieuPaiementCommence,
   notePoints,
   obstacleAvantages,
   obstaclePanier,
@@ -651,6 +652,17 @@ describe("étape Paiement : en ligne ou à la livraison", () => {
     );
     expect(notePoints(`12${_}points`, true)).toBe(
       `Payée en ligne, elle vous rapporterait 12${_}points.`,
+    );
+  });
+
+  // Revue du 19/10 : le client ouvre le paiement en ligne, le ferme, puis
+  // choisit « Payer à la livraison ». L'avertissement disait « dans un autre
+  // onglet ou avant de quitter la page » : faux, il ne reconnaissait pas sa
+  // propre tentative.
+  it("paiement en ligne déjà commencé : où, seulement s'il ne l'a pas été dans cette page", () => {
+    expect(lieuPaiementCommence(true)).toBe("");
+    expect(lieuPaiementCommence(false)).toBe(
+      ", dans un autre onglet ou avant de quitter la page",
     );
   });
 });

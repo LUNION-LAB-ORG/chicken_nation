@@ -21,6 +21,7 @@ import {
   lireCommandeEnAttente,
   lirePanierCommande,
   oublierCommandeEnAttente,
+  oublierEcartMontant,
   oublierEcartPoints,
   oublierPanierCommande,
 } from "../utils/memoire-navigateur.utils";
@@ -104,6 +105,7 @@ export function useActionsCommande() {
         setPanier((panier) => remettreSansDoubler(panier, lignes));
         oublierPanierCommande(c.id);
         oublierEcartPoints(c.id);
+        oublierEcartMontant(c.id);
         effacerMarquePaiement(c.reference);
         // La caisse ne doit plus proposer de payer la commande annulée.
         if (lireCommandeEnAttente()?.id === c.id) oublierCommandeEnAttente();

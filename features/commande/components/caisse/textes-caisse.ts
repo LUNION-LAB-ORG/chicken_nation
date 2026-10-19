@@ -199,3 +199,12 @@ export const notePoints = (points: string, aLaLivraison: boolean) =>
   aLaLivraison
     ? `Payée en ligne, elle vous rapporterait ${points}.`
     : `Payée en ligne, cette commande vous rapportera ${points}.`;
+
+/**
+ * Avertissement « un paiement en ligne a déjà été commencé » : où il l'a été.
+ * Commencé dans cette page (le client a ouvert le module puis l'a fermé),
+ * dire « dans un autre onglet ou avant de quitter la page » est faux, et il
+ * risque de ne pas reconnaître sa propre tentative.
+ */
+export const lieuPaiementCommence = (dansCettePage: boolean) =>
+  dansCettePage ? "" : ", dans un autre onglet ou avant de quitter la page";

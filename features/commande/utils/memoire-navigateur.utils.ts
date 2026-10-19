@@ -247,6 +247,51 @@ export function oublierEcartPoints(commandeId: string) {
   ecrire(session, cleEcart(commandeId), null);
 }
 
+// ── Total enregistré différent du total affiché (à la livraison) ─────────
+
+/**
+ * À la livraison, rien ne se paie dans la caisse : le client valide le total
+ * affiché, puis le serveur enregistre le sien (offre de livraison refusée
+ * pour ce client, points accordés en moins...). En ligne, le bouton dit le
+ * montant du serveur AVANT de payer ; à la livraison, la commande est déjà
+ * partie. L'écart est noté le temps de l'onglet : le suivi le dit, avec
+ * « Modifier ma commande » tant qu'elle n'est pas confirmée.
+ */
+export interface IEcartMontant {
+  /** Total affiché au clic sur « Valider ma commande ». */
+  affiche: number;
+  /** Total enregistré par le serveur, arrondi comme l'affichage. */
+  enregistre: number;
+}
+
+const cleEcartMontant = (commandeId: string) =>
+  `cn-ecart-montant-${commandeId}`;
+
+export function noterEcartMontant(commandeId: string, ecart: IEcartMontant) {
+  ecrire(session, cleEcartMontant(commandeId), JSON.stringify(ecart));
+}
+
+export function lireEcartMontant(commandeId: string): IEcartMontant | null {
+  try {
+    const e = JSON.parse(
+      lire(session, cleEcartMontant(commandeId)) ?? "null",
+    ) as IEcartMontant | null;
+
+    return e &&
+      typeof e.affiche === "number" &&
+      typeof e.enregistre === "number" &&
+      e.affiche !== e.enregistre
+      ? e
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+export function oublierEcartMontant(commandeId: string) {
+  ecrire(session, cleEcartMontant(commandeId), null);
+}
+
 // ── Tentative de paiement ─────────────────────────────────────────────────
 
 /**

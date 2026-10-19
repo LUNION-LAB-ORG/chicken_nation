@@ -19,7 +19,11 @@ import {
 } from "../../actions/commande.action";
 import { usePaiementCommande } from "../../hooks/usePaiementCommande";
 import { articleDeLigne } from "../../utils/analytique.utils";
-import { decisionPaiement, signatureCommande } from "../../utils/caisse.utils";
+import {
+  decisionPaiement,
+  ecartMontant,
+  signatureCommande,
+} from "../../utils/caisse.utils";
 import { messageErreurAction } from "../../utils/erreur-action.utils";
 import {
   etatPaiement,
@@ -27,6 +31,7 @@ import {
   lireMarquePaiement,
   noterCommandeEnAttente,
   noterCommandeEnvoyee,
+  noterEcartMontant,
   noterEcartPoints,
   oublierCommandeEnAttente,
   oublierEcartPoints,
@@ -37,7 +42,11 @@ import { aPayer } from "../../utils/statut.utils";
 
 import { ChoixPaiement } from "./ChoixPaiement";
 import { classePanneau, ErreurEtape, TitreEtape } from "./EtapePanier";
-import { libelleValidation, TEXTE_PAIEMENT_EN_LIGNE } from "./textes-caisse";
+import {
+  libelleValidation,
+  lieuPaiementCommence,
+  TEXTE_PAIEMENT_EN_LIGNE,
+} from "./textes-caisse";
 
 import { Bouton } from "@/components/site/Bouton";
 import { Lien } from "@/components/site/Lien";
@@ -156,13 +165,15 @@ export function EtapePaiement({
    * client est prévenu avant de la payer de nouveau ou de la remplacer.
    * `confirmation` : succès déjà annoncé, on ne paie pas de nouveau.
    * `aLaLivraison` : moyen choisi quand l'avertissement a été donné ; il ne
-   * vaut que pour ce moyen.
+   * vaut que pour ce moyen. `ici` : paiement commencé dans cette page (le
+   * texte ne parle alors ni d'un autre onglet ni d'une visite précédente).
    */
   const [averti, setAverti] = useState<{
     id: string;
     reference: string;
     confirmation: boolean;
     aLaLivraison: boolean;
+    ici: boolean;
   } | null>(null);
   const succes = useRef(false);
   // Commandes dont le module a été ouvert dans cette page : leur marque
@@ -230,14 +241,23 @@ export function EtapePaiement({
   /**
    * Commande à payer à la livraison créée : rien à payer dans le navigateur
    * (ni commande en attente, ni marque de paiement). Les points accordés plus
-   * faibles que prévu sont notés sans s'arrêter, la commande est partie : le
-   * suivi le dit.
+   * faibles que prévu, et un total enregistré différent du total affiché au
+   * clic, sont notés sans s'arrêter, la commande est partie : le suivi le
+   * dit, avec « Modifier ma commande ».
    */
-  const envoyee = (c: { id: string; reference: string; remise: number }) => {
+  const envoyee = (c: {
+    id: string;
+    reference: string;
+    montant: number;
+    remise: number;
+  }) => {
     // Gardé le temps de l'onglet : « Modifier ma commande » du suivi le remet.
     sauverPanierCommande(c.id, aCommander);
     if (pointsRetenus > 0 && c.remise < remiseDesPoints)
       noterEcartPoints(c.id, { estimee: remiseDesPoints, accordee: c.remise });
+    const ecartTotal = ecartMontant(c.montant, totalEstime);
+
+    if (ecartTotal) noterEcartMontant(c.id, ecartTotal);
     noterCommandeEnvoyee(c.reference);
     onEnvoyee(c.id);
   };
@@ -289,6 +309,7 @@ export function EtapePaiement({
               reference: attente.reference,
               confirmation: tentative !== "commence",
               aLaLivraison,
+              ici: ouvertesIci.current.has(attente.reference),
             });
 
             return setEtat("libre");
@@ -514,9 +535,8 @@ export function EtapePaiement({
               <>
                 Un paiement en ligne a déjà été commencé pour la commande{" "}
                 <span className="whitespace-nowrap">{avertiIci.reference}</span>
-                , dans un autre onglet ou avant de quitter la page. Si vous avez
-                été débité, ne passez pas une seconde commande{INSECABLE}:
-                appelez le{" "}
+                {lieuPaiementCommence(avertiIci.ici)}. Si vous avez été débité,
+                ne passez pas une seconde commande{INSECABLE}: appelez le{" "}
                 <a
                   className="font-semibold whitespace-nowrap underline"
                   href={telLien()}

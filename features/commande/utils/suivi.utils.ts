@@ -267,6 +267,20 @@ export function etapesFrise(
 // ── Points gagnés ─────────────────────────────────────────────────────────
 
 /**
+ * Total enregistré différent du total affiché à la validation (à la
+ * livraison) : « Montant enregistré : 9 100 FCFA, et non 7 600 FCFA comme
+ * affiché. » ; null s'il n'y a plus d'écart (le serveur fait foi, relu).
+ */
+export function texteEcartMontant(
+  montant: number,
+  ecart: { affiche: number } | null,
+): string | null {
+  if (!ecart || Math.ceil(montant) === ecart.affiche) return null;
+
+  return `Montant enregistré${N}: ${fcfa(montant)}, et non ${fcfa(ecart.affiche)} comme affiché.`;
+}
+
+/**
  * Points crédités par cette commande : comme le serveur à la confirmation du
  * paiement en ligne (kkiapay-order.listener : floor(net_amount × points_per_xof),
  * plats avant remise, hors livraison et frais de service). Rien pour une

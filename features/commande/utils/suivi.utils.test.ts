@@ -24,6 +24,7 @@ import {
   resumeCommande,
   texteAbsents,
   texteAjout,
+  texteEcartMontant,
   textePointsCredites,
   texteReglesPoints,
   texteTranche,
@@ -731,5 +732,24 @@ describe("versCompte", () => {
       versCompte(null, { current_level: "VVIP", total_points: 3 }, []).niveau,
     ).toBe("vvip");
     expect(versCompte(null, { current_level: "AUTRE" }, []).niveau).toBeNull();
+  });
+});
+
+/**
+ * Revue du 19/10 : à la livraison, le client validait un total estimé et le
+ * suivi affichait celui du serveur sans dire qu'il différait.
+ */
+describe("texteEcartMontant : total enregistré différent du total affiché", () => {
+  it("dit les deux montants, le serveur faisant foi", () => {
+    expect(texteEcartMontant(9100, { affiche: 7600 })).toBe(
+      `Montant enregistré${_}: 9${_}100${_}FCFA, et non 7${_}600${_}FCFA comme affiché.`,
+    );
+  });
+
+  it("rien sans écart noté, ou si le serveur donne de nouveau le total affiché", () => {
+    expect(texteEcartMontant(9100, null)).toBeNull();
+    expect(texteEcartMontant(7600, { affiche: 7600 })).toBeNull();
+    // Montant à virgule : arrondi au franc supérieur, comme l'affichage.
+    expect(texteEcartMontant(7599.4, { affiche: 7600 })).toBeNull();
   });
 });
