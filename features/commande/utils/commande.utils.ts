@@ -118,6 +118,9 @@ export function versCommande(o: Brut): ICommande {
     created_at: String(o.created_at ?? ""),
     date: (o.date as string) ?? null,
     recovery_code: (o.recovery_code as string) ?? null,
+    // Lus pour reconnaître une commande du site à confirmer (statut.utils).
+    canal: texte(o.channel),
+    auto: typeof o.auto === "boolean" ? o.auto : null,
     restaurant: r
       ? {
           id: String(r.id),

@@ -3,7 +3,7 @@ import type { ICompteClient } from "../utils/suivi.utils";
 import type { ReactNode } from "react";
 
 import { telephoneLisible } from "../utils/panier.utils";
-import { aPayer } from "../utils/statut.utils";
+import { aConfirmer, aPayer, aPayerALaLivraison } from "../utils/statut.utils";
 import {
   dateCommande,
   estServie,
@@ -146,6 +146,7 @@ export function CarteCommande({
         ) : null}
         {lieu.court} · {lieu.detail} ·{" "}
         <strong className="text-encre tabular-nums">{fcfa(c.amount)}</strong>
+        {aPayerALaLivraison(c) ? " · à payer à la livraison" : null}
         {points >= 1
           ? ` · +${nombre(points)}${INSECABLE}point${points >= 2 ? "s" : ""}`
           : null}
@@ -155,7 +156,11 @@ export function CarteCommande({
   );
 }
 
-/** Actions d'une commande : payer ou modifier, suivre, recommander. */
+/**
+ * Actions d'une commande : payer ou modifier, suivre, recommander. Une
+ * commande à payer à la livraison se modifie tant que le centre d'appels ne
+ * l'a pas confirmée, mais ne se paie jamais en ligne (jamais de ?payer=1).
+ */
 function actionsDe(c: ICommande) {
   const lien = `/fr/commander/${c.id}`;
   const pourClient = { id: c.id, reference: c.reference, lignes: c.lignes };
@@ -170,6 +175,15 @@ function actionsDe(c: ICommande) {
           // et sous le focus (?payer=1). Le libellé le dit.
           <LienBouton href={`${lien}?payer=1`}>Voir et payer</LienBouton>
         }
+        commande={pourClient}
+      />
+    );
+  }
+  if (aConfirmer(c)) {
+    return (
+      <ActionsCommande
+        action="modifier"
+        avant={<LienBouton href={lien}>Suivre la commande</LienBouton>}
         commande={pourClient}
       />
     );

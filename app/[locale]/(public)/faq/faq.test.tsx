@@ -77,6 +77,15 @@ describe("FAQ : page et JSON-LD tirés du même tableau", () => {
     expect(html).not.toMatch(/href="tel:(?!\+2252721712130)/);
   });
 
+  it("paiement : en ligne, ou à la livraison pour une commande livrée", () => {
+    const tout = `${visible} ${JSON.stringify(schema)}`;
+
+    expect(tout).toContain(
+      "Sur notre site, vous payez en ligne, ou à la livraison pour une commande livrée.",
+    );
+    expect(tout).not.toContain("paiement se fait uniquement en ligne");
+  });
+
   it("aucune promesse retirée par la retouche 2", () => {
     const tout = `${visible} ${JSON.stringify(schema)}`;
 

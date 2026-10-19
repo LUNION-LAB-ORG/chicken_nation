@@ -2,8 +2,9 @@ import type { ILignePanier } from "../types/commande.types";
 
 /**
  * Ce que le navigateur retient entre deux chargements de page, hors panier :
- * le panier d'une commande créée (pour la modifier) et la tentative de
- * paiement d'une commande (pour ne pas faire payer deux fois).
+ * le panier d'une commande créée (pour la modifier), la tentative de
+ * paiement d'une commande (pour ne pas faire payer deux fois) et la commande
+ * à payer à la livraison tout juste envoyée (pour l'annoncer une fois).
  *
  * Navigation privée ou stockage bloqué : chaque accès peut lever une
  * exception, d'où les try/catch. On perd alors ce confort, rien de plus.
@@ -153,6 +154,58 @@ export function lireCommandeEnAttente(
 export function oublierCommandeEnAttente() {
   ecrire(local, CLE_EN_ATTENTE, null);
   ecrire(session, CLE_EN_ATTENTE, null);
+}
+
+// ── Commande à payer à la livraison, envoyée ──────────────────────────────
+
+/**
+ * Commande à payer à la livraison tout juste envoyée par la caisse : le suivi
+ * l'annonce une fois (« Commande reçue, notre équipe vous appelle »). Gardée
+ * le temps de l'onglet, 30 min au plus ; rien à payer dans le navigateur, donc
+ * aucune commande en attente ni marque de paiement.
+ */
+const CLE_ENVOYEE = "cn-commande-envoyee";
+
+export const DUREE_ENVOYEE_MS = 30 * 60 * 1000;
+
+export function noterCommandeEnvoyee(
+  reference: string,
+  maintenant = Date.now(),
+) {
+  ecrire(
+    session,
+    CLE_ENVOYEE,
+    JSON.stringify({ reference, notee: maintenant }),
+  );
+}
+
+/** Vrai si cette commande vient d'être envoyée depuis ce navigateur (moins de 30 min). */
+export function lireCommandeEnvoyee(
+  reference: string,
+  maintenant = Date.now(),
+): boolean {
+  try {
+    const m = JSON.parse(lire(session, CLE_ENVOYEE) ?? "null") as {
+      reference?: unknown;
+      notee?: unknown;
+    } | null;
+
+    if (!m || typeof m !== "object" || typeof m.notee !== "number")
+      return false;
+    if (maintenant - m.notee > DUREE_ENVOYEE_MS) {
+      oublierCommandeEnvoyee();
+
+      return false;
+    }
+
+    return m.reference === reference;
+  } catch {
+    return false;
+  }
+}
+
+export function oublierCommandeEnvoyee() {
+  ecrire(session, CLE_ENVOYEE, null);
 }
 
 // ── Remise des points plus faible que prévu ───────────────────────────────

@@ -17,7 +17,10 @@ export interface IRecapCaisse {
   fraisService: number | null;
   tauxFraisService: number | null;
   total: number;
-  /** « Payée en ligne, cette commande vous rapportera 18 points. », ou null. */
+  /**
+   * « Payée en ligne, cette commande vous rapportera 18 points. » (à la
+   * livraison : « elle vous rapporterait »), ou null.
+   */
   note: string | null;
 }
 

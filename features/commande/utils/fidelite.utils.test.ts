@@ -113,11 +113,12 @@ describe("points gagnés", () => {
     expect(pointsGagnes(12500, 0.001)).toBe(12);
     expect(pointsGagnes(999, 0.001)).toBe(0);
     expect(pointsGagnes(5000, 0)).toBe(0);
+    // Seul le paiement en ligne rapporte des points (pas la livraison).
     expect(textePointsGagnes(12500, 0.001)).toBe(
-      `Cette commande vous rapportera 12${_}points.`,
+      `Payée en ligne, cette commande vous rapportera 12${_}points.`,
     );
     expect(textePointsGagnes(1500, 0.001)).toBe(
-      `Cette commande vous rapportera 1${_}point.`,
+      `Payée en ligne, cette commande vous rapportera 1${_}point.`,
     );
     expect(textePointsGagnes(999, 0.001)).toBeNull();
   });

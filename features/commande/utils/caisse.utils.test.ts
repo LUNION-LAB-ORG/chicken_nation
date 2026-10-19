@@ -7,6 +7,7 @@ import {
   etapeAccessible,
   etapeMaximale,
   livraisonPrete,
+  moyenPaiementRetenu,
   obstacleLivraison,
   panierDeLaCommande,
   signatureCommande,
@@ -183,6 +184,43 @@ describe("commande créée, pas encore payée", () => {
     ).not.toBe(s);
   });
 
+  it("paiement en ligne : signature inchangée (celles déjà gardées restent valables)", () => {
+    const s = signatureCommande(BASE);
+
+    // Forme gardée dans le navigateur avant le paiement à la livraison.
+    expect(Object.keys(JSON.parse(s))).toEqual([
+      "mode",
+      "panier",
+      "adresse",
+      "restaurant",
+      "heure",
+      "code",
+      "points",
+      "cadeaux",
+    ]);
+    expect(signatureCommande({ ...BASE, paiement: "ONLINE" })).toBe(s);
+    expect(signatureCommande({ ...BASE, paiement: undefined })).toBe(s);
+  });
+
+  it("à la livraison : autre signature, donc la commande en ligne non payée est remplacée", () => {
+    const enLigne = signatureCommande(BASE);
+    const aLaLivraison = signatureCommande({ ...BASE, paiement: "OFFLINE" });
+
+    expect(aLaLivraison).not.toBe(enLigne);
+    expect(JSON.parse(aLaLivraison).paiement).toBe("OFFLINE");
+    expect(decisionPaiement({ signature: enLigne }, aLaLivraison)).toBe(
+      "remplacer",
+    );
+    // Même panier : la commande est bien celle du panier (suivi, recette 1).
+    expect(panierDeLaCommande(aLaLivraison, BASE.lignes)).toBe(true);
+    // Un retrait se paie toujours en ligne : rien ne change.
+    const retrait = { ...BASE, mode: "PICKUP", restaurantId: "r" };
+
+    expect(signatureCommande({ ...retrait, paiement: "OFFLINE" })).toBe(
+      signatureCommande(retrait),
+    );
+  });
+
   it("panier de la commande payée sur le suivi : vidé seulement s'il n'a pas changé (recette 1)", () => {
     const s = signatureCommande(BASE);
 
@@ -206,5 +244,18 @@ describe("commande créée, pas encore payée", () => {
         signatureCommande({ ...BASE, points: 120 }),
       ),
     ).toBe("remplacer");
+  });
+});
+
+describe("moyen de paiement", () => {
+  it("à la livraison seulement s'il est choisi, pour une livraison, et proposé par le serveur", () => {
+    expect(moyenPaiementRetenu("OFFLINE", "DELIVERY", true)).toBe("OFFLINE");
+    expect(moyenPaiementRetenu("ONLINE", "DELIVERY", true)).toBe("ONLINE");
+    // Retrait, ou serveur qui ne le propose pas (ancien, réglage coupé).
+    expect(moyenPaiementRetenu("OFFLINE", "PICKUP", true)).toBe("ONLINE");
+    expect(moyenPaiementRetenu("OFFLINE", "DELIVERY", false)).toBe("ONLINE");
+    // Valeur inconnue : en ligne.
+    expect(moyenPaiementRetenu(undefined, "DELIVERY", true)).toBe("ONLINE");
+    expect(moyenPaiementRetenu("CASH", "DELIVERY", true)).toBe("ONLINE");
   });
 });

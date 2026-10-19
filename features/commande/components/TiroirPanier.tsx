@@ -49,8 +49,8 @@ const focaliserTitre = () =>
 let reglagesEnCours: Promise<IReglagesFidelite | null> | null = null;
 
 /**
- * Réglages publics de fidélité (« Cette commande vous rapportera N points »),
- * lus à la première ouverture du tiroir. En cas d'échec, rien n'est affiché
+ * Réglages publics de fidélité (« Payée en ligne, cette commande vous
+ * rapportera N points »), lus à la première ouverture du tiroir. En cas d'échec, rien n'est affiché
  * (aucun chiffre écrit en dur) et la lecture sera retentée à l'ouverture
  * suivante.
  */

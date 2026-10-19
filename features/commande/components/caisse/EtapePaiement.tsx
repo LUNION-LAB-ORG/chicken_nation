@@ -5,6 +5,7 @@ import type {
   IConfigPaiement,
   ICreationCommande,
   ILignePanier,
+  MoyenPaiement,
 } from "../../types/commande.types";
 import type { IEcartPoints } from "../../utils/memoire-navigateur.utils";
 import type { ReactNode } from "react";
@@ -17,6 +18,7 @@ import {
   obtenirCommandeAction,
 } from "../../actions/commande.action";
 import { usePaiementCommande } from "../../hooks/usePaiementCommande";
+import { articleDeLigne } from "../../utils/analytique.utils";
 import { decisionPaiement, signatureCommande } from "../../utils/caisse.utils";
 import { messageErreurAction } from "../../utils/erreur-action.utils";
 import {
@@ -24,6 +26,7 @@ import {
   lireCommandeEnAttente,
   lireMarquePaiement,
   noterCommandeEnAttente,
+  noterCommandeEnvoyee,
   noterEcartPoints,
   oublierCommandeEnAttente,
   oublierEcartPoints,
@@ -32,10 +35,13 @@ import {
 } from "../../utils/memoire-navigateur.utils";
 import { aPayer } from "../../utils/statut.utils";
 
+import { ChoixPaiement } from "./ChoixPaiement";
 import { classePanneau, ErreurEtape, TitreEtape } from "./EtapePanier";
+import { libelleValidation, TEXTE_PAIEMENT_EN_LIGNE } from "./textes-caisse";
 
 import { Bouton } from "@/components/site/Bouton";
 import { Lien } from "@/components/site/Lien";
+import { evenementCommerce } from "@/lib/analytique";
 import { fcfa, INSECABLE, TELEPHONE, telLien } from "@/lib/typo";
 
 /** Moyens acceptés par KKiaPay (maquette, JS 1209). */
@@ -84,6 +90,14 @@ export interface ILigneResume {
  *     page de suivi prend le relais avec son bouton « Payer ».
  *  6. Points accordés plus faibles que l'estimation : le client le voit
  *     AVANT de payer.
+ *
+ * À la livraison (livraison seulement, si le serveur le propose) : rien ne
+ * se paie ici. Au clic « Valider ma commande », une commande en ligne non
+ * payée de ce navigateur est traitée comme ci-dessus (payée : suivi ;
+ * payable : annulée, après l'avertissement si un paiement a été commencé,
+ * même dans cette page), puis la commande est créée et le suivi l'annonce.
+ * Elle arrive dans « À relancer » : le centre d'appels appelle pour la
+ * confirmer.
  */
 export function EtapePaiement({
   client,
@@ -95,14 +109,17 @@ export function EtapePaiement({
   resume,
   pretAPayer,
   verifier,
+  propose,
+  onMoyen,
   onAller,
   onPaye,
   onRelais,
+  onEnvoyee,
   onRefus,
   pied,
 }: {
   client: IClient;
-  /** Ce qui sera envoyé à la création. */
+  /** Ce qui sera envoyé à la création (`paiement` : moyen retenu). */
   creation: ICreationCommande;
   aCommander: ILignePanier[];
   totalEstime: number;
@@ -113,14 +130,20 @@ export function EtapePaiement({
   pretAPayer: boolean;
   /** Contrôle des étapes avant de créer : faux si une étape bloque (la caisse y mène). */
   verifier: () => boolean;
+  /** Paiement à la livraison proposé (livraison, annoncé par le serveur) : le choix s'affiche. */
+  propose: boolean;
+  onMoyen: (moyen: MoyenPaiement) => void;
   onAller: (etape: 1 | 3 | 4) => void;
   /** Commande payée : panier vidé, suivi. */
   onPaye: (id: string) => void;
   /** Le suivi prend le relais (module indisponible). */
   onRelais: (id: string) => void;
+  /** Commande à payer à la livraison envoyée : panier vidé, suivi. */
+  onEnvoyee: (id: string) => void;
   /** Création refusée : points ou cadeaux à relire. */
   onRefus: () => void;
-  pied: (bouton: ReactNode) => ReactNode;
+  /** Pied de l'étape ; `pleineLargeur` : le libellé du bouton dit déjà le montant. */
+  pied: (bouton: ReactNode, pleineLargeur: boolean) => ReactNode;
 }) {
   const [ouverte, setOuverte] = useState<ICommandeOuverte | null>(null);
   // « ferme » : module fermé sans paiement (ou paiement refusé).
@@ -132,11 +155,14 @@ export function EtapePaiement({
    * page rechargée au retour de Mobile Money) il y a moins de 15 min : le
    * client est prévenu avant de la payer de nouveau ou de la remplacer.
    * `confirmation` : succès déjà annoncé, on ne paie pas de nouveau.
+   * `aLaLivraison` : moyen choisi quand l'avertissement a été donné ; il ne
+   * vaut que pour ce moyen.
    */
   const [averti, setAverti] = useState<{
     id: string;
     reference: string;
     confirmation: boolean;
+    aLaLivraison: boolean;
   } | null>(null);
   const succes = useRef(false);
   // Commandes dont le module a été ouvert dans cette page : leur marque
@@ -148,7 +174,9 @@ export function EtapePaiement({
   const bouton = useRef<HTMLButtonElement>(null);
 
   const signature = signatureCommande(creation);
-  // La commande ouverte vaut pour ce contenu seulement.
+  const aLaLivraison = creation.paiement === "OFFLINE";
+  // La commande ouverte vaut pour ce contenu seulement (et le paiement en
+  // ligne : à la livraison, l'empreinte n'est jamais la même).
   const courante = ouverte && ouverte.signature === signature ? ouverte : null;
 
   const { pret, erreurChargement, reessayer, payer, echec, marque } =
@@ -199,11 +227,32 @@ export function EtapePaiement({
     return () => document.removeEventListener("visibilitychange", relire);
   }, [courante?.id]);
 
+  /**
+   * Commande à payer à la livraison créée : rien à payer dans le navigateur
+   * (ni commande en attente, ni marque de paiement). Les points accordés plus
+   * faibles que prévu sont notés sans s'arrêter, la commande est partie : le
+   * suivi le dit.
+   */
+  const envoyee = (c: { id: string; reference: string; remise: number }) => {
+    // Gardé le temps de l'onglet : « Modifier ma commande » du suivi le remet.
+    sauverPanierCommande(c.id, aCommander);
+    if (pointsRetenus > 0 && c.remise < remiseDesPoints)
+      noterEcartPoints(c.id, { estimee: remiseDesPoints, accordee: c.remise });
+    noterCommandeEnvoyee(c.reference);
+    onEnvoyee(c.id);
+  };
+
   const lancer = async () => {
     if (etat === "creation") return;
     if (!verifier()) return;
     setErreur(null);
     setEtat("creation");
+    // Mesure d'audience (GA4) : moyen de paiement choisi, au clic.
+    evenementCommerce(
+      "add_payment_info",
+      aCommander.map((l) => articleDeLigne(l)),
+      { payment_type: aLaLivraison ? "a_la_livraison" : "en_ligne" },
+    );
     try {
       let commande: ICommandeOuverte | null = null;
       // Commande non payée de ce client, créée ici ou dans un autre onglet.
@@ -213,17 +262,22 @@ export function EtapePaiement({
       // Paiement commencé hors de cette page : rouvrir ou remplacer la
       // commande sans prévenir pouvait faire payer deux fois. Premier clic :
       // l'avertissement ; second clic : on continue (sauf succès annoncé).
+      // À la livraison, même si le module a été ouvert dans cette page : un
+      // paiement Mobile Money encore en cours, plus une commande à la
+      // livraison, donneraient deux commandes vivantes.
       if (
         attente &&
         decision !== "creer" &&
-        !ouvertesIci.current.has(attente.reference)
+        (aLaLivraison || !ouvertesIci.current.has(attente.reference))
       ) {
         const tentative = etatPaiement(
           lireMarquePaiement(attente.reference),
           Date.now(),
         );
         const confirme =
-          tentative === "commence" && averti?.reference === attente.reference;
+          tentative === "commence" &&
+          averti?.reference === attente.reference &&
+          averti.aLaLivraison === aLaLivraison;
 
         if (tentative !== "libre" && !confirme) {
           const lue = await obtenirCommandeAction(attente.id);
@@ -234,6 +288,7 @@ export function EtapePaiement({
               id: attente.id,
               reference: attente.reference,
               confirmation: tentative !== "commence",
+              aLaLivraison,
             });
 
             return setEtat("libre");
@@ -288,6 +343,7 @@ export function EtapePaiement({
 
           return setEtat("libre");
         }
+        if (aLaLivraison) return envoyee(res.data);
         noterCommandeEnAttente({
           id: res.data.id,
           reference: res.data.reference,
@@ -342,13 +398,24 @@ export function EtapePaiement({
     !occupe &&
     etatPaiement(marque, Date.now()) === "commence";
 
-  const libelle = erreurChargement
-    ? `Payer ${fcfa(montant)}`
-    : !pret
-      ? "Préparation du paiement…"
-      : etat === "creation"
-        ? "Création de la commande…"
-        : `Payer ${fcfa(montant)}`;
+  const libelle = aLaLivraison
+    ? libelleValidation(occupe)
+    : erreurChargement
+      ? `Payer ${fcfa(montant)}`
+      : !pret
+        ? "Préparation du paiement…"
+        : etat === "creation"
+          ? "Création de la commande…"
+          : `Payer ${fcfa(montant)}`;
+  // Messages du paiement en ligne : sans objet à la livraison.
+  const enLigne = !aLaLivraison;
+  const avertiIci =
+    averti && averti.aLaLivraison === aLaLivraison ? averti : null;
+
+  const changerMoyen = (moyen: MoyenPaiement) => {
+    setErreur(null);
+    onMoyen(moyen);
+  };
 
   return (
     <>
@@ -377,24 +444,33 @@ export function EtapePaiement({
             </div>
           ))}
         </div>
-        <div className="grid gap-2">
-          <p className="text-base font-bold">Paiement en ligne avec KKiaPay</p>
-          <ul className="flex list-none flex-wrap gap-1.5">
-            {MOYENS.map((m) => (
-              <li
-                key={m}
-                className="rounded-pilule border border-trait bg-surface px-3 py-1 text-[13px] font-semibold"
-              >
-                {m}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <p className="text-[13px] leading-[1.45] text-encre-doux">
-          Sur le site, la commande se paie en ligne. Elle part au restaurant dès
-          que le paiement est accepté. Tant qu&apos;elle n&apos;est pas payée,
-          vous pouvez la modifier.
-        </p>
+        {propose ? (
+          <ChoixPaiement
+            moyen={aLaLivraison ? "OFFLINE" : "ONLINE"}
+            onChange={changerMoyen}
+          />
+        ) : (
+          <>
+            <div className="grid gap-2">
+              <p className="text-base font-bold">
+                Paiement en ligne avec KKiaPay
+              </p>
+              <ul className="flex list-none flex-wrap gap-1.5">
+                {MOYENS.map((m) => (
+                  <li
+                    key={m}
+                    className="rounded-pilule border border-trait bg-surface px-3 py-1 text-[13px] font-semibold"
+                  >
+                    {m}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <p className="text-[13px] leading-[1.45] text-encre-doux">
+              {TEXTE_PAIEMENT_EN_LIGNE}
+            </p>
+          </>
+        )}
         {ecart && courante ? (
           <p
             className="rounded-carte bg-jaune-pale px-3.5 py-3 text-sm leading-[1.45]"
@@ -415,18 +491,58 @@ export function EtapePaiement({
             Montant enregistré pour cette commande{INSECABLE}: {fcfa(montant)}.
           </p>
         ) : null}
-        {averti ? (
+        {avertiIci?.aLaLivraison ? (
           <p
             className="rounded-carte bg-jaune-pale px-3.5 py-3 text-sm leading-[1.45]"
             role="status"
           >
-            {averti.confirmation ? (
+            {avertiIci.confirmation ? (
+              <>
+                Le paiement en ligne de la commande{" "}
+                <span className="whitespace-nowrap">{avertiIci.reference}</span>{" "}
+                a été accepté et attend sa confirmation. Ne passez pas une
+                seconde commande{INSECABLE}:{" "}
+                <Lien
+                  className="min-h-0"
+                  href={`/fr/commander/${avertiIci.id}`}
+                >
+                  suivez la commande
+                </Lien>
+                .
+              </>
+            ) : (
+              <>
+                Un paiement en ligne a déjà été commencé pour la commande{" "}
+                <span className="whitespace-nowrap">{avertiIci.reference}</span>
+                , dans un autre onglet ou avant de quitter la page. Si vous avez
+                été débité, ne passez pas une seconde commande{INSECABLE}:
+                appelez le{" "}
+                <a
+                  className="font-semibold whitespace-nowrap underline"
+                  href={telLien()}
+                >
+                  {TELEPHONE.replace(/ /g, INSECABLE)}
+                </a>
+                . Sinon, appuyez de nouveau sur «{INSECABLE}Valider ma commande
+                {INSECABLE}»{INSECABLE}: la commande en ligne sera annulée.
+              </>
+            )}
+          </p>
+        ) : avertiIci ? (
+          <p
+            className="rounded-carte bg-jaune-pale px-3.5 py-3 text-sm leading-[1.45]"
+            role="status"
+          >
+            {avertiIci.confirmation ? (
               <>
                 Le paiement de la commande{" "}
-                <span className="whitespace-nowrap">{averti.reference}</span> a
-                été accepté et attend sa confirmation. Ne payez pas une seconde
-                fois{INSECABLE}:{" "}
-                <Lien className="min-h-0" href={`/fr/commander/${averti.id}`}>
+                <span className="whitespace-nowrap">{avertiIci.reference}</span>{" "}
+                a été accepté et attend sa confirmation. Ne payez pas une
+                seconde fois{INSECABLE}:{" "}
+                <Lien
+                  className="min-h-0"
+                  href={`/fr/commander/${avertiIci.id}`}
+                >
                   suivez la commande
                 </Lien>
                 .
@@ -434,8 +550,8 @@ export function EtapePaiement({
             ) : (
               <>
                 Un paiement a déjà été commencé pour la commande{" "}
-                <span className="whitespace-nowrap">{averti.reference}</span>,
-                dans un autre onglet ou avant de quitter la page. Si vous avez
+                <span className="whitespace-nowrap">{avertiIci.reference}</span>
+                , dans un autre onglet ou avant de quitter la page. Si vous avez
                 été débité, ne payez pas une seconde fois{INSECABLE}: appelez le{" "}
                 <a
                   className="font-semibold whitespace-nowrap underline"
@@ -448,7 +564,7 @@ export function EtapePaiement({
             )}
           </p>
         ) : null}
-        {commence ? (
+        {enLigne && commence ? (
           <p className="rounded-carte bg-jaune-pale px-3.5 py-3 text-sm leading-[1.45]">
             Un paiement a déjà été commencé pour cette commande. Si vous avez
             été débité, ne payez pas une seconde fois{INSECABLE}: appelez le{" "}
@@ -461,7 +577,7 @@ export function EtapePaiement({
             .
           </p>
         ) : null}
-        {etat === "ferme" ? (
+        {enLigne && etat === "ferme" ? (
           <p
             className="rounded-carte bg-jaune-pale px-3.5 py-3 text-sm leading-[1.45] font-semibold"
             role="status"
@@ -471,7 +587,7 @@ export function EtapePaiement({
             sera payée.
           </p>
         ) : null}
-        {erreurChargement ? (
+        {enLigne && erreurChargement ? (
           <div
             className="flex flex-wrap items-center gap-x-3 gap-y-1"
             role="alert"
@@ -493,13 +609,24 @@ export function EtapePaiement({
           // focus le perd (retour en haut de page au clavier).
           aria-disabled={occupe || undefined}
           className="gap-1.5 px-4 min-[1000px]:w-auto"
-          disabled={!pret || !pretAPayer || erreurChargement}
-          icone="cadenas"
+          // À la livraison, l'état du module de paiement ne compte pas.
+          disabled={
+            aLaLivraison
+              ? !pretAPayer
+              : !pret || !pretAPayer || erreurChargement
+          }
+          icone={aLaLivraison ? "coche" : "cadenas"}
+          // Le total reste visible à côté : sous 420 px, « Valider » suffit.
+          libelleCourt={
+            aLaLivraison ? (occupe ? "Envoi…" : "Valider") : undefined
+          }
           taille="grand"
           onClick={lancer}
         >
           {libelle}
         </Bouton>,
+        // À la livraison, le libellé ne dit pas le montant : le total reste visible.
+        !aLaLivraison,
       )}
     </>
   );

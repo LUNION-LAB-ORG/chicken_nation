@@ -63,13 +63,25 @@ export interface IArticleGA {
 
 /**
  * Événement de commerce GA4 (`view_item`, `add_to_cart`, `begin_checkout`,
- * `purchase`) : devise XOF, valeur égale à la somme des articles sauf montant
- * donné (total payé pour un achat).
+ * `add_payment_info`, `purchase`) : devise XOF, valeur égale à la somme des
+ * articles sauf montant donné (total payé pour un achat). `payment_type` :
+ * moyen choisi à l'étape Paiement (« en_ligne » ou « a_la_livraison »).
+ * `purchase` reste réservé au paiement en ligne accepté : une commande à
+ * payer à la livraison pas encore confirmée n'est pas une vente.
  */
 export function evenementCommerce(
-  nom: "view_item" | "add_to_cart" | "begin_checkout" | "purchase",
+  nom:
+    | "view_item"
+    | "add_to_cart"
+    | "begin_checkout"
+    | "add_payment_info"
+    | "purchase",
   articles: IArticleGA[],
-  extra: { value?: number; transaction_id?: string } = {},
+  extra: {
+    value?: number;
+    transaction_id?: string;
+    payment_type?: "en_ligne" | "a_la_livraison";
+  } = {},
 ) {
   const value =
     extra.value ??

@@ -16,6 +16,7 @@ import {
   heureRetraitAtom,
   lireCaisseGardee,
   modeAtom,
+  moyenPaiementAtom,
   oublierAdresseAtom,
   oublierAvantagesAtom,
   restaurantIdAtom,
@@ -255,6 +256,47 @@ describe("avantages en mémoire", () => {
     s.set(avantagesAtom, { points: 120, cadeaux: ["r1"] });
     s.set(oublierAvantagesAtom);
     expect(s.get(avantagesAtom)).toEqual(AVANTAGES_VIDES);
+  });
+});
+
+describe("moyen de paiement en mémoire", () => {
+  it("en ligne par défaut ; à la livraison seulement en livraison", () => {
+    const s = createStore();
+
+    expect(s.get(moyenPaiementAtom)).toBe("ONLINE");
+    s.set(moyenPaiementAtom, "OFFLINE");
+    expect(s.get(moyenPaiementAtom)).toBe("OFFLINE");
+    // Rien de gardé dans le navigateur (clé cn-caisse inchangée).
+    expect(s.get(caisseAtom)).toEqual({
+      mode: "DELIVERY",
+      adresse: null,
+      restaurantId: null,
+    });
+    s.set(moyenPaiementAtom, "ONLINE");
+    expect(s.get(moyenPaiementAtom)).toBe("ONLINE");
+  });
+
+  it("passer en retrait le ramène en ligne, et il y reste au retour en livraison", () => {
+    const s = createStore();
+
+    s.set(moyenPaiementAtom, "OFFLINE");
+    s.set(modeAtom, "PICKUP");
+    expect(s.get(moyenPaiementAtom)).toBe("ONLINE");
+    // En retrait, « à la livraison » ne s'écrit pas.
+    s.set(moyenPaiementAtom, "OFFLINE");
+    expect(s.get(moyenPaiementAtom)).toBe("ONLINE");
+    s.set(modeAtom, "DELIVERY");
+    expect(s.get(moyenPaiementAtom)).toBe("ONLINE");
+  });
+
+  it("gardé quand le panier change ou se vide (« Modifier ma commande » le retrouve)", () => {
+    const s = createStore();
+
+    s.set(panierAtom, [ligne("box")]);
+    s.set(moyenPaiementAtom, "OFFLINE");
+    s.set(panierAtom, []);
+    s.set(panierAtom, [ligne("box", 2)]);
+    expect(s.get(moyenPaiementAtom)).toBe("OFFLINE");
   });
 });
 

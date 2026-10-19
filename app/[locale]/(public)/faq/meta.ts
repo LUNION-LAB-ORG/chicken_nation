@@ -122,7 +122,7 @@ export function questionsFaq(fidelite: IConfigFidelite): RubriqueFaq[] {
         {
           question: "Quels moyens de paiement acceptez-vous ?",
           reponse: [
-            "Nous acceptons les espèces, le Mobile Money (Orange Money, MTN Money, Wave, Moov Money) et la carte bancaire (Visa, Mastercard). Sur notre site, le paiement se fait uniquement en ligne.",
+            "Nous acceptons les espèces, le Mobile Money (Orange Money, MTN Money, Wave, Moov Money) et la carte bancaire (Visa, Mastercard). Sur notre site, vous payez en ligne, ou à la livraison pour une commande livrée.",
           ],
         },
         {

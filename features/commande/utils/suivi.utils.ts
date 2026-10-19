@@ -15,7 +15,7 @@ import {
   versCadeau,
 } from "./fidelite.utils";
 import { versReglagesFidelite } from "./reponses-api.utils";
-import { aPayer, etapesSuivi } from "./statut.utils";
+import { aConfirmer, aPayer, etapesSuivi } from "./statut.utils";
 
 import { restaurantDuSite } from "@/features/restaurants/restaurants.site";
 import { fcfa, INSECABLE as N, nombre } from "@/lib/typo";
@@ -178,10 +178,12 @@ export interface IEtapeFrise {
  * Livrée ou Récupérée (completed_at, collected_at).
  *
  * Payée mais pas encore acceptée (PENDING) : la première étape est en cours,
- * « En attente de confirmation ».
+ * « En attente de confirmation ». Commande du site à payer à la livraison pas
+ * encore confirmée : c'est le centre d'appels qui appelle, pas le restaurant.
  */
 export function etapesFrise(
-  c: Pick<ICommande, "type" | "status" | "heures">,
+  c: Pick<ICommande, "type" | "status" | "heures"> &
+    Partial<Pick<ICommande, "paied" | "payment_method" | "canal" | "auto">>,
 ): IEtapeFrise[] {
   const retrait = c.type === "PICKUP";
   const h = c.heures;
@@ -219,6 +221,13 @@ export function etapesFrise(
     e.statuts.includes(c.status),
   );
   const finie = indexActuel === modele.length - 1;
+  const appel = aConfirmer({
+    status: c.status,
+    paied: !!c.paied,
+    payment_method: c.payment_method ?? null,
+    canal: c.canal,
+    auto: c.auto,
+  });
 
   return modele.map(([libelle, texte, icone, quand], i) => {
     const etat: EtatEtape =
@@ -231,7 +240,9 @@ export function etapesFrise(
     if (etat === "actuel" && indexActuel < 0) {
       return {
         libelle: "En attente de confirmation",
-        texte: "Le restaurant va confirmer votre commande dans un instant.",
+        texte: appel
+          ? "Notre équipe vous appelle pour confirmer votre commande."
+          : "Le restaurant va confirmer votre commande dans un instant.",
         icone,
         etat,
         heure: null,

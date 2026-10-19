@@ -165,3 +165,37 @@ export function reglesPoints(r: {
 /** « Préparée au restaurant Marcory Zone 4, à 3,1 km » (sans distance si elle est inconnue). */
 export const textePreparation = (nom: string, km: number | null) =>
   `Préparée au restaurant ${nom}${km ? `, à ${kmTexte(km)}` : ""}`;
+
+// ── Moyen de paiement (étape 5) ───────────────────────────────────────────
+
+/** Moyens acceptés par KKiaPay (maquette, JS 1209), en une ligne. */
+export const DETAIL_PAIEMENT_EN_LIGNE =
+  "Wave, Orange Money, MTN MoMo, Moov Money ou carte bancaire";
+
+/** Ce que le livreur accepte. */
+export const DETAIL_PAIEMENT_LIVRAISON =
+  "En espèces ou par Mobile Money, au livreur";
+
+/** Sous le choix « Payer en ligne », et quand le paiement à la livraison n'est pas proposé. */
+export const TEXTE_PAIEMENT_EN_LIGNE =
+  "La commande part au restaurant dès que le paiement est accepté. Tant qu'elle n'est pas payée, vous pouvez la modifier.";
+
+/** Sous le choix « Payer à la livraison » : l'appel, puis aucun point gagné. */
+export const TEXTE_PAIEMENT_LIVRAISON =
+  "Notre équipe vous appelle pour confirmer la commande, puis elle part en cuisine. Les commandes payées à la livraison ne rapportent pas de points.";
+
+/**
+ * Bouton de l'étape 5 à la livraison : rien à payer ici, la commande est
+ * envoyée. Pas de montant dans le libellé : le total reste visible à côté.
+ */
+export const libelleValidation = (envoi: boolean) =>
+  envoi ? "Envoi de la commande…" : "Valider ma commande";
+
+/**
+ * Note du récapitulatif sur les points : seul le paiement en ligne en
+ * rapporte. À la livraison, le client sait ce qu'il aurait gagné.
+ */
+export const notePoints = (points: string, aLaLivraison: boolean) =>
+  aLaLivraison
+    ? `Payée en ligne, elle vous rapporterait ${points}.`
+    : `Payée en ligne, cette commande vous rapportera ${points}.`;

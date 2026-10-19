@@ -127,6 +127,46 @@ describe("événements GA4", () => {
     ]);
   });
 
+  it("moyen de paiement choisi (add_payment_info) : en ligne ou à la livraison", () => {
+    const recus = [];
+    const article = {
+      item_id: "p1",
+      item_name: "BOX",
+      price: 5500,
+      quantity: 2,
+    };
+
+    globalThis.window = { gtag: (...a) => recus.push(a) };
+    evenementCommerce("add_payment_info", [article], {
+      payment_type: "a_la_livraison",
+    });
+    evenementCommerce("add_payment_info", [article], {
+      payment_type: "en_ligne",
+    });
+    expect(recus).toEqual([
+      [
+        "event",
+        "add_payment_info",
+        {
+          currency: "XOF",
+          payment_type: "a_la_livraison",
+          value: 11000,
+          items: [article],
+        },
+      ],
+      [
+        "event",
+        "add_payment_info",
+        {
+          currency: "XOF",
+          payment_type: "en_ligne",
+          value: 11000,
+          items: [article],
+        },
+      ],
+    ]);
+  });
+
   it("une mesure qui échoue ne casse pas la page", () => {
     globalThis.window = {
       gtag: () => {

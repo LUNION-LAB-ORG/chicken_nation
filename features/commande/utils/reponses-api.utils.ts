@@ -215,7 +215,9 @@ export function versReglagesFidelite(brut: unknown): IReglagesFidelite {
  * Conditions publiques (GET /orders/conditions-commande). Taux absent, négatif
  * ou aberrant : null. Grille seulement si `grille_frais_appliquee` est vrai
  * (avec les zones du livreur, la grille n'est qu'un secours et ses prix
- * seraient faux) et si chaque palier est lisible.
+ * seraient faux) et si chaque palier est lisible. Paiement à la livraison
+ * seulement s'il est annoncé disponible (`paiement_livraison.disponible`) :
+ * un serveur plus ancien ne dit rien, et l'option reste cachée.
  */
 export function versConditionsCommande(brut: unknown): IConditionsCommande {
   const d = estObjet(brut) ? brut : {};
@@ -241,6 +243,7 @@ export function versConditionsCommande(brut: unknown): IConditionsCommande {
     return { distanceMaxKm: max, montant };
   });
   const lisible = grille.length > 0 && grille.every((p) => p !== null);
+  const livraison = estObjet(d.paiement_livraison) ? d.paiement_livraison : {};
 
   return {
     tauxFraisService,
@@ -248,6 +251,7 @@ export function versConditionsCommande(brut: unknown): IConditionsCommande {
       d.grille_frais_appliquee === true && lisible
         ? (grille as NonNullable<(typeof grille)[number]>[])
         : null,
+    paiementLivraison: livraison.disponible === true,
   };
 }
 

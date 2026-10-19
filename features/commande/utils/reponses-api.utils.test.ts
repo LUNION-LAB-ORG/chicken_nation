@@ -293,6 +293,7 @@ describe("conditions de la commande", () => {
     expect(versConditionsCommande(API)).toEqual({
       tauxFraisService: 0.01,
       grille: null,
+      paiementLivraison: false,
     });
     expect(
       versConditionsCommande({ ...API, grille_frais_appliquee: true }).grille,
@@ -307,6 +308,7 @@ describe("conditions de la commande", () => {
     expect(versConditionsCommande(null)).toEqual({
       tauxFraisService: null,
       grille: null,
+      paiementLivraison: false,
     });
     expect(
       versConditionsCommande({
@@ -317,6 +319,7 @@ describe("conditions de la commande", () => {
     ).toEqual({
       tauxFraisService: null,
       grille: null,
+      paiementLivraison: false,
     });
     expect(
       versConditionsCommande({
@@ -328,6 +331,28 @@ describe("conditions de la commande", () => {
     expect(
       versConditionsCommande({ taux_frais_service: -0.01 }).tauxFraisService,
     ).toBeNull();
+  });
+
+  it("paiement à la livraison : seulement s'il est annoncé disponible", () => {
+    expect(
+      versConditionsCommande({
+        ...API,
+        paiement_livraison: { disponible: true },
+      }).paiementLivraison,
+    ).toBe(true);
+    expect(
+      versConditionsCommande({
+        ...API,
+        paiement_livraison: { disponible: false },
+      }).paiementLivraison,
+    ).toBe(false);
+    // Serveur plus ancien (champ absent) ou réponse abîmée : option cachée.
+    expect(versConditionsCommande(API).paiementLivraison).toBe(false);
+    for (const abime of [null, true, "1", [], { disponible: "true" }, {}])
+      expect(
+        versConditionsCommande({ ...API, paiement_livraison: abime })
+          .paiementLivraison,
+      ).toBe(false);
   });
 
   it("frais de service : arrondis à la dizaine supérieure, comme le serveur", () => {

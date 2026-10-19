@@ -158,8 +158,10 @@ export const pointsGagnes = (sousTotal: number, pointsParFranc: number) =>
     : 0;
 
 /**
- * « Cette commande vous rapportera 12 points. », pour un visiteur connecté ou
- * non (réglages publics). Rien sous 1 point : la phrase ne promet jamais 0.
+ * « Payée en ligne, cette commande vous rapportera 12 points. », pour un
+ * visiteur connecté ou non (réglages publics) : seul le paiement en ligne en
+ * rapporte, pas le paiement à la livraison. Rien sous 1 point : la phrase ne
+ * promet jamais 0.
  */
 export function textePointsGagnes(
   sousTotal: number,
@@ -167,7 +169,9 @@ export function textePointsGagnes(
 ): string | null {
   const n = pointsGagnes(sousTotal, pointsParFranc);
 
-  return n >= 1 ? `Cette commande vous rapportera ${pointsLisibles(n)}.` : null;
+  return n >= 1
+    ? `Payée en ligne, cette commande vous rapportera ${pointsLisibles(n)}.`
+    : null;
 }
 
 /**

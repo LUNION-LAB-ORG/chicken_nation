@@ -5,13 +5,17 @@ import {
   DELAI_CONFIRMATION_MS,
   DELAI_PROTECTION_MS,
   DUREE_EN_ATTENTE_MS,
+  DUREE_ENVOYEE_MS,
   ecrireMarquePaiement,
   etatPaiement,
   lireCommandeEnAttente,
+  lireCommandeEnvoyee,
   lireMarquePaiement,
   lirePanierCommande,
   noterCommandeEnAttente,
+  noterCommandeEnvoyee,
   oublierCommandeEnAttente,
+  oublierCommandeEnvoyee,
   sauverPanierCommande,
 } from "./memoire-navigateur.utils";
 
@@ -152,5 +156,51 @@ describe("commande en attente de paiement (étape 5)", () => {
       noterCommandeEnAttente({ id: "c1", reference: "ORD-1", signature: "s" }),
     ).not.toThrow();
     expect(lireCommandeEnAttente()).toBeNull();
+  });
+});
+
+describe("commande à payer à la livraison, envoyée", () => {
+  it("le temps de l'onglet, pour sa seule référence, sans commande en attente ni marque de paiement", () => {
+    const t = 2_000_000;
+
+    expect(lireCommandeEnvoyee("ORD-7", t)).toBe(false);
+    noterCommandeEnvoyee("ORD-7", t);
+    expect(session.cles()).toEqual(["cn-commande-envoyee"]);
+    expect(local.cles()).toEqual([]);
+    expect(lireCommandeEnAttente()).toBeNull();
+    expect(lireCommandeEnvoyee("ORD-7", t + 1000)).toBe(true);
+    expect(lireCommandeEnvoyee("ORD-8", t + 1000)).toBe(false);
+    oublierCommandeEnvoyee();
+    expect(lireCommandeEnvoyee("ORD-7", t + 1000)).toBe(false);
+  });
+
+  it("oubliée au-delà de 30 min", () => {
+    const t = 3_000_000;
+
+    noterCommandeEnvoyee("ORD-7", t);
+    expect(lireCommandeEnvoyee("ORD-7", t + DUREE_ENVOYEE_MS)).toBe(true);
+    expect(lireCommandeEnvoyee("ORD-7", t + DUREE_ENVOYEE_MS + 1)).toBe(false);
+    expect(session.cles()).toEqual([]);
+  });
+
+  it("valeur abîmée ou stockage bloqué : rien, sans erreur", () => {
+    session.setItem("cn-commande-envoyee", "{pas du json");
+    expect(lireCommandeEnvoyee("ORD-7")).toBe(false);
+    session.setItem(
+      "cn-commande-envoyee",
+      JSON.stringify({ reference: "ORD-7" }),
+    );
+    expect(lireCommandeEnvoyee("ORD-7")).toBe(false);
+    globalThis.window = {
+      get sessionStorage() {
+        throw new Error("bloqué");
+      },
+      get localStorage() {
+        throw new Error("bloqué");
+      },
+    };
+    expect(() => noterCommandeEnvoyee("ORD-7")).not.toThrow();
+    expect(lireCommandeEnvoyee("ORD-7")).toBe(false);
+    expect(() => oublierCommandeEnvoyee()).not.toThrow();
   });
 });

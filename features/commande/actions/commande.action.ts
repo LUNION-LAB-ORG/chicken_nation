@@ -48,9 +48,11 @@ import {
   versPlatDetail,
   versReglagesFidelite,
 } from "../utils/reponses-api.utils";
+import { aConfirmer, aPayer } from "../utils/statut.utils";
 
 import { obtenirClientAction } from "./connexion.action";
 
+import { INSECABLE, TELEPHONE } from "@/lib/typo";
 import { formatImageUrl } from "@/utils/formatImageUrl";
 
 type Brut = Record<string, unknown>;
@@ -496,10 +498,10 @@ async function lireReglagesFidelite(): Promise<Resultat<IReglagesFidelite>> {
 }
 
 /**
- * Réglages de fidélité lisibles SANS connexion : « Cette commande vous
- * rapportera N points » (fidelite.utils, textePointsGagnes) dans le panier
- * d'un visiteur, et la durée de validité des points. En cas d'échec, rien
- * n'est affiché : aucun chiffre de fidélité n'est écrit en dur.
+ * Réglages de fidélité lisibles SANS connexion : « Payée en ligne, cette
+ * commande vous rapportera N points » (fidelite.utils, textePointsGagnes)
+ * dans le panier d'un visiteur, et la durée de validité des points. En cas
+ * d'échec, rien n'est affiché : aucun chiffre de fidélité n'est écrit en dur.
  */
 export async function lireReglagesFideliteAction(): Promise<
   Resultat<IReglagesFidelite>
@@ -598,6 +600,8 @@ export async function lireFideliteAction(): Promise<Resultat<IFideliteClient>> {
  * compare à son estimation pour prévenir le client avant le paiement.
  * `montant` et `paiement` : total à débiter et clé publique KKiaPay renvoyés
  * par le serveur, pour ouvrir le paiement sans relire la commande (étape 5).
+ * Paiement à la livraison (`c.paiement` OFFLINE, livraison seulement) : la
+ * commande attend l'appel du centre d'appels, rien n'est payé ici.
  */
 export async function creerCommandeAction(c: ICreationCommande): Promise<
   Resultat<{
@@ -767,7 +771,10 @@ export async function creerCommandeAction(c: ICreationCommande): Promise<
           }),
         }
       : {}),
-    payment_method: "ONLINE",
+    // À la livraison seulement pour une livraison (le serveur refuserait
+    // sinon) ; toute autre valeur reçue vaut paiement en ligne.
+    payment_method:
+      c.paiement === "OFFLINE" && c.mode === "DELIVERY" ? "OFFLINE" : "ONLINE",
     date: c.heureRetrait ?? new Date().toISOString(),
     ...(c.code ? { code_promo: c.code } : {}),
     ...(points > 0 ? { points } : {}),
@@ -794,26 +801,36 @@ export async function creerCommandeAction(c: ICreationCommande): Promise<
 }
 
 /**
- * Annulation par le client d'une commande pas encore payée, pour la modifier.
- * Le serveur rend le bon d'achat ou le code promo engagé et les cadeaux
- * (reward.service, restoreConsumedGiftsForOrder), et range le panier annulé
- * dans « À relancer » pour le centre d'appels. Les points, eux, ne sont
- * jamais déduits d'une commande non payée : rien à rendre.
+ * Annulation par le client d'une commande pas encore payée, pour la modifier :
+ * commande en ligne non payée, ou commande du site à payer à la livraison que
+ * le centre d'appels n'a pas encore confirmée. Le serveur rend le bon d'achat
+ * ou le code promo engagé et les cadeaux (reward.service,
+ * restoreConsumedGiftsForOrder), et range la commande annulée dans « À
+ * relancer » pour le centre d'appels. Les points, eux, ne sont jamais déduits
+ * d'une commande non payée ou pas encore confirmée : rien à rendre.
  */
 export async function annulerCommandeAction(
   id: string,
 ): Promise<Resultat<null>> {
   if (!estUuid(id)) return { ok: false, message: "Commande introuvable." };
   // Relue juste avant : une commande payée entre-temps ne s'annule pas d'ici
-  // (l'annulation déclencherait un remboursement).
+  // (l'annulation déclencherait un remboursement), ni une commande déjà
+  // confirmée (le restaurant l'a reçue).
   const actuelle = await appelApi<Brut>(`/orders/${id}/client`);
 
   if (!actuelle.ok) return actuelle;
-  if (actuelle.data.paied || actuelle.data.status !== "PENDING") {
+  const commande = versCommande(actuelle.data);
+
+  if (commande.paied) {
     return {
       ok: false,
-      message:
-        "Cette commande est déjà payée ou en cours : elle ne peut plus être modifiée.",
+      message: `Cette commande est déjà payée${INSECABLE}: elle ne peut plus être modifiée.`,
+    };
+  }
+  if (!aPayer(commande) && !aConfirmer(commande)) {
+    return {
+      ok: false,
+      message: `Cette commande est déjà confirmée${INSECABLE}: appelez le ${TELEPHONE.replace(/ /g, INSECABLE)} pour la modifier.`,
     };
   }
   const res = await appelApi<Brut>(`/orders/${id}/client/status`, {

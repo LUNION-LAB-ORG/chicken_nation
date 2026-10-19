@@ -3,6 +3,7 @@ import type {
   ICreationCommande,
   ILignePanier,
   ModeCommande,
+  MoyenPaiement,
 } from "../types/commande.types";
 
 import { signaturePanier } from "./panier.utils";
@@ -134,6 +135,23 @@ export function etapeAccessible(demandee: number, e: IEtatCaisse): EtapeCaisse {
   return Math.max(1, Math.min(max, n)) as EtapeCaisse;
 }
 
+// ── Moyen de paiement ─────────────────────────────────────────────────────
+
+/**
+ * Moyen de paiement envoyé au serveur : à la livraison seulement s'il est
+ * choisi, pour une livraison, et proposé par le serveur
+ * (`conditions.paiementLivraison`). Tout le reste se paie en ligne.
+ */
+export function moyenPaiementRetenu(
+  choisi: MoyenPaiement | null | undefined,
+  mode: ModeCommande,
+  propose: boolean,
+): MoyenPaiement {
+  return choisi === "OFFLINE" && mode === "DELIVERY" && propose
+    ? "OFFLINE"
+    : "ONLINE";
+}
+
 // ── Commande créée, pas encore payée ──────────────────────────────────────
 
 /**
@@ -141,6 +159,10 @@ export function etapeAccessible(demandee: number, e: IEtatCaisse): EtapeCaisse {
  * choix et quantités, mode, adresse et repère, restaurant, heure, code,
  * points, cadeaux et leur épicé. Deux clics « Payer » sur la même empreinte
  * paient la même commande.
+ *
+ * Le paiement à la livraison n'y entre que lorsqu'il est choisi : les
+ * empreintes en ligne déjà gardées dans le navigateur restent les mêmes, et
+ * changer de moyen de paiement remplace la commande non payée.
  */
 export function signatureCommande(c: ICreationCommande): string {
   const adresse =
@@ -166,6 +188,9 @@ export function signatureCommande(c: ICreationCommande): string {
     code: c.code ?? null,
     points: c.points ?? 0,
     cadeaux,
+    ...(moyenPaiementRetenu(c.paiement, c.mode, true) === "OFFLINE"
+      ? { paiement: "OFFLINE" }
+      : {}),
   });
 }
 

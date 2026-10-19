@@ -17,9 +17,9 @@ import { Bouton } from "@/components/site/Bouton";
 
 /**
  * « Modifier ma commande » avec sa confirmation sur place : la commande non
- * payée est annulée et ses plats reviennent dans le panier (règle du site,
- * plan 4.3). Le focus passe sur « Oui, modifier », puis revient au bouton
- * si le client renonce.
+ * payée (ou à payer à la livraison, pas encore confirmée) est annulée et ses
+ * plats reviennent dans le panier (règle du site, plan 4.3). Le focus passe
+ * sur « Oui, modifier », puis revient au bouton si le client renonce.
  */
 export function ConfirmationModifier({
   onConfirmer,
@@ -61,8 +61,8 @@ export function ConfirmationModifier({
           role="group"
         >
           <p>
-            Cette commande non payée sera annulée et ses plats remis dans votre
-            panier. Vous paierez ensuite la nouvelle commande.
+            Cette commande sera annulée et votre panier vous sera rendu. Vous
+            passerez ensuite une nouvelle commande.
           </p>
           <div className="flex flex-wrap gap-2">
             {/* aria-disabled et non disabled : un bouton désactivé sous le
@@ -137,8 +137,8 @@ export function BoutonRecommander({
 }
 
 /**
- * Actions d'une commande dans Mes commandes : `modifier` (commande non payée)
- * ou `recommander`. Les liens (« Payer », « Voir le détail ») sont rendus par
+ * Actions d'une commande dans Mes commandes : `modifier` (commande non payée,
+ * ou à payer à la livraison pas encore confirmée) ou `recommander`. Les liens (« Payer », « Voir le détail ») sont rendus par
  * le serveur et passés dans `avant` ou `apres`.
  */
 export function ActionsCommande({

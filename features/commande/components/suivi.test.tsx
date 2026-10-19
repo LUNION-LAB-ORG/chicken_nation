@@ -126,6 +126,22 @@ const A_PAYER = versCommande({
     note: "Portail bleu",
   }),
 });
+// Commande du site à payer à la livraison, pas encore confirmée au téléphone.
+const A_CONFIRMER = versCommande({
+  ...BRUT,
+  id: "c0ffee00-0000-4000-8000-000000000005",
+  reference: "ORD-261019-40417",
+  type: "DELIVERY",
+  status: "PENDING",
+  paied: false,
+  payment_method: "OFFLINE",
+  channel: "WEB",
+  auto: true,
+  accepted_at: null,
+  delivery_fee: 1500,
+  amount: 16870,
+  address: JSON.stringify({ address: "Cocody, rue des Jardins" }),
+});
 const LIVREE = versCommande({
   ...BRUT,
   type: "DELIVERY",
@@ -247,6 +263,50 @@ describe("SuiviCommande", () => {
     expect(t).toContain("Préparée au restaurant Marcory Zone 4.");
     seulNumero(html);
     sansInterdit(html);
+  });
+
+  it("à payer à la livraison, pas encore confirmée : ni « Payer » ni code, « Modifier » et frise", () => {
+    const html = suivi(A_CONFIRMER);
+    const t = texte(html);
+
+    expect(t).toContain("À confirmer");
+    expect(t).toContain("16 870 FCFA · à payer à la livraison");
+    expect(t).toContain(
+      "Paiement à la livraison Vous paierez 16 870 FCFA au livreur, en espèces ou par Mobile Money.",
+    );
+    expect(t).toContain("Modifier ma commande");
+    expect(t).not.toContain("Payer");
+    expect(t).not.toContain("Préparation du paiement…");
+    expect(html).not.toContain("?payer=1");
+    expect(t).toContain(
+      "En attente de confirmation Notre équipe vous appelle pour confirmer votre commande.",
+    );
+    // Code de récupération seulement une fois la commande confirmée.
+    expect(t).not.toContain("Code de récupération");
+    expect(t).not.toContain("points crédités");
+    expect(t).not.toContain("Vos avantages");
+    seulNumero(html);
+    sansInterdit(html);
+  });
+
+  it("à payer à la livraison, confirmée au téléphone : plus de « Modifier », code affiché", () => {
+    const confirmee = {
+      ...A_CONFIRMER,
+      status: "ACCEPTED",
+      auto: false,
+      heures: { ...A_CONFIRMER.heures, accepted_at: "2026-10-19T08:16:07Z" },
+    };
+    const t = texte(suivi(confirmee));
+
+    expect(t).toContain("Confirmée");
+    expect(t).toContain("à payer à la livraison");
+    expect(t).toContain("Paiement à la livraison");
+    expect(t).not.toContain("Modifier ma commande");
+    expect(t).toContain("Code de récupération");
+    // Remise au client : plus « à payer ».
+    expect(texte(suivi({ ...confirmee, status: "COLLECTED" }))).not.toContain(
+      "à payer à la livraison",
+    );
   });
 
   it("livrée : « Commande terminée », « Recommander », plus de code", () => {
@@ -387,6 +447,29 @@ describe("Mes commandes", () => {
     expect(html.match(/<h2/g)).toHaveLength(2);
     expect(html.match(/<h3/g)).toHaveLength(3);
     expect(html).not.toContain("<h1");
+    seulNumero(html);
+    sansInterdit(html);
+  });
+
+  it("à payer à la livraison : « Suivre » et « Modifier », jamais « Voir et payer »", () => {
+    const html = renderToStaticMarkup(
+      <MesCommandes
+        client={CLIENT}
+        commandes={{ ok: true, data: [A_CONFIRMER] }}
+        compte={{ ok: true, data: compte }}
+      />,
+    );
+    const t = texte(html);
+
+    expect(t).toContain("À confirmer");
+    expect(t).toContain(
+      "Livraison · Cocody, rue des Jardins · 16 870 FCFA · à payer à la livraison",
+    );
+    expect(t).toContain("Suivre la commande Modifier ma commande");
+    expect(t).not.toContain("Voir et payer");
+    expect(html).not.toContain("?payer=1");
+    // Aucun point annoncé sur la commande elle-même.
+    expect(t).not.toMatch(/à payer à la livraison · \+/);
     seulNumero(html);
     sansInterdit(html);
   });

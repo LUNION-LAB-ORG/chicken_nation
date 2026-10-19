@@ -1,11 +1,17 @@
 import type { ICommande } from "../types/commande.types";
 
-/** Libellés repris de l'application (app/src/features/orders/utils/order.utils.tsx). */
-export function libelleStatut(
-  c: Pick<ICommande, "status" | "type" | "paied" | "payment_method">,
-) {
+/** Champs qui disent si une commande du site attend l'appel du centre d'appels. */
+type EtatConfirmation = Pick<ICommande, "status" | "paied" | "payment_method"> &
+  Partial<Pick<ICommande, "canal" | "auto">>;
+
+/**
+ * Libellés repris de l'application (app/src/features/orders/utils/order.utils.tsx),
+ * plus « À confirmer » pour une commande du site à payer à la livraison.
+ */
+export function libelleStatut(c: EtatConfirmation & Pick<ICommande, "type">) {
   if (c.status === "PENDING" && c.payment_method === "ONLINE" && !c.paied)
     return "En attente de paiement";
+  if (aConfirmer(c)) return "À confirmer";
   switch (c.status) {
     case "PENDING":
       return "En attente";
@@ -66,3 +72,39 @@ export const estTerminee = (c: Pick<ICommande, "status">) =>
 export const aPayer = (
   c: Pick<ICommande, "status" | "paied" | "payment_method">,
 ) => c.payment_method === "ONLINE" && !c.paied && c.status === "PENDING";
+
+/**
+ * Commande du site à payer à la livraison que le centre d'appels n'a pas
+ * encore confirmée (règle `estAConfirmer` du serveur) : elle n'est pas encore
+ * partie au restaurant, le client peut la modifier. Jamais une commande en
+ * espèces de l'application (canal APP ou vide), ni une commande saisie ou
+ * reprise au centre d'appels (`auto` faux).
+ */
+export const aConfirmer = (c: EtatConfirmation) =>
+  c.payment_method === "OFFLINE" &&
+  !c.paied &&
+  c.status === "PENDING" &&
+  c.canal === "WEB" &&
+  c.auto === true;
+
+/** Statuts où une commande livrée n'a pas encore été remise au client. */
+const AVANT_REMISE: ICommande["status"][] = [
+  "PENDING",
+  "ACCEPTED",
+  "IN_PROGRESS",
+  "READY",
+  "PICKED_UP",
+];
+
+/**
+ * Livraison à payer au livreur, pas encore remise. Une commande remise
+ * (COLLECTED) attend seulement la confirmation de l'encaissement du livreur :
+ * on n'y écrit plus « à payer ». Un retrait n'est jamais « à la livraison ».
+ */
+export const aPayerALaLivraison = (
+  c: Pick<ICommande, "status" | "paied" | "payment_method" | "type">,
+) =>
+  c.payment_method === "OFFLINE" &&
+  !c.paied &&
+  c.type !== "PICKUP" &&
+  AVANT_REMISE.includes(c.status);

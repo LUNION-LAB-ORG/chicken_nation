@@ -11,6 +11,7 @@ import MesPoints from "../MesPoints";
 
 import { BarreEtapes } from "./BarreEtapes";
 import { EtapeLivraisonRetrait } from "./EtapeLivraisonRetrait";
+import { EtapePaiement } from "./EtapePaiement";
 import { AlerteMode, EtapePanier } from "./EtapePanier";
 import { PiedEtape } from "./PiedEtape";
 import {
@@ -20,6 +21,8 @@ import {
   heureCreneau,
   inconnusDuTotal,
   libelleTotal,
+  libelleValidation,
+  notePoints,
   obstacleAvantages,
   obstaclePanier,
   problemesSansMode,
@@ -495,6 +498,160 @@ describe("écrans de la caisse", () => {
     expect(html).toContain("Épicé ou non, pour BIG CHICKEN ?");
     expect(html).toContain("Choisissez épicé ou non épicé.");
     expect(html).toContain("Retirer");
+  });
+});
+
+describe("étape Paiement : en ligne ou à la livraison", () => {
+  const CLIENT = {
+    id: "k1",
+    phone: "+2250102030405",
+    first_name: "Awa",
+    last_name: "Test",
+    email: null,
+  };
+  const creation = (x = {}) => ({
+    mode: "DELIVERY",
+    lignes: [ligne()],
+    adresse: {
+      libelle: "Cocody Angré",
+      latitude: 5.39,
+      longitude: -3.98,
+      repere: "",
+    },
+    restaurantId: null,
+    heureRetrait: null,
+    code: null,
+    points: 0,
+    cadeaux: [],
+    ...x,
+  });
+  const etape = ({ propose = true, ...x } = {}) =>
+    renderToStaticMarkup(
+      <EtapePaiement
+        aCommander={[ligne()]}
+        client={CLIENT}
+        creation={creation(x)}
+        pied={(bouton, pleineLargeur) => (
+          <PiedEtape
+            libelleTotal="Total"
+            pleineLargeur={pleineLargeur}
+            total={13690}
+          >
+            {bouton}
+          </PiedEtape>
+        )}
+        pointsRetenus={0}
+        pretAPayer={true}
+        propose={propose}
+        remiseDesPoints={0}
+        resume={[]}
+        totalEstime={13690}
+        verifier={() => true}
+        onAller={() => {}}
+        onEnvoyee={() => {}}
+        onMoyen={() => {}}
+        onPaye={() => {}}
+        onRefus={() => {}}
+        onRelais={() => {}}
+      />,
+    );
+  const bouton = (html) => html.match(/<button[^>]*>.*?<\/button>/gs).at(-1);
+
+  it("livraison et option proposée : deux choix, en ligne par défaut", () => {
+    const html = etape({ paiement: "ONLINE" });
+    const t = texte(html);
+
+    expect(html.match(/type="radio"/g)).toHaveLength(2);
+    expect(t).toContain(
+      "Payer en ligne Wave, Orange Money, MTN MoMo, Moov Money ou carte bancaire",
+    );
+    expect(t).toContain(
+      "Payer à la livraison En espèces ou par Mobile Money, au livreur",
+    );
+    expect(html).toMatch(/id="paiement-en-ligne"[^>]*checked=""/);
+    expect(t).toContain(
+      "La commande part au restaurant dès que le paiement est accepté.",
+    );
+    // En ligne : rien ne change, KKiaPay pas encore prêt au rendu.
+    expect(bouton(html)).toContain('disabled=""');
+    expect(texte(bouton(html))).toContain("Préparation du paiement…");
+    sansInterdit(html);
+  });
+
+  it("à la livraison : bouton actif sans KKiaPay, libellé sans montant, total visible", () => {
+    const html = etape({ paiement: "OFFLINE" });
+    const t = texte(html);
+    const b = bouton(html);
+
+    expect(html).toMatch(/id="paiement-livraison"[^>]*checked=""/);
+    expect(t).toContain(
+      "Notre équipe vous appelle pour confirmer la commande, puis elle part en cuisine. Les commandes payées à la livraison ne rapportent pas de points.",
+    );
+    expect(b).not.toContain('disabled=""');
+    expect(b).toContain('aria-label="Valider ma commande"');
+    expect(texte(b)).toBe("Valider ma commande Valider");
+    expect(b).not.toContain("FCFA");
+    expect(b).toContain("#i-coche");
+    // Le total reste visible à côté du bouton, même sous 375 px.
+    expect(html).not.toContain("max-[374px]:hidden");
+    expect(t).toContain("Total 13 690 FCFA");
+    expect(t).not.toContain("Préparation du paiement");
+    expect(t).not.toContain("Paiement en ligne avec KKiaPay");
+    sansInterdit(html);
+  });
+
+  it("à la livraison, encore en calcul : bouton désactivé", () => {
+    const html = renderToStaticMarkup(
+      <EtapePaiement
+        propose
+        aCommander={[ligne()]}
+        client={CLIENT}
+        creation={creation({ paiement: "OFFLINE" })}
+        pied={(b) => b}
+        pointsRetenus={0}
+        pretAPayer={false}
+        remiseDesPoints={0}
+        resume={[]}
+        totalEstime={13690}
+        verifier={() => true}
+        onAller={() => {}}
+        onEnvoyee={() => {}}
+        onMoyen={() => {}}
+        onPaye={() => {}}
+        onRefus={() => {}}
+        onRelais={() => {}}
+      />,
+    );
+
+    expect(bouton(html)).toContain('disabled=""');
+  });
+
+  it("option non proposée (retrait, serveur ancien, réglage coupé) : paiement en ligne seul", () => {
+    for (const html of [
+      etape({ propose: false }),
+      etape({ propose: false, mode: "PICKUP", restaurantId: "r1" }),
+    ]) {
+      const t = texte(html);
+
+      expect(html).not.toContain('type="radio"');
+      expect(t).not.toContain("à la livraison");
+      expect(t).toContain("Paiement en ligne avec KKiaPay");
+      expect(t).toContain(
+        "La commande part au restaurant dès que le paiement est accepté. Tant qu'elle n'est pas payée, vous pouvez la modifier.",
+      );
+      sansInterdit(html);
+    }
+  });
+
+  it("textes du bouton et des points", () => {
+    expect(libelleValidation(false)).toBe("Valider ma commande");
+    expect(libelleValidation(true)).toBe("Envoi de la commande…");
+    expect(notePoints(`12${_}points`, false)).toBe(
+      `Payée en ligne, cette commande vous rapportera 12${_}points.`,
+    );
+    expect(notePoints(`12${_}points`, true)).toBe(
+      `Payée en ligne, elle vous rapporterait 12${_}points.`,
+    );
   });
 });
 

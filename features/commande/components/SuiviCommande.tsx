@@ -26,13 +26,20 @@ import {
   etatPaiement,
   type IEcartPoints,
   lireCommandeEnAttente,
+  lireCommandeEnvoyee,
   lireEcartPoints,
   lireMarquePaiement,
   oublierCommandeEnAttente,
+  oublierCommandeEnvoyee,
   oublierEcartPoints,
   oublierPanierCommande,
 } from "../utils/memoire-navigateur.utils";
-import { aPayer, estTerminee } from "../utils/statut.utils";
+import {
+  aConfirmer,
+  aPayer,
+  aPayerALaLivraison,
+  estTerminee,
+} from "../utils/statut.utils";
 import {
   creneauRetrait,
   dateCommande,
@@ -132,6 +139,9 @@ function Roue({ petite }: { petite?: boolean }) {
  *  - frise, code de récupération (seulement s'il vient de l'API), lieu,
  *    récapitulatif avec photos, « Modifier » tant qu'elle n'est pas payée,
  *    « Recommander » une fois servie ou annulée ;
+ *  - à payer à la livraison : « Commande reçue » juste après l'envoi depuis
+ *    ce navigateur, montant relu sur le serveur, « Modifier » tant que le
+ *    centre d'appels ne l'a pas confirmée, pas de code avant ;
  *  - seul numéro affiché : 27 21 71 21 30.
  * La commande arrive déjà lue par la page (rendu serveur) : rien n'attend.
  */
@@ -181,7 +191,10 @@ export default function SuiviCommande({
   const [ecartPoints, setEcartPoints] = useState<IEcartPoints | null>(null);
   // Payée juste après une tentative faite dans ce navigateur.
   const [justePaye, setJustePaye] = useState(false);
+  // À payer à la livraison, tout juste envoyée depuis la caisse de ce navigateur.
+  const [justeEnvoyee, setJusteEnvoyee] = useState(false);
   const titrePaye = useRef<HTMLHeadingElement>(null);
+  const titreEnvoyee = useRef<HTMLHeadingElement>(null);
   const titreAvance = useRef<HTMLHeadingElement>(null);
   // Numéros des relectures : une réponse lente, dépassée par une plus récente,
   // est ignorée. Sinon une ancienne réponse « non payée » arrivée après la
@@ -332,6 +345,18 @@ export default function SuiviCommande({
     if (justePaye) titrePaye.current?.focus();
   }, [justePaye]);
 
+  // Commande à payer à la livraison envoyée depuis la caisse : « Commande
+  // reçue » une seule fois (la marque est effacée aussitôt).
+  useEffect(() => {
+    if (!reference || !lireCommandeEnvoyee(reference)) return;
+    setJusteEnvoyee(true);
+    oublierCommandeEnvoyee();
+  }, [reference]);
+
+  useEffect(() => {
+    if (justeEnvoyee) titreEnvoyee.current?.focus();
+  }, [justeEnvoyee]);
+
   const etat =
     commande && aPayer(commande) ? etatPaiement(marque, horloge) : "libre";
   // « Payer » affiché et actif (avec l'avertissement si un paiement a été
@@ -431,7 +456,13 @@ export default function SuiviCommande({
           </div>
           <p className="text-sm">
             {dateCommande(commande.created_at)} · {fcfa(commande.amount)}
-            {commande.paied ? " payés" : aPayer(commande) ? " à payer" : ""}
+            {commande.paied
+              ? " payés"
+              : aPayer(commande)
+                ? " à payer"
+                : aPayerALaLivraison(commande)
+                  ? " · à payer à la livraison"
+                  : ""}
           </p>
         </>
       ) : null}
@@ -467,6 +498,10 @@ export default function SuiviCommande({
   const restaurant = restaurantDeCommande(commande);
   // « Paiement accepté, part en cuisine » : seulement tant qu'elle est en cours.
   const blocPaye = justePaye && !annulee && !servie;
+  // À payer à la livraison, pas encore confirmée par le centre d'appels.
+  const attendAppel = aConfirmer(commande);
+  // « Commande reçue, notre équipe vous appelle » : tant qu'elle attend l'appel.
+  const blocEnvoyee = justeEnvoyee && attendAppel;
   const creneau = creneauRetrait(commande);
   const lieu = lieuCommande(commande);
   const payantes = commande.lignes.filter((l) => !l.offert);
@@ -529,6 +564,87 @@ export default function SuiviCommande({
             </section>
           ) : null}
 
+          {blocEnvoyee ? (
+            <section
+              aria-labelledby="t-envoyee"
+              className={cn(PANNEAU, "justify-items-center gap-3 text-center")}
+            >
+              <span className="grid size-16 place-items-center rounded-full bg-ok-fond text-ok">
+                <Icone className="size-[34px]" nom="coche" />
+              </span>
+              <h2
+                ref={titreEnvoyee}
+                className={TITRE_PANNEAU}
+                id="t-envoyee"
+                tabIndex={-1}
+              >
+                Commande reçue
+              </h2>
+              <p className="text-sm text-encre-doux">
+                Notre équipe vous appelle pour la confirmer. Vous paierez{" "}
+                <strong className="whitespace-nowrap text-encre">
+                  {fcfa(commande.amount)}
+                </strong>{" "}
+                à la livraison.
+              </p>
+              <p className="text-sm text-encre-doux">
+                <AppelSite />
+              </p>
+              <Bouton
+                bloc
+                taille="grand"
+                onClick={() => {
+                  titreAvance.current?.focus();
+                  titreAvance.current?.scrollIntoView({ block: "start" });
+                }}
+              >
+                Suivre ma commande
+              </Bouton>
+            </section>
+          ) : null}
+
+          {aPayerALaLivraison(commande) ? (
+            <section aria-labelledby="t-paiement-livraison" className={PANNEAU}>
+              <h2 className={TITRE_PANNEAU} id="t-paiement-livraison">
+                Paiement à la livraison
+              </h2>
+              <p className="text-sm">
+                Vous paierez{" "}
+                <strong className="whitespace-nowrap">
+                  {fcfa(commande.amount)}
+                </strong>{" "}
+                au livreur, en espèces ou par Mobile Money.
+              </p>
+              {ecartPoints ? (
+                <p
+                  className="rounded-carte bg-jaune-pale px-3.5 py-3 text-sm"
+                  role="status"
+                >
+                  {ecartPoints.accordee > 0
+                    ? `Vos points donnent une remise de ${fcfa(ecartPoints.accordee)}, et non ${fcfa(ecartPoints.estimee)} comme estimé.`
+                    : "Vos points n'ont pas pu être utilisés sur cette commande."}
+                  {attendAppel
+                    ? " Vous pouvez modifier votre commande tant qu'elle n'est pas confirmée."
+                    : ""}
+                </p>
+              ) : null}
+              {attendAppel ? (
+                <div className="flex flex-wrap gap-2">
+                  <ConfirmationModifier
+                    desactive={enCours !== null}
+                    enCours={enCours === "modifier"}
+                    erreur={erreurModif}
+                    onConfirmer={async () => {
+                      await modifier(commande);
+                      // Annulée sans retour à la caisse : l'état est relu tout de suite.
+                      relire();
+                    }}
+                  />
+                </div>
+              ) : null}
+            </section>
+          ) : null}
+
           {aPayer(commande) ? (
             <section
               aria-labelledby="t-paiement"
@@ -563,9 +679,9 @@ export default function SuiviCommande({
               ) : (
                 <>
                   <p className="text-sm text-encre-doux">
-                    Sur le site, la commande se paie en ligne. Elle part au
-                    restaurant dès que le paiement est accepté. Tant
-                    qu&apos;elle n&apos;est pas payée, vous pouvez la modifier.
+                    La commande part au restaurant dès que le paiement est
+                    accepté. Tant qu&apos;elle n&apos;est pas payée, vous pouvez
+                    la modifier.
                   </p>
                   {ecartPoints ? (
                     <p
@@ -665,8 +781,12 @@ export default function SuiviCommande({
             </section>
           ) : null}
 
-          {/* Code donné par l'API seulement : rien n'est inventé (décision encore ouverte côté métier). */}
-          {enCoursDeSuivi && !termine && commande.recovery_code ? (
+          {/* Code donné par l'API seulement : rien n'est inventé (décision encore
+              ouverte côté métier). Pas avant la confirmation au téléphone. */}
+          {enCoursDeSuivi &&
+          !termine &&
+          !attendAppel &&
+          commande.recovery_code ? (
             <section
               aria-labelledby="t-code"
               className={cn(

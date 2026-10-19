@@ -4,6 +4,12 @@ import { describe, expect, it } from "bun:test";
 import { versCommande } from "./commande.utils";
 import { signatureLigne } from "./panier.utils";
 import {
+  aConfirmer,
+  aPayer,
+  aPayerALaLivraison,
+  libelleStatut,
+} from "./statut.utils";
+import {
   creneauRetrait,
   dateCommande,
   etapesFrise,
@@ -148,6 +154,127 @@ describe("versCommande : heure demandée et repère", () => {
         address: JSON.stringify({ address: "Ici", note: "" }),
       }).repere,
     ).toBeNull();
+  });
+});
+
+describe("versCommande : canal et commande passée par le client", () => {
+  it("lit channel et auto ; absents (commandes anciennes) : null", () => {
+    const site = versCommande({ ...API, channel: "WEB", auto: true });
+
+    expect(site.canal).toBe("WEB");
+    expect(site.auto).toBe(true);
+    expect(versCommande({ ...API, channel: "APP", auto: false })).toMatchObject(
+      { canal: "APP", auto: false },
+    );
+    expect(COMMANDE.canal).toBeNull();
+    expect(COMMANDE.auto).toBeNull();
+    expect(versCommande({ ...API, channel: "", auto: "true" })).toMatchObject({
+      canal: null,
+      auto: null,
+    });
+  });
+});
+
+describe("paiement à la livraison", () => {
+  // Commande du site à payer à la livraison, que personne n'a encore appelée.
+  const A_CONFIRMER = {
+    type: "DELIVERY",
+    status: "PENDING",
+    paied: false,
+    payment_method: "OFFLINE",
+    canal: "WEB",
+    auto: true,
+  };
+
+  it("à confirmer : règle estAConfirmer du serveur", () => {
+    expect(aConfirmer(A_CONFIRMER)).toBe(true);
+    // Commande en espèces de l'application, ou d'avant le 02/10 (canal vide).
+    expect(aConfirmer({ ...A_CONFIRMER, canal: "APP" })).toBe(false);
+    expect(aConfirmer({ ...A_CONFIRMER, canal: null })).toBe(false);
+    expect(aConfirmer({ ...A_CONFIRMER, canal: undefined })).toBe(false);
+    // Reprise ou saisie au centre d'appels (« Manuel »).
+    expect(aConfirmer({ ...A_CONFIRMER, auto: false })).toBe(false);
+    expect(aConfirmer({ ...A_CONFIRMER, auto: null })).toBe(false);
+    // Confirmée, payée, en ligne ou annulée.
+    expect(aConfirmer({ ...A_CONFIRMER, status: "ACCEPTED" })).toBe(false);
+    expect(aConfirmer({ ...A_CONFIRMER, paied: true })).toBe(false);
+    expect(aConfirmer({ ...A_CONFIRMER, payment_method: "ONLINE" })).toBe(
+      false,
+    );
+    expect(aConfirmer({ ...A_CONFIRMER, status: "CANCELLED" })).toBe(false);
+  });
+
+  it("à payer à la livraison jusqu'à la remise ; jamais « Payer » en ligne", () => {
+    for (const status of [
+      "PENDING",
+      "ACCEPTED",
+      "IN_PROGRESS",
+      "READY",
+      "PICKED_UP",
+    ])
+      expect(aPayerALaLivraison({ ...A_CONFIRMER, status })).toBe(true);
+    // Remise au client : seule la confirmation de l'encaissement reste.
+    expect(aPayerALaLivraison({ ...A_CONFIRMER, status: "COLLECTED" })).toBe(
+      false,
+    );
+    expect(aPayerALaLivraison({ ...A_CONFIRMER, status: "COMPLETED" })).toBe(
+      false,
+    );
+    expect(aPayerALaLivraison({ ...A_CONFIRMER, status: "CANCELLED" })).toBe(
+      false,
+    );
+    expect(aPayerALaLivraison({ ...A_CONFIRMER, paied: true })).toBe(false);
+    expect(aPayerALaLivraison({ ...A_CONFIRMER, type: "PICKUP" })).toBe(false);
+    // Une commande de l'application en espèces aussi (ni « À confirmer » ni « Modifier »).
+    expect(aPayerALaLivraison({ ...A_CONFIRMER, canal: "APP" })).toBe(true);
+    // « Payer » reste réservé au paiement en ligne.
+    expect(aPayer(A_CONFIRMER)).toBe(false);
+  });
+
+  it("libellé « À confirmer » ; « En attente » ailleurs, inchangé", () => {
+    expect(libelleStatut(A_CONFIRMER)).toBe("À confirmer");
+    expect(libelleStatut({ ...A_CONFIRMER, canal: "APP" })).toBe("En attente");
+    expect(libelleStatut({ ...A_CONFIRMER, status: "ACCEPTED" })).toBe(
+      "Confirmée",
+    );
+    expect(libelleStatut({ ...A_CONFIRMER, payment_method: "ONLINE" })).toBe(
+      "En attente de paiement",
+    );
+    expect(etatStatut(A_CONFIRMER)).toBe("attente");
+  });
+
+  it("frise : c'est notre équipe qui appelle, pas le restaurant", () => {
+    const heures = {
+      accepted_at: null,
+      prepared_at: null,
+      ready_at: null,
+      picked_up_at: null,
+      collected_at: null,
+      completed_at: null,
+    };
+    const e = etapesFrise({ ...A_CONFIRMER, heures });
+
+    expect(e[0].etat).toBe("actuel");
+    expect(e[0].libelle).toBe("En attente de confirmation");
+    expect(e[0].texte).toBe(
+      "Notre équipe vous appelle pour confirmer votre commande.",
+    );
+    // Commande de l'application en espèces : le restaurant confirme.
+    expect(etapesFrise({ ...A_CONFIRMER, canal: "APP", heures })[0].texte).toBe(
+      "Le restaurant va confirmer votre commande dans un instant.",
+    );
+  });
+
+  it("aucun point crédité", () => {
+    expect(pointsCredites({ ...A_CONFIRMER, net_amount: 20000 }, 0.001)).toBe(
+      0,
+    );
+    expect(
+      pointsCredites(
+        { ...A_CONFIRMER, status: "COMPLETED", paied: true, net_amount: 20000 },
+        0.001,
+      ),
+    ).toBe(0);
   });
 });
 

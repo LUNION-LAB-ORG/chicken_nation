@@ -54,6 +54,9 @@ Les Trois Sources @sauf /fr/confidentiality-none-disclosure-agreement
 [texte]
 # Réduction de 20 % jamais promise (trait d'union ou signe moins)
 [-\u2212]20 ?%
+# Le site propose aussi le paiement à la livraison (19/10) : phrases devenues fausses
+paiement se fait uniquement en ligne
+la commande se paie en ligne
 # Tirets cadratin et demi-cadratin
 \u2014
 \u2013

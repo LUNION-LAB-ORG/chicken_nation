@@ -43,6 +43,7 @@ import {
   etapeVueAtom,
   heureRetraitAtom,
   modeAtom,
+  moyenPaiementAtom,
   oublierAdresseAtom,
   oublierAvantagesAtom,
   restaurantIdAtom,
@@ -61,6 +62,7 @@ import {
 import {
   etapeAccessible,
   etapeMaximale,
+  moyenPaiementRetenu,
   obstacleLivraison,
   panierDeLaCommande,
 } from "../../utils/caisse.utils";
@@ -113,6 +115,7 @@ import {
   fenetreCreneau,
   inconnusDuTotal,
   libelleTotal,
+  notePoints,
   obstacleAvantages,
   obstaclePanier,
   problemesSansMode,
@@ -219,6 +222,7 @@ export function Caisse({
   const [avantages, setAvantages] = useAtom(avantagesAtom);
   const oublierAvantages = useSetAtom(oublierAvantagesAtom);
   const oublierAdresse = useSetAtom(oublierAdresseAtom);
+  const [moyenChoisi, setMoyen] = useAtom(moyenPaiementAtom);
   const codeAReverifier = useAtomValue(codeAReverifierAtom);
   const setBarre = useSetAtom(barreCaisseAtom);
   const etapeDemandee = useAtomValue(etapeDemandeeAtom);
@@ -294,6 +298,9 @@ export function Caisse({
   /** Module de paiement indisponible : le suivi prend le relais avec « Payer ». */
   const confierAuSuivi = (id: string) =>
     quitter("Ouverture du paiement…", `/fr/commander/${id}?payer=1`);
+  /** Commande à payer à la livraison envoyée : suivi (« Commande reçue »). */
+  const terminerEnvoyee = (id: string) =>
+    quitter("Commande envoyée. Ouverture du suivi…", `/fr/commander/${id}`);
 
   /**
    * Retour sur la caisse avec une commande non payée créée dans ce navigateur
@@ -428,6 +435,7 @@ export function Caisse({
     setNiveauxEpice({});
     setAvisCumul(null);
     oublierAvantages();
+    setMoyen("ONLINE");
   }, [clientId]);
 
   /**
@@ -706,6 +714,22 @@ export function Caisse({
       : "Retrait"
     : "Livraison ou retrait";
 
+  // ── Moyen de paiement ──────────────────────────────────────────────────
+
+  // À la livraison : livraison seulement, et si le serveur le propose.
+  const paiementLivraisonPropose =
+    mode === "DELIVERY" && conditions.paiementLivraison;
+  const moyen = moyenPaiementRetenu(
+    moyenChoisi,
+    mode,
+    conditions.paiementLivraison,
+  );
+
+  // Option plus proposée : le choix repasse en ligne.
+  useEffect(() => {
+    if (monte && moyen !== moyenChoisi) setMoyen("ONLINE");
+  }, [monte, moyen, moyenChoisi]);
+
   // ── Totaux ─────────────────────────────────────────────────────────────
 
   const fraisLivraison =
@@ -768,7 +792,7 @@ export function Caisse({
     total: totalEstime,
     note:
       gagnes >= 1
-        ? `Payée en ligne, cette commande vous rapportera ${pointsLisibles(gagnes)}.`
+        ? notePoints(pointsLisibles(gagnes), moyen === "OFFLINE")
         : null,
   };
 
@@ -923,10 +947,10 @@ export function Caisse({
       setErreurEtape({ etape: erreurEtape.etape, message: raisonAffichee });
   }, [raisonAffichee]);
 
-  const pied = (n: EtapeCaisse, bouton: ReactNode) => (
+  const pied = (n: EtapeCaisse, bouton: ReactNode, pleineLargeur = n === 5) => (
     <PiedEtape
       libelleTotal={texteTotal}
-      pleineLargeur={n === 5}
+      pleineLargeur={pleineLargeur}
       total={totalEstime}
       onRetour={n > 1 ? () => aller(n - 1) : undefined}
     >
@@ -1077,6 +1101,7 @@ export function Caisse({
         ...(typeof epice === "boolean" ? { epice } : {}),
       };
     }),
+    paiement: moyen,
   };
 
   const resume: ILigneResume[] = [
@@ -1381,9 +1406,10 @@ export function Caisse({
         aCommander={aCommander}
         client={client}
         creation={creation}
-        pied={(bouton) => pied(5, bouton)}
+        pied={(bouton, pleineLargeur) => pied(5, bouton, pleineLargeur)}
         pointsRetenus={retenus}
         pretAPayer={!revalidation && !calculFrais}
+        propose={paiementLivraisonPropose}
         remiseDesPoints={remiseDesPoints}
         resume={resume}
         totalEstime={totalEstime}
@@ -1394,6 +1420,8 @@ export function Caisse({
           return false;
         }}
         onAller={(n) => aller(n)}
+        onEnvoyee={terminerEnvoyee}
+        onMoyen={setMoyen}
         onPaye={terminerPaye}
         onRefus={() => {
           if (retenus > 0 || cadeauxRetenus.length)

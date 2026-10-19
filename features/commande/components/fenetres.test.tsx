@@ -341,7 +341,7 @@ describe("ContenuTiroir", () => {
     expect(html).toMatch(/id="tiroir-mode-livraison"[^>]*checked=""/);
     expect(t).toContain("Sous-total 12 000 FCFA");
     expect(t).toContain(
-      "Adresse, code promo, points et cadeaux à l'étape suivante. Cette commande vous rapportera 12 points.",
+      "Adresse, code promo, points et cadeaux à l'étape suivante. Payée en ligne, cette commande vous rapportera 12 points.",
     );
     expect(html).toMatch(/href="\/fr\/commander"/);
     expect(t).toContain("Passer commande");

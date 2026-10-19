@@ -1,6 +1,10 @@
 "use client";
 
-import type { IAdresseLivraison, ModeCommande } from "../types/commande.types";
+import type {
+  IAdresseLivraison,
+  ModeCommande,
+  MoyenPaiement,
+} from "../types/commande.types";
 import type { EtapeCaisse } from "../utils/caisse.utils";
 
 import { atom, type Getter } from "jotai";
@@ -18,7 +22,8 @@ import { panierAtom, stockageNavigateur } from "./panier.store";
  *    livraison (avec son repère) et restaurant de retrait. Le client qui
  *    revient les retrouve.
  *  - En mémoire seulement, perdus au rechargement : heure de retrait (un
- *    créneau d'hier ne vaut plus rien), étape, code, points et cadeaux.
+ *    créneau d'hier ne vaut plus rien), étape, code, points, cadeaux et
+ *    moyen de paiement.
  */
 
 // ── Mode, adresse, restaurant (gardés) ────────────────────────────────────
@@ -105,11 +110,16 @@ function caissePourEcrire(get: Getter): ICaisseGardee {
   return get(caisseAtom);
 }
 
-/** Livraison ou retrait. */
+/** Moyen de paiement tel que choisi (lu par moyenPaiementAtom, plus bas). */
+const moyenPaiementBrutAtom = atom<MoyenPaiement>("ONLINE");
+
+/** Livraison ou retrait. Le retrait se paie toujours en ligne. */
 export const modeAtom = atom(
   (get) => get(caisseAtom).mode,
-  (get, set, mode: ModeCommande) =>
-    set(caisseGardeeAtom, { ...caissePourEcrire(get), mode }),
+  (get, set, mode: ModeCommande) => {
+    if (mode !== "DELIVERY") set(moyenPaiementBrutAtom, "ONLINE");
+    set(caisseGardeeAtom, { ...caissePourEcrire(get), mode });
+  },
 );
 
 /** Adresse de livraison choisie (texte, point GPS et repère), ou null. */
@@ -141,6 +151,27 @@ export const restaurantIdAtom = atom(
     if (restaurantId !== actuelle.restaurantId) set(heureRetraitAtom, null);
     set(caisseGardeeAtom, { ...actuelle, restaurantId });
   },
+);
+
+// ── Moyen de paiement (en mémoire) ────────────────────────────────────────
+
+/**
+ * Moyen de paiement choisi à l'étape Paiement : en ligne par défaut. À la
+ * livraison seulement pour une livraison : passer en retrait le ramène en
+ * ligne (et il y reste en revenant à la livraison). Si le serveur ne propose
+ * pas le paiement à la livraison, la caisse le ramène aussi en ligne
+ * (caisse.utils, moyenPaiementRetenu).
+ */
+export const moyenPaiementAtom = atom(
+  (get): MoyenPaiement =>
+    get(modeAtom) === "DELIVERY" ? get(moyenPaiementBrutAtom) : "ONLINE",
+  (get, set, moyen: MoyenPaiement) =>
+    set(
+      moyenPaiementBrutAtom,
+      moyen === "OFFLINE" && get(modeAtom) === "DELIVERY"
+        ? "OFFLINE"
+        : "ONLINE",
+    ),
 );
 
 // ── Étapes (en mémoire) ───────────────────────────────────────────────────

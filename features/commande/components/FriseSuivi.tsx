@@ -9,15 +9,16 @@ import { Icone } from "@/components/site/Icone";
 import { cn } from "@/lib/utils";
 
 /**
- * Pastille d'état d'une commande (« En attente de paiement », « En
- * préparation », « Livrée », « Annulée »), partagée par le suivi et Mes
- * commandes. Jamais coupée (nowrap).
+ * Pastille d'état d'une commande (« En attente de paiement », « À
+ * confirmer », « En préparation », « Livrée », « Annulée »), partagée par le
+ * suivi et Mes commandes. Jamais coupée (nowrap).
  */
 export function PastilleStatut({
   commande,
   className,
 }: {
-  commande: Pick<ICommande, "status" | "type" | "paied" | "payment_method">;
+  commande: Pick<ICommande, "status" | "type" | "paied" | "payment_method"> &
+    Partial<Pick<ICommande, "canal" | "auto">>;
   className?: string;
 }) {
   const etat = etatStatut(commande);

@@ -177,6 +177,16 @@ export interface ICommande {
   date: string | null;
   recovery_code: string | null;
   /**
+   * Canal de la commande (WEB, APP, CALL_CENTER…), ou null (commandes
+   * d'avant le 02/10). Absent : lecture d'avant le paiement à la livraison.
+   */
+  canal?: string | null;
+  /**
+   * Commande passée par le client lui-même (site ou application) ; faux une
+   * fois reprise au téléphone par le centre d'appels. null si inconnu.
+   */
+  auto?: boolean | null;
+  /**
    * Restaurant de la commande, SANS son numéro : le seul numéro affiché par le
    * site est le 27 21 71 21 30 (retouche 6). Le numéro reçu de l'API est
    * écarté à la lecture.
@@ -343,7 +353,19 @@ export interface IConditionsCommande {
    * null = au-delà du palier précédent.
    */
   grille: { distanceMaxKm: number | null; montant: number }[] | null;
+  /**
+   * Paiement à la livraison proposé sur le site (réglage du back office,
+   * `paiement_livraison.disponible`). Faux si le serveur ne l'annonce pas
+   * (version plus ancienne) : l'option reste cachée.
+   */
+  paiementLivraison: boolean;
 }
+
+/**
+ * Moyen de paiement choisi à l'étape Paiement : en ligne (KKiaPay) ou à la
+ * livraison (espèces ou Mobile Money remis au livreur, livraison seulement).
+ */
+export type MoyenPaiement = "ONLINE" | "OFFLINE";
 
 /** Ce que la caisse envoie pour créer la commande (creerCommandeAction). */
 export interface ICreationCommande {
@@ -358,6 +380,8 @@ export interface ICreationCommande {
   points?: number;
   /** Cadeaux choisis, ajoutés à 0 F. */
   cadeaux?: CadeauChoisi[];
+  /** Absent : en ligne (page d'avant le paiement à la livraison). */
+  paiement?: MoyenPaiement;
 }
 
 /** Ligne de commande telle que POST /orders/create-v2 l'attend. */
