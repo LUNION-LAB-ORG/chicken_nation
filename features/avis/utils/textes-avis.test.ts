@@ -82,6 +82,15 @@ describe("textes de la page", () => {
     for (const t of TOUS) expect(t).not.toMatch(/ [:?!]/);
   });
 
+  it("impératif à deux pronoms : « dis-le-nous », avec ses deux traits d'union", () => {
+    for (const t of TOUS) expect(t).not.toMatch(/dis-le nous/i);
+    expect(TEXTES_AVIS.presentation.paragraphes[1]).toContain(
+      "dis-le-nous aussi.",
+    );
+    // Aussi dans la description de la page (résultat Google, partage).
+    expect(DESCRIPTION_PAGE_AVIS).toContain(`hauteur${_}: dis-le-nous.`);
+  });
+
   it("aucune donnée d'exemple de la maquette (numéro, référence, agent, stores écrits à la main)", () => {
     const texte = TOUS.join("\n");
 

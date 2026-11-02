@@ -36,14 +36,6 @@ export function ecranPrecedent(ecran: EcranAvis): EcranAvis | null {
   return null;
 }
 
-/** Numéro d'étape affiché (« Étape 1 sur 2 »), null hors des deux étapes. */
-export function numeroEtape(ecran: EcranAvis): 1 | 2 | null {
-  if (ecran === "experience") return 1;
-  if (ecran === "numero") return 2;
-
-  return null;
-}
-
 /** Ce que l'action serveur reçoit (elle revérifie tout). */
 export function envoiDepuisSaisie(
   saisie: SaisieAvis,

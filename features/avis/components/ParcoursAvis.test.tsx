@@ -11,7 +11,6 @@ import {
   ecranPrecedent,
   envoiDepuisSaisie,
   lireBrouillon,
-  numeroEtape,
   texteBrouillon,
 } from "../utils/parcours-avis";
 
@@ -130,9 +129,6 @@ describe("enchaînement des quatre écrans", () => {
     expect(ecranPrecedent("experience")).toBe("presentation");
     expect(ecranPrecedent("presentation")).toBeNull();
     expect(ecranPrecedent("merci")).toBeNull();
-    expect(numeroEtape("experience")).toBe(1);
-    expect(numeroEtape("numero")).toBe(2);
-    expect(numeroEtape("merci")).toBeNull();
 
     expect(presentation()).not.toContain('aria-label="Retour"');
     expect(experience()).toContain('aria-label="Retour"');

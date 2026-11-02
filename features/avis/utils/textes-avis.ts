@@ -12,7 +12,7 @@ export const CHEMIN_AVIS = "/avis";
 
 export const TITRE_PAGE_AVIS = "Ton avis compte";
 
-export const DESCRIPTION_PAGE_AVIS = `Un retard, une commande incomplète, un plat pas à la hauteur${INSECABLE}: dis-le nous. Ton message reste privé, notre équipe le lit.`;
+export const DESCRIPTION_PAGE_AVIS = `Un retard, une commande incomplète, un plat pas à la hauteur${INSECABLE}: dis-le-nous. Ton message reste privé, notre équipe le lit.`;
 
 export const ALT_MASCOTTE = "Le Champion, mascotte Chicken Nation";
 
@@ -29,7 +29,7 @@ export const TEXTES_AVIS = {
     sousTitre: "Ton avis compte.",
     paragraphes: [
       `Chez Chicken Nation, chaque commande et chaque passage dans nos stores nous fait grandir. Mais on n'est pas parfaits${INSECABLE}: un retard, une commande incomplète, un plat pas à la hauteur, ça peut arriver.`,
-      "Quand c'est le cas, on veut le savoir, pour de vrai. Et si tout s'est bien passé, dis-le nous aussi.",
+      "Quand c'est le cas, on veut le savoir, pour de vrai. Et si tout s'est bien passé, dis-le-nous aussi.",
     ],
     prive:
       "Ton message reste privé. Il n'est jamais publié sur le site. Notre équipe le lit et te rappelle si quelque chose ne va pas.",

@@ -45,6 +45,13 @@ const { envoyerAvisAction } = await import("./envoyer-avis.action");
 const { oublierEnvoisAvis } = await import("../utils/limite-avis");
 
 const UUID = "6b1e3f4a-2c5d-4e6f-8a9b-0c1d2e3f4a5b";
+const CLE = "cle-du-site-pour-les-tests-0123456789abcdef";
+const CLE_AVANT = process.env.CLE_SERVEUR_SITE;
+
+afterAll(() => {
+  if (CLE_AVANT === undefined) delete process.env.CLE_SERVEUR_SITE;
+  else process.env.CLE_SERVEUR_SITE = CLE_AVANT;
+});
 
 const envoi = (x = {}) => ({
   ressenti: "PAS_CONTENT",
@@ -65,6 +72,7 @@ beforeEach(() => {
   reponse = { statut: 201, corps: { ok: true } };
   reseauCoupe = false;
   ipVisiteur = "41.202.10.20";
+  process.env.CLE_SERVEUR_SITE = CLE;
 });
 
 describe("envoi d'un avis par le serveur du site", () => {
@@ -77,6 +85,8 @@ describe("envoi d'un avis par le serveur du site", () => {
     expect(appel.methode).toBe("POST");
     expect(appel.entetes.Authorization).toBeUndefined();
     expect(appel.entetes["X-Forwarded-For"]).toBe("41.202.10.20");
+    // Clé partagée : l'API refuse tout envoi d'avis qui ne la porte pas.
+    expect(appel.entetes["X-Cle-Site"]).toBe(CLE);
     expect(appel.corps).toEqual({
       ressenti: "PAS_CONTENT",
       canal: "TELEPHONE",
@@ -193,13 +203,33 @@ describe("envoi d'un avis par le serveur du site", () => {
     });
   });
 
-  it("serveur injoignable ou en erreur : une phrase simple", async () => {
+  it("clé du site absente du .env : rien ne part, une phrase simple", async () => {
+    delete process.env.CLE_SERVEUR_SITE;
+    /* eslint-disable no-console -- le journal du serveur est capturé ici */
+    const erreur = console.error;
+    const journal = [];
+
+    console.error = (...m) => journal.push(m.join(" "));
+    try {
+      expect(await envoyerAvisAction(envoi())).toEqual({
+        ok: false,
+        message: "Ton avis n'a pas pu partir. Réessaie dans un instant.",
+      });
+    } finally {
+      console.error = erreur;
+    }
+    /* eslint-enable no-console */
+    expect(appels).toHaveLength(0);
+    expect(journal.join(" ")).toContain("CLE_SERVEUR_SITE");
+  });
+
+  it("serveur injoignable ou en erreur (clé refusée comprise) : une phrase simple", async () => {
     const panne = {
       ok: false,
       message: "Ton avis n'a pas pu partir. Réessaie dans un instant.",
     };
 
-    for (const statut of [500, 502, 503, 404]) {
+    for (const statut of [500, 502, 503, 404, 403]) {
       oublierEnvoisAvis();
       reponse = { statut, corps: { message: "Internal server error" } };
       expect(await envoyerAvisAction(envoi())).toEqual(panne);
