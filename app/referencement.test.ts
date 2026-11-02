@@ -139,6 +139,7 @@ describe("sitemap", () => {
       "/fr/carte-nation/adhesion",
       "/fr/faq",
       "/fr/contact",
+      "/fr/avis",
       "/fr/privacy-rules",
       "/fr/deletion-of-account",
       "/fr/restaurants/zone-4",
@@ -322,6 +323,78 @@ describe("images de partage des plats", () => {
         l: 1200,
         h: 630,
       });
+    }
+  });
+});
+
+describe("page « Ton avis compte » : adresse imposée /fr/avis", () => {
+  const fetchOrigine = globalThis.fetch;
+
+  it("canonique /fr/avis, indexable, titre et description sans tiret", async () => {
+    const { metadata: meta } = await import("./[locale]/(public)/avis/page");
+
+    expect(meta.alternates.canonical).toBe(`${SITE}/fr/avis`);
+    expect(meta.openGraph.url).toBe(`${SITE}/fr/avis`);
+    expect(meta.title).toBe("Ton avis compte");
+    expect(meta.robots).toBeUndefined();
+    expect(meta.description.length).toBeLessThanOrEqual(155);
+    expect(meta.description).not.toMatch(/[—–]/);
+    expect(meta.description).not.toMatch(/ [:?!]/);
+  });
+
+  it("dans le sitemap, une seule fois", async () => {
+    globalThis.fetch = async (url) =>
+      String(url) === `${baseURL}/dishes`
+        ? new Response(JSON.stringify(platsProduction))
+        : new Response(JSON.stringify({ data: [] }));
+    try {
+      const adresses = (await sitemap()).map((e) => e.url);
+
+      expect(adresses.filter((a) => a === `${SITE}/fr/avis`)).toHaveLength(1);
+    } finally {
+      globalThis.fetch = fetchOrigine;
+    }
+  });
+
+  it("/avis passe par proxy.ts et part vers /fr/avis (307), sans redirection de plat", async () => {
+    const motif = new RegExp(`^${configProxy.matcher[0]}$`);
+
+    for (const chemin of ["/avis", "/fr/avis"])
+      expect(motif.test(chemin)).toBe(true);
+
+    const { default: proxy } = await import("../proxy");
+    const { NextRequest } = await import("next/server");
+    let appelsApi = 0;
+
+    globalThis.fetch = async () => {
+      appelsApi++;
+
+      return new Response("[]");
+    };
+    try {
+      const sansLangue = await proxy(
+        new NextRequest(`${SITE}/avis?source=marque-page`),
+      );
+
+      expect(sansLangue.status).toBe(307);
+      expect(new URL(sansLangue.headers.get("location"), SITE).pathname).toBe(
+        "/fr/avis",
+      );
+      expect(sansLangue.headers.get("location")).toContain(
+        "source=marque-page",
+      );
+
+      // L'adresse du QR code est servie telle quelle (aucune redirection).
+      const qr = await proxy(
+        new NextRequest(`${SITE}/fr/avis?source=marque-page`),
+      );
+
+      expect(qr.headers.get("location")).toBeNull();
+      expect(qr.status).toBe(200);
+      // La carte n'est lue que pour /fr/carte/… : rien ici.
+      expect(appelsApi).toBe(0);
+    } finally {
+      globalThis.fetch = fetchOrigine;
     }
   });
 });

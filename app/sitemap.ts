@@ -36,6 +36,8 @@ const PAGES_FIXES: {
   { chemin: "/fr/carte-nation/adhesion", priorite: 0.7, frequence: "monthly" },
   { chemin: "/fr/faq", priorite: 0.5, frequence: "monthly" },
   { chemin: "/fr/contact", priorite: 0.5, frequence: "yearly" },
+  // « Ton avis compte » : adresse imposée par le client (QR code imprimé).
+  { chemin: "/fr/avis", priorite: 0.4, frequence: "yearly" },
   { chemin: "/fr/privacy-rules", priorite: 0.2, frequence: "yearly" },
   { chemin: "/fr/deletion-of-account", priorite: 0.2, frequence: "yearly" },
   // Adresse imposée par la déclaration « Data safety » de Google Play
