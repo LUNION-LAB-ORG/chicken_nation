@@ -509,6 +509,10 @@ export function Caisse({
 
   const aCommander = lignesACommander(lignes);
   const total = sousTotal(lignes);
+  // Pour les offres limitées à des menus ou des catégories.
+  const platsDuPanier = Array.from(new Set(aCommander.map((l) => l.dish_id)))
+    .sort()
+    .join(",");
   const cleAdresse =
     mode === "DELIVERY" && adresse
       ? `${adresse.latitude},${adresse.longitude}`
@@ -541,6 +545,7 @@ export function Caisse({
             latitude,
             longitude,
             total,
+            platsDuPanier,
           );
 
           if (n !== requete.current) return;
@@ -565,7 +570,12 @@ export function Caisse({
           }
         }
         // Itinéraire indisponible (serveur plus ancien), ou montant changé.
-        const f = await calculerFraisAction(latitude, longitude, total);
+        const f = await calculerFraisAction(
+          latitude,
+          longitude,
+          total,
+          platsDuPanier,
+        );
 
         if (n !== requete.current) return;
         setCalcul((avant) => ({
@@ -588,7 +598,7 @@ export function Caisse({
         if (n === requete.current) setCalculFrais(false);
       }
     })();
-  }, [monte, cleAdresse, total]);
+  }, [monte, cleAdresse, total, platsDuPanier]);
 
   // ── État de la caisse ──────────────────────────────────────────────────
 

@@ -19,7 +19,7 @@ import type {
   Resultat,
 } from "../types/commande.types";
 
-import { appelApi } from "../apis/api-client.server";
+import { appelApi, lireJetonClient } from "../apis/api-client.server";
 import { versCommande } from "../utils/commande.utils";
 import {
   articlesAvecCadeaux,
@@ -225,6 +225,7 @@ export async function calculerFraisAction(
   latitude: number,
   longitude: number,
   montantPanier: number,
+  platsDuPanier = "",
 ): Promise<Resultat<IFraisLivraison>> {
   if (!Number.isFinite(latitude) || !Number.isFinite(longitude))
     return { ok: false, message: "Position invalide." };
@@ -232,9 +233,12 @@ export async function calculerFraisAction(
     lat: String(latitude),
     long: String(longitude),
     order_amount: String(Math.max(0, Math.round(Number(montantPanier) || 0))),
+    ...(platsDuPanier ? { dish_ids: platsDuPanier } : {}),
   });
+  // Connecté, le serveur le reconnaît : offres réservées aux étudiants ou à un
+  // niveau. Sans jeton, la route reste ouverte.
   const res = await appelApi<Brut>(`/orders/frais-livraison?${params}`, {
-    public: true,
+    public: !(await lireJetonClient()),
   });
 
   if (!res.ok) return res;
@@ -254,6 +258,7 @@ export async function itineraireLivraisonAction(
   latitude: number,
   longitude: number,
   montantPanier: number,
+  platsDuPanier = "",
 ): Promise<Resultat<IItineraireLivraison>> {
   if (!Number.isFinite(latitude) || !Number.isFinite(longitude))
     return { ok: false, message: "Position invalide." };
@@ -261,9 +266,10 @@ export async function itineraireLivraisonAction(
     lat: String(latitude),
     long: String(longitude),
     order_amount: String(Math.max(0, Math.round(Number(montantPanier) || 0))),
+    ...(platsDuPanier ? { dish_ids: platsDuPanier } : {}),
   });
   const res = await appelApi<Brut>(`/orders/itineraire-livraison?${params}`, {
-    public: true,
+    public: !(await lireJetonClient()),
   });
 
   if (!res.ok) return res;
